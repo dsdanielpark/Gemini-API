@@ -2,7 +2,7 @@
 import json
 import requests
 from typing import Optional
-from gemini.constants import IMG_UPLOAD_HEADERS
+from gemini.constants import IMG_UPLOAD_HEADERS, REQUIRED_COOKIE_LIST
 
 
 def extract_links(data: list) -> list:
@@ -62,17 +62,12 @@ def upload_image(image: bytes, filename: str = "Photo.jpg"):
     return resp.text
 
 
-def extract_bard_cookie(cookies: bool = False) -> dict:
+def extract_cookies_from_brwoser() -> dict:
     """
-    Extracts the specified Bard cookie(s) from the browser's cookies.
+    Extracts the specified Bard cookies from the browser's cookies.
 
     This function searches for the specified Bard cookies in various web browsers
     installed on the system. It supports modern web browsers and operating systems.
-
-    Args:
-        cookies (bool, optional): If False, extracts only '__Secure-1PSID' cookie.
-            If True, extracts '__Secure-1PSID', '__Secure-1PSIDTS', and '__Secure-1PSIDCC' cookies.
-            Defaults to False.
 
     Returns:
         dict: A dictionary containing the extracted Bard cookies.
@@ -100,29 +95,20 @@ def extract_bard_cookie(cookies: bool = False) -> dict:
     for browser_fn in supported_browsers:
         try:
             cj = browser_fn(domain_name=".google.com")
-
             for cookie in cj:
-                print(cookie.name)
-                if cookie.name == "__Secure-1PSID" and cookie.value.endswith("."):
-                    cookie_dict["__Secure-1PSID"] = cookie.value
-                if cookies:
-                    if cookie.name == "__Secure-1PSIDTS":
-                        print(cookie.value)
-                        cookie_dict["__Secure-1PSIDTS"] = cookie.value
-                    elif cookie.name == "__Secure-1PSIDCC":
-                        print(cookie.value)
-                        cookie_dict["__Secure-1PSIDCC"] = cookie.value
-                if len(cookie_dict) == 3:
-                    return cookie_dict
+                if cookie.name.startswith("__Secure-1PSID") or cookie.name == "NID":
+                    cookie_dict[cookie.name] = cookie.value
         except Exception as e:
-            # Ignore exceptions and try the next browser function
-            continue
-
-    if not cookie_dict:
-        raise Exception("No supported browser found or issue with cookie extraction")
-
-    print(cookie_dict)
+            print("No supported browser found or issue with cookie extraction. Report issue at https://github.com/borisbabic/browser_cookie3/issues")
+            continue  # Ignore exceptions and try the next browser function
+    
+    # Ensure all required cookies are present
+    required_cookies = {"__Secure-1PSIDTS", "__Secure-1PSIDCC", "__Secure-1PSID", "NID"}
+    if not required_cookies.issubset(cookie_dict.keys()):
+        raise ValueError("Cookies '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID' and 'NID' are required but not found.")
+    
     return cookie_dict
+
 
 
 def max_token(text: str, n: int) -> str:
@@ -222,28 +208,6 @@ def build_input_replit_data_struct(instructions: str, code: str, filename: str) 
             ]
         ]
     ]
-
-
-def build_bard_answer(
-    parsed_answer: list,
-    images: list[str],
-    program_lang: str,
-    code: str,
-    status_code: int,
-) -> dict:
-    return {
-        "content": parsed_answer[4][0][1][0],
-        "conversation_id": parsed_answer[1][0],
-        "response_id": parsed_answer[1][1],
-        "factuality_queries": parsed_answer[3],
-        "text_query": parsed_answer[2][0] if parsed_answer[2] else "",
-        "choices": [{"id": x[0], "content": x[1]} for x in parsed_answer[4]],
-        "links": extract_links(parsed_answer[4]),
-        "images": images,
-        "program_lang": program_lang,
-        "code": code,
-        "status_code": status_code,
-    }
 
 
 def build_export_data_structure(
