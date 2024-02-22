@@ -1,11 +1,11 @@
-# Copyright 2023 Daniel Park, MIT License
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 
 from os import environ
-from geminiapi.core import Bard
-from geminiapi.chat import ChatBard
-from geminiapi.core_async import BardAsync
-from geminiapi.core_cookies import BardCookies, BardAsyncCookies
-from geminiapi.constants import (
+from gemini.core import Bard
+from gemini.chat import ChatBard
+from gemini.core_async import BardAsync
+from gemini.core_cookies import BardCookies, BardAsyncCookies
+from gemini.constants import (
     SESSION_HEADERS,
     ALLOWED_LANGUAGES,
     DEFAULT_LANGUAGE,
@@ -14,7 +14,7 @@ from geminiapi.constants import (
     IMG_UPLOAD_HEADERS,
     Tool,
 )
-from geminiapi.utils import (
+from gemini.utils import (
     extract_links,
     upload_image,
     extract_bard_cookie,

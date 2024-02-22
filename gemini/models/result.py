@@ -1,7 +1,7 @@
 from typing import List, Optional, Union, Dict, Tuple
 
-from geminiapi.models.draft import BardDraft
-from geminiapi.models.tools.tool import BardTool
+from gemini.models.draft import BardDraft
+from gemini.models.tools.tool import BardTool
 
 
 class BardUserLocation:

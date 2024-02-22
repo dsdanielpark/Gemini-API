@@ -1,8 +1,8 @@
-# Util Functions for Async and Sync Core Cookie Modes
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import json
 import requests
 from typing import Optional
-from geminiapi.constants import IMG_UPLOAD_HEADERS
+from gemini.constants import IMG_UPLOAD_HEADERS
 
 
 def extract_links(data: list) -> list:

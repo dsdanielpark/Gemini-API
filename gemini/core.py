@@ -1,4 +1,4 @@
-# Standard library imports
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import base64
 import json
 import os
@@ -16,15 +16,16 @@ try:
     from google.cloud import translate_v2 as translate
 except ImportError:
     pass
-from geminiapi.constants import (
+from .constants import (
     ALLOWED_LANGUAGES,
     REPLIT_SUPPORT_PROGRAM_LANGUAGES,
     SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
+    REQUIRED_COOKIE_LIST,
     Tool,
 )
-from geminiapi.models.result import BardResult
-from geminiapi.utils import (
+from .models.result import BardResult
+from .utils import (
     build_bard_answer,
     build_export_data_structure,
     build_input_replit_data_struct,
@@ -32,16 +33,28 @@ from geminiapi.utils import (
     extract_bard_cookie,
     upload_image,
 )
+from .models.base import (
+    WebImage,
+    GeneratedImage,
+    Candidate,
+    ModelOutput,
+)
+from .models.exceptions import (
+    AuthError,
+    APIError,
+    GeminiError,
+    TimeoutError,
+)
 
 
-class Bard:
+class Gemini:
     """
-    Bard class for interacting with Google Bard.
+    Gemini class for interacting with Google Gemini.
     """
 
     def __init__(
         self,
-        token: Optional[str] = None,
+        cookie_dict: dict = None,
         timeout: int = 20,
         proxies: Optional[dict] = None,
         session: Optional[requests.Session] = None,
@@ -50,14 +63,14 @@ class Bard:
         language: Optional[str] = None,
         run_code: bool = False,
         token_from_browser: bool = False,
-        multi_cookies_bool: bool = False,
-        cookie_dict: dict = None,
+        multi_cookies_bool: bool = True,
+
     ):
         """
-        Initialize the Bard instance.
+        Initialize the Gemini instance.
 
         Args:
-            token (str, optional): Bard API token.
+            token (str, optional): Gemini API token.
             timeout (int, optional, default = 20): Request timeout in seconds.
             proxies (dict, optional): Proxy configuration for requests.
             session (requests.Session, optional): Requests session object.
@@ -71,18 +84,18 @@ class Bard:
         """
         self.cookie_dict = cookie_dict
         self.multi_cookies_bool = multi_cookies_bool
-        self.token = self._get_token(token, token_from_browser, multi_cookies_bool)
+        self.cookie_dict = self._get_cookies(token_from_browser, multi_cookies_bool)
         self.proxies = proxies
         self.timeout = timeout
+        self.session = self._get_session(session)
+        self.SNlM0e = self._get_snim0e()
+        self.language = language or os.getenv("GEMINI_LANGUAGE")
+        self.run_code = run_code
+        self.google_translator_api_key = google_translator_api_key
         self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.conversation_id = conversation_id or ""
         self.response_id = ""
         self.choice_id = ""
-        self.session = self._get_session(session)
-        self.SNlM0e = self._get_snim0e()
-        self.language = language or os.getenv("_BARD_API_LANG")
-        self.run_code = run_code
-        self.google_translator_api_key = google_translator_api_key
         self.og_pid = ""
         self.rot = ""
         self.exp_id = ""
@@ -91,26 +104,23 @@ class Bard:
         if google_translator_api_key:
             assert translate
 
-    def _get_token(
-        self, token: str, token_from_browser: bool, multi_cookies_bool: bool
+    def _get_cookies(
+        self, token_from_browser: bool, multi_cookies_bool: bool
     ) -> str:
         """
-        Get the Bard API token either from the provided token or from the browser cookie.
+        Get the Gemini API token either from the provided token or from the browser cookie.
 
         Args:
-            token (str): Bard API token.
+            token (str): Gemini API token.
             token_from_browser (bool): Whether to extract the token from the browser cookie.
             multi_cookies_bool (bool): Whether to extract multiple cookies from the browser.
 
         Returns:
-            str: The Bard API token.
+            str: The Gemini API token.
         Raises:
             Exception: If the token is not provided and can't be extracted from the browser.
         """
-        if token:
-            return token
-
-        env_token = os.getenv("_BARD_API_KEY")
+        env_token = os.getenv("GEMINI_COOKIES_DICT")
         if env_token:
             return env_token
 
@@ -118,23 +128,19 @@ class Bard:
             extracted_cookie_dict = extract_bard_cookie(cookies=multi_cookies_bool)
             if self.multi_cookies_bool:
                 self.cookie_dict = extracted_cookie_dict
-                required_cookies = [
-                    "__Secure-1PSID",
-                    "__Secure-1PSIDTS",
-                    "__Secure-1PSIDCC",
-                ]
+                required_cookies = REQUIRED_COOKIE_LIST
                 if len(extracted_cookie_dict) < len(required_cookies) or not all(
                     key in extracted_cookie_dict for key in required_cookies
                 ):
                     print(
-                        "Essential cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) are missing."
+                        "Essential cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC, NID) are missing."
                     )
-                    return extracted_cookie_dict.get("__Secure-1PSID", "")
+                    return extracted_cookie_dict
             if extracted_cookie_dict:
-                return extracted_cookie_dict.get("__Secure-1PSID", "")
+                return extracted_cookie_dict
 
         raise Exception(
-            "Bard API Key must be provided as the 'token' argument or extracted from the browser."
+            "Gemini API Key must be provided as the 'token' argument or extracted from the browser."
         )
 
     def _get_session(self, session: Optional[requests.Session]) -> requests.Session:
@@ -150,30 +156,26 @@ class Bard:
         if session is not None:
             return session
 
-        new_session = requests.Session()
-        new_session.headers = SESSION_HEADERS
-        new_session.cookies.set("__Secure-1PSID", self.token)
-        new_session.proxies = self.proxies
+        session = requests.Session()
+        session.headers = SESSION_HEADERS
+        session.cookies.set("__Secure-1PSID", self.cookies['__Secure-1PSID'])
+        session.proxies = self.proxies
 
         if self.cookie_dict is not None:
             for k, v in self.cookie_dict.items():
-                new_session.cookies.set(k, v)
+                session.cookies.set(k, v)
 
-        return new_session
+        return session
 
     def _get_snim0e(self) -> str:
         """
-        Get the SNlM0e value from the Bard API response.
+        Get the SNlM0e value from the Gemini API response.
 
         Returns:
             str: SNlM0e value.
         Raises:
             Exception: If the __Secure-1PSID value is invalid or SNlM0e value is not found in the response.
         """
-        if not self.token or self.token[-1] != ".":
-            print(
-                "__Secure-1PSID value should end with a single dot. Enter correct __Secure-1PSID value."
-            )
         resp = self.session.get(
             "https://gemini.google.com/", timeout=self.timeout, proxies=self.proxies
         )
@@ -184,7 +186,7 @@ class Bard:
         snim0e = re.search(r"SNlM0e\":\"(.*?)\"", resp.text)
         if not snim0e:
             raise Exception(
-                "SNlM0e value not found. Double-check __Secure-1PSID value or pass it as Bard(token='xxxxx')"
+                "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookie_dict=Dict())"
             )
         return snim0e.group(1)
 
@@ -196,13 +198,13 @@ class Bard:
         tool: Optional[Tool] = None,
     ) -> dict:
         """
-        Get an answer from the Bard API for the given input text.
+        Get an answer from the Gemini API for the given input text.
 
         Example:
         >>> token = 'xxxxxx'
-        >>> bard = Bard(token=token)
+        >>> Gemini = Gemini(token=token)
 
-        >>> response = bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
+        >>> response = Gemini.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
         >>> print(response['content'])
 
         Args:
@@ -212,7 +214,7 @@ class Bard:
             tool : tool to use can be one of Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, Youtube
 
         Returns:
-            dict: Answer from the Bard API in the following format:
+            dict: Answer from the Gemini API in the following format:
                 {
                     "content": str,
                     "conversation_id": str,
@@ -364,13 +366,13 @@ class Bard:
 
     def speech(self, input_text: str, lang: str = "en-US") -> dict:
         """
-        Get speech audio from Bard API for the given input text.
+        Get speech audio from Gemini API for the given input text.
 
         Example:
         >>> token = 'xxxxxx'
-        >>> bard = Bard(token=token)
-        >>> audio = bard.speech("hello!")
-        >>> with open("bard.ogg", "wb") as f:
+        >>> Gemini = Gemini(token=token)
+        >>> audio = Gemini.speech("hello!")
+        >>> with open("Gemini.ogg", "wb") as f:
         >>>     f.write(bytes(audio['audio']))
 
         Args:
@@ -378,7 +380,7 @@ class Bard:
             lang (str, optional, default = "en-US"): Input language for the query.
 
         Returns:
-            dict: Answer from the Bard API in the following format:
+            dict: Answer from the Gemini API in the following format:
             {
                 "audio": bytes,
                 "status_code": int
@@ -423,20 +425,20 @@ class Bard:
 
     def export_conversation(self, bard_answer, title: str = "") -> dict:
         """
-        Get Share URL for specific answer from bard
+        Get Share URL for specific answer from Gemini
 
         Example:
         >>> token = 'xxxxxx'
-        >>> bard = Bard(token=token)
-        >>> bard_answer = bard.get_answer("hello!")
-        >>> url = bard.export_conversation(bard_answer, title="Export Conversation")
+        >>> Gemini = Gemini(token=token)
+        >>> bard_answer = Gemini.get_answer("hello!")
+        >>> url = Gemini.export_conversation(bard_answer, title="Export Conversation")
         >>> print(url['url'])
 
         Args:
             bard_answer (dict): bard_answer returned from get_answer
             title (str, optional, default = ""): Title for URL
         Returns:
-            dict: Answer from the Bard API in the following format:
+            dict: Answer from the Gemini API in the following format:
             {
                 "url": str,
                 "status_code": int
@@ -472,7 +474,7 @@ class Bard:
         # Post-processing of response
         resp_dict = json.loads(resp.content.splitlines()[3])
         url_id = json.loads(resp_dict[0][2])[2]
-        url = f"https://g.co/bard/share/{url_id}"
+        url = f"https://g.co/Gemini/share/{url_id}"
 
         # Increment request ID
         self._reqid += 100000
@@ -482,13 +484,13 @@ class Bard:
         self, input_text: str, image: bytes, lang: Optional[str] = None
     ) -> dict:
         """
-        Send Bard image along with question and get answer
+        Send Gemini image along with question and get answer
 
         Example:
         >>> token = 'xxxxxx'
-        >>> bard = Bard(token=token)
+        >>> Gemini = Gemini(token=token)
         >>> image = open('image.jpg', 'rb').read()
-        >>> bard_answer = bard.ask_about_image("what is in the image?", image)['content']
+        >>> bard_answer = Gemini.ask_about_image("what is in the image?", image)['content']
 
         Args:
             input_text (str): Input text for the query.
@@ -496,7 +498,7 @@ class Bard:
             lang (str, optional): Language to use.
 
         Returns:
-            dict: Answer from the Bard API in the following format:
+            dict: Answer from the Gemini API in the following format:
                 {
                     "content": str,
                     "conversation_id": str,
@@ -568,7 +570,7 @@ class Bard:
             ],
         ]
         params = {
-            "bl": "boq_assistant-bard-web-server_20230716.16_p2",
+            "bl": "boq_assistant-Gemini-web-server_20230716.16_p2",
             "_reqid": str(self._reqid),
             "rt": "c",
         }
@@ -741,9 +743,9 @@ class Bard:
 
         Example:
         >>> token = 'xxxxxx'
-        >>> bard = Bard(token=token)
-        >>> bard_answer = bard.get_answer("Give me python code to print hello world")
-        >>> url = bard.export_replit(bard_answer['code'], bard_answer['program_lang'])
+        >>> Gemini = Gemini(token=token)
+        >>> bard_answer = Gemini.get_answer("Give me python code to print hello world")
+        >>> url = Gemini.export_replit(bard_answer['code'], bard_answer['program_lang'])
         >>> print(url['url'])
 
         Args:
@@ -752,7 +754,7 @@ class Bard:
             filename (str, optional): filename
             **kwargs: instructions, source_path
         Returns:
-        dict: Answer from the Bard API in the following format:
+        dict: Answer from the Gemini API in the following format:
             {
                 "url": str,
                 "status_code": int
@@ -827,108 +829,3 @@ class Bard:
                 ):
                     links.append(item)
         return links
-
-    # def _set_cookie_refresh_data(self):
-    #     resp = self.session.get(
-    #         "https://gemini.google.com/", timeout=self.timeout, proxies=self.proxies
-    #     )
-
-    #     og_pid_regex = r"https:\/\/accounts\.google\.com\/ListAccounts\?authuser=[0-9]+\\u0026pid=([0-9]+)"
-    #     exp_id_regex = r'https:\/\/accounts\.google\.com\/RotateCookiesPage"],([0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+)'
-
-    #     matches_og_pid = re.search(og_pid_regex, resp.text)
-    #     matches_exp_id = re.search(exp_id_regex, resp.text)
-
-    #     print(matches_og_pid, matches_exp_id)
-    #     if matches_og_pid:
-    #         og_pid_url = matches_og_pid.group(0)
-    #         og_pid_query = urlparse(og_pid_url.replace("\\u0026", "&")).query
-    #         print(og_pid_query)
-    #         og_pid = parse_qs(og_pid_query)["pid"][0]
-    #         print(f"og_pid: {og_pid}")
-    #         self.og_pid = og_pid
-
-    #     if matches_exp_id:
-    #         values_str = matches_exp_id.group(1)
-    #         values_array = [int(val) for val in values_str.split(",")]
-    #         print(f"Values array: {values_array}")
-
-    #         if len(values_array) >= 5:
-    #             rot = values_array[0]
-    #             exp_id = values_array[4]
-
-    #             # You can print or use rot and exp_id as needed
-    #             print(f"rot: {rot}")
-    #             print(f"exp_id: {exp_id}")
-
-    #             self.rot = rot
-    #             self.exp_id = exp_id
-
-    #         # Update cookies using the extracted og_pid and exp_id
-    #         update_cookies_url = f"https://accounts.google.com/RotateCookiesPage?og_pid={self.og_pid}&rot={self.rot}&origin=https%3A%2F%2Fbard.google.com&exp_id={self.exp_id}"
-    #         headers_google = {
-    #             "Host": "accounts.google.com",
-    #             "Referer": "https://gemini.google.com/",
-    #             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-    #         }
-
-    #         try:
-    #             response = self.session.get(
-    #                 update_cookies_url,
-    #                 headers=headers_google,
-    #                 timeout=self.timeout,
-    #                 proxies=self.proxies,
-    #             )
-    #             response.raise_for_status()
-    #         except requests.exceptions.HTTPError as err:
-    #             print(f"HTTP Error: {err}")
-    #         # Extract initValue from the updated cookies
-    #         print(response.text)
-    #         init_value_regex = r"init\(\'(-?\d+)\',"
-    #         matches_init_value = re.findall(init_value_regex, response.text)
-    #         print(matches_init_value)
-    #         if matches_init_value:
-    #             self.init_value = matches_init_value[0]
-
-    # def update_1PSIDTS(self):
-    #     # Prepare request data
-    #     self._set_cookie_refresh_data()
-    #     data = [self.og_pid, f"{self.init_value}"]
-    #     data = json.dumps(data)
-    #     update_cookies_url = f"https://accounts.google.com/RotateCookiesPage?og_pid={self.og_pid}&rot={self.rot}&origin=https%3A%2F%2Fbard.google.com&exp_id={self.exp_id}"
-
-    #     # Update 1PSIDTS using the extracted og_pid and initValue
-    #     update_1psidts_url = "https://accounts.google.com/RotateCookies"
-    #     headers_rotate = {
-    #         "Host": "accounts.google.com",
-    #         "Content-Type": "application/json",
-    #         "Referer": update_cookies_url,
-    #         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-    #     }
-    #     # headers_rotate.update(self.headers)
-
-    #     response = self.session.post(
-    #         update_1psidts_url,
-    #         data=data,
-    #         headers=headers_rotate,
-    #         timeout=self.timeout,
-    #         proxies=self.proxies,
-    #     )
-    #     response.raise_for_status()
-
-    #     # Extract updated 1PSIDTS from the response headers
-    #     cookie_headers = response.headers.get("Set-Cookie", "")
-    #     parsed_cookies = self.parse_cookies(cookie_headers)
-    #     return parsed_cookies
-
-    # def parse_cookies(self, cookie_headers):
-    #     cookie_dict = {}
-
-    #     matches = re.findall(r"([^;]+)", cookie_headers)
-
-    #     for match in matches:
-    #         key_value = match.split("=")
-    #         if len(key_value) == 2:
-    #             cookie_dict[key_value[0].strip()] = key_value[1].strip()
-
-    #     return cookie_dict

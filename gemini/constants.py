@@ -1,3 +1,4 @@
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 from enum import Enum
 from colorama import Fore
 
@@ -159,6 +160,14 @@ REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
 }
 
 
+
+REQUIRED_COOKIE_LIST = [
+    "__Secure-1PSID",
+    "__Secure-1PSIDTS",
+    "__Secure-1PSIDCC",
+    "NID",
+]
+
 class Tool(Enum):
     GMAIL = ["workspace_tool", "Gmail"]
     GOOGLE_DOCS = ["workspace_tool", "Google Docs"]
@@ -167,3 +176,5 @@ class Tool(Enum):
     GOOGLE_HOTELS = ["google_hotels_tool"]
     GOOGLE_MAPS = ["google_map_tool"]
     YOUTUBE = ["youtube_tool"]
+
+

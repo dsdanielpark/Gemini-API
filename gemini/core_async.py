@@ -1,5 +1,6 @@
 # The asynchronous bard may not yield significant benefits and may not be perfectly implemented.
 # You can contribute a more optimized implementation anytime through a Pull Request.
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import os
 import re
 import json
@@ -18,15 +19,15 @@ try:
     from langdetect import detect
 except ImportError:
     pass
-from geminiapi.constants import (
+from gemini.constants import (
     ALLOWED_LANGUAGES,
     SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
     Tool,
     POST_ENDPOINT,
 )
-from geminiapi.models.result import BardResult
-from geminiapi.utils import (
+from gemini.models.result import BardResult
+from gemini.utils import (
     extract_links,
     upload_image,
     extract_bard_cookie,

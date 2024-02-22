@@ -1,4 +1,4 @@
-from geminiapi.models.user_content import UserContent
+from gemini.models.user_content import UserContent
 from typing import List
 
 

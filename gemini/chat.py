@@ -1,10 +1,10 @@
-import os
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import requests
 from typing import Optional
 from colorama import Fore, Back, Style
-from geminiapi.core import Bard
-from geminiapi.constants import SEPARATOR_LINE, SESSION_HEADERS
-from geminiapi.utils import extract_bard_cookie
+from gemini.core import Bard
+from gemini.constants import SEPARATOR_LINE, SESSION_HEADERS
+from gemini.utils import extract_bard_cookie
 
 
 class ChatBard(Bard):

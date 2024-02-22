@@ -1,6 +1,6 @@
 from typing import List, Optional, Union, Dict, Tuple
 
-from geminiapi.models.user_content import UserContent
+from gemini.models.user_content import UserContent
 
 
 class BardYoutubeVideo:

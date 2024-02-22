@@ -1,17 +1,17 @@
 from typing import List, Optional, Union, Dict, Tuple
 
-from geminiapi.models.citation import DraftCitation
-from geminiapi.models.tools.code import CodeContent
-from geminiapi.models.tools.flight import BardFlightContent
-from geminiapi.models.tools.gworkspace import GoogleWorkspaceContent
-from geminiapi.models.image import BardImageContent
-from geminiapi.models.tools.hotel import BardHotelContent
-from geminiapi.models.tools.json import JsonContent
-from geminiapi.models.tools.link import BardLink
-from geminiapi.models.tools.map import BardMapContent
-from geminiapi.models.tools.tool_declaimer import BardToolDeclaimer
-from geminiapi.models.user_content import UserContent
-from geminiapi.models.tools.youtube import BardYoutubeContent
+from gemini.models.citation import DraftCitation
+from gemini.models.tools.code import CodeContent
+from gemini.models.tools.flight import BardFlightContent
+from gemini.models.tools.gworkspace import GoogleWorkspaceContent
+from gemini.models.image import BardImageContent
+from gemini.models.tools.hotel import BardHotelContent
+from gemini.models.tools.json import JsonContent
+from gemini.models.tools.link import BardLink
+from gemini.models.tools.map import BardMapContent
+from gemini.models.tools.tool_declaimer import BardToolDeclaimer
+from gemini.models.user_content import UserContent
+from gemini.models.tools.youtube import BardYoutubeContent
 
 
 class BardDraft:
