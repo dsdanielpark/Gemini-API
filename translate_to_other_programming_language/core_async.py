@@ -3,7 +3,7 @@ import os
 import random
 import string
 from re import search
-from geminiapi.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
+from gemini.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
 from deep_translator import GoogleTranslator
 from httpx import AsyncClient
 

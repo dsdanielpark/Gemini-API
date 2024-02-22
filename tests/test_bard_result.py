@@ -1,6 +1,6 @@
 import unittest
 
-from geminiapi.models.result import BardResult
+from gemini.models.result import BardResult
 from data import t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11
 
 

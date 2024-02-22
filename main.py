@@ -1,4 +1,4 @@
-from geminiapi import ChatBard
+from gemini import ChatBard
 
 
 if __name__ == "__main__":

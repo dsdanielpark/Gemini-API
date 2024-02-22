@@ -6,7 +6,7 @@ import re
 import aiohttp
 import asyncio
 from deep_translator import GoogleTranslator
-from geminiapi.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
+from gemini.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
 
 
 class Bard:
