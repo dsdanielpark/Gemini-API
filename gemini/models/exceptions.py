@@ -1,30 +1,15 @@
 class AuthError(Exception):
-    """
-    Exception for authentication errors caused by invalid credentials/cookies.
-    """
-
+    """Invalid credentials/cookies."""
     pass
-
 
 class APIError(Exception):
-    """
-    Exception for package-level errors which need to be fixed in the future development (e.g. validation errors).
-    """
-
+    """Package-level error."""
     pass
-
 
 class GeminiError(Exception):
-    """
-    Exception for errors returned from Gemini server which are not handled by the package.
-    """
-
+    """Unhandled server error."""
     pass
 
-
 class TimeoutError(GeminiError):
-    """
-    Exception for request timeouts.
-    """
-
+    """Request timeout."""
     pass
