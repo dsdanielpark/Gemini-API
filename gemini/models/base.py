@@ -1,9 +1,11 @@
 import re
+import os
+import requests
 from datetime import datetime
 from typing import List, Dict
 from loguru import logger
-from httpx import AsyncClient
 from pydantic import BaseModel, validator
+from typing import Dict
 
 
 class Image(BaseModel):
@@ -30,18 +32,18 @@ class Image(BaseModel):
         """Save the image to disk."""
         filename = filename or re.search(r"^(.*\.\w+)", self.url.split("/")[-1]).group()
 
-        with AsyncClient(follow_redirects=True, cookies=cookies) as client:
-            response = client.get(self.url)
-            response.raise_for_status()  # Raise an exception for non-200 responses
-            content_type = response.headers.get("content-type")
-            if content_type and "image" not in content_type:
-                logger.warning(
-                    f"Content type of {filename} is not image, but {content_type}."
-                )
-            with open(f"{path}{filename}", "wb") as file:
-                file.write(response.read())
+        response = requests.get(self.url, cookies=cookies)
+        response.raise_for_status()  # Raise an exception for non-200 responses
 
+        content_type = response.headers.get("content-type")
+        if content_type and "image" not in content_type:
+            logger.warning(
+                f"Content type of {filename} is not image, but {content_type}."
+            )
 
+        os.makedirs(path, exist_ok=True)
+        with open(os.path.join(path, filename), "wb") as file:
+            file.write(response.content)
 class WebImage(Image):
     """Image from the web."""
 
@@ -93,7 +95,7 @@ class Candidate(BaseModel):
 
 
 class GeminiOutput(BaseModel):
-    """Classified output from gemini.google.com."""
+    """Classified output from https://gemini.google.com/"""
 
     metadata: List[str]
     candidates: List[Candidate]
