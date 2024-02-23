@@ -17,8 +17,6 @@ $ pip install python-gemini-api
 $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
-<br>
-
 ## Authentication
 
 > **Warning** *DO NOT* expose your cookies. 
