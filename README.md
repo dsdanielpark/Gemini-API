@@ -2,8 +2,7 @@
 
 
 
-A Python wrapper interacts with [Google Gemini](https://gemini.google.com) via reverse engineering. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
-
+A Python wrapper interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
 <br>
 
 ## Installation
@@ -33,13 +32,15 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 <br>
 
 ## [FAQ](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_FAQ.md)
+Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
+
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
-Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated.
+Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 
 ## Contributors
-I would like to express my sincere gratitude to all the contributors.
+We would like to express my sincere gratitude to all the contributors.
 
 ## Contacts
 - **Core Maintainer:** [Daniel Park](https://github.com/dsdanielpark)
@@ -51,5 +52,8 @@ I would like to express my sincere gratitude to all the contributors.
 
 
 ## References
-[1] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
-[2] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
+[1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
+[2] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
+[3] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+
+
