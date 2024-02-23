@@ -1,10 +1,8 @@
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
 
 from os import environ
-from gemini.core import Bard
-from gemini.chat import ChatBard
-from gemini.core_async import BardAsync
-from gemini.core_cookies import BardCookies, BardAsyncCookies
+from gemini.core import Gemini
+from gemini.async_core import BardAsync
 from gemini.constants import (
     SESSION_HEADERS,
     ALLOWED_LANGUAGES,
@@ -17,7 +15,7 @@ from gemini.constants import (
 from gemini.utils import (
     extract_links,
     upload_image,
-    extract_bard_cookie,
+    auto_,
     max_token,
     max_sentence,
 )
@@ -26,7 +24,7 @@ from gemini.utils import (
 bard_api_key = environ.get("_BARD_API_KEY")
 
 __all__ = [
-    "Bard",
+    "Gemini",
     "ChatBard",
     "BardAsync",
     "BardCookies",
