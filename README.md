@@ -2,7 +2,7 @@
 
 
 
-A Python wrapper, python-gemini-api, interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
+A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
 
 <br>
 
