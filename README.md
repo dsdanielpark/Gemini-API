@@ -20,7 +20,7 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 > **Warning** *DO NOT* expose your cookies. 
 
-- Depending on the region and Google account status, multiple cookies may be required, including `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID`, **or more**.
+- Depending on the region and Google account status, *multiple cookies may be required*, including `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID`, *or more*.
 - You must appropriately set the `cookies_dict` parameter to `Gemini` class.
 - Cookie values can be changed shortly, thus it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package.
 
@@ -31,13 +31,22 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 
 <br>
+
+## [FAQ](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_FAQ.md)
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated.
 
+
+## Contributors
+I would like to express my sincere gratitude to all the contributors.
+
 ## Contacts
 - **Core Maintainer:** [Daniel Park](https://github.com/dsdanielpark)
 - **E-mail:** parkminwoo1991@gmail.com
+
+## License
+[MIT](https://opensource.org/license/mit/) license, 2024, Minwoo(Daniel) Park. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk.
 
 
 
