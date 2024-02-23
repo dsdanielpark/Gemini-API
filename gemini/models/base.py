@@ -1,4 +1,3 @@
-# Refer to https://github.com/HanaokaYuzu/Gemini-API/
 import re
 from datetime import datetime
 from typing import List, Dict
