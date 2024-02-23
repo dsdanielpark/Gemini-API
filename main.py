@@ -1,6 +1,6 @@
-from gemini import ChatBard
+from gemini import ChatGemini
 
 
 if __name__ == "__main__":
-    chat = ChatBard()
+    chat = ChatGemini()
     chat.start()
