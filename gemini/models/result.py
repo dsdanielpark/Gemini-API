@@ -1,10 +1,10 @@
 from typing import List, Optional, Union, Dict, Tuple
 
-from gemini.models.draft import BardDraft
-from gemini.models.tools.tool import BardTool
+from gemini.models.draft import GeminiDraft
+from gemini.models.tools.tool import GeminiTool
 
 
-class BardUserLocation:
+class GeminiUserLocation:
     def __init__(self, input_list: list):
         self._input_list = input_list
 
@@ -28,7 +28,7 @@ class BardUserLocation:
         return self.location_str
 
 
-class BardResult:
+class GeminiResult:
     def __init__(self, input_list: list):
         self._input_list = input_list
         self.conversation_id = self._input_list[1][0]
@@ -43,18 +43,18 @@ class BardResult:
         return self._input_list[3]
 
     @property
-    def drafts(self) -> list[BardDraft]:
+    def drafts(self) -> list[GeminiDraft]:
         return (
-            [BardDraft(c) for c in self._input_list[4]] if self._input_list[4] else []
+            [GeminiDraft(c) for c in self._input_list[4]] if self._input_list[4] else []
         )
 
     @property
-    def location(self) -> BardUserLocation:
-        return BardUserLocation(self._input_list[5])
+    def location(self) -> GeminiUserLocation:
+        return GeminiUserLocation(self._input_list[5])
 
     @property
-    def progress_tool(self) -> BardTool:
-        return BardTool(self._input_list[6]) if self._input_list[6] else None
+    def progress_tool(self) -> GeminiTool:
+        return GeminiTool(self._input_list[6]) if self._input_list[6] else None
 
     @property
     def country(self) -> str:
@@ -67,11 +67,11 @@ class BardResult:
         return self._input_list[10][0]
 
     @property
-    def tools_applied(self) -> list[BardTool]:
+    def tools_applied(self) -> list[GeminiTool]:
         if len(self._input_list) < 12:
             return []
         return (
-            [BardTool(tool) for tool in self._input_list[11]]
+            [GeminiTool(tool) for tool in self._input_list[11]]
             if self._input_list[11]
             else []
         )
