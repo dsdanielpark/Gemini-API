@@ -2,7 +2,7 @@
 
 
 
-A Python wrapper interfacing with [Google Gemini](https://gemini.google.com) through reverse engineering.
+A Python wrapper interacts with [Google Gemini](https://gemini.google.com) via reverse engineering. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
 
 ## Installation
 ```
@@ -14,10 +14,11 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 ## Authentication
 
-> **Warning** *DO NOT* expose your cookies. You can also use Google official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart). 
+> **Warning** *DO NOT* expose your cookies. 
 
 - Depending on the region and Google account status, multiple cookies may be required, including `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID`, **or more**.
-- You must appropriately set the `cookies_dict` parameter to `Gemini` class. However, since cookie values can change very quickly, it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package.
+- You must appropriately set the `cookies_dict` parameter to `Gemini` class.
+- Cookie values can be changed shortly, thus it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package.
 
 
 ## Usage
