@@ -24,7 +24,6 @@ from .constants import (
 from .utils import (
     build_export_data_structure,
     build_input_replit_data_struct,
-    build_input_text_struct,
     extract_cookies_from_brwoser,
     upload_image,
 )
@@ -39,6 +38,7 @@ from .models.exceptions import (
     GeminiError,
     TimeoutError,
 )
+from .models.session import GeminiSession
 
 
 class Gemini:
@@ -84,7 +84,7 @@ class Gemini:
             run_code (bool, optional, default = False): Whether to directly execute the code included in the answer (IPython only).
             auto_cookies (bool, optional, default = False): Retrieve a token from the browser.
         """
-        self.cookies = cookies or self._auto_get_cookies(auto_cookies)
+        self.cookies = cookies or self._get_auto_cookies(auto_cookies)
         self.session = self._get_session(session)
         self.proxies = proxies
         self.timeout = timeout
@@ -101,7 +101,7 @@ class Gemini:
         self.exp_id = ""
         self.init_value = ""
 
-    def _auto_get_cookies(self, auto_cookies: bool) -> dict:
+    def _get_auto_cookies(self, auto_cookies: bool) -> dict:
         """
         Get the Gemini API token either from the provided token or from the browser cookie.
 
@@ -177,9 +177,9 @@ class Gemini:
 
     def generate_content(
         self,
-        input_text: str,
+        prompt: str,
+        session: Optional["GeminiSession"] = None,
         image: Optional[bytes] = None,
-        image_name: Optional[str] = None,
         tool: Optional[Tool] = None,
     ) -> dict:
         """
@@ -192,7 +192,7 @@ class Gemini:
         >>> print(response['content'])
 
         Args:
-            input_text (str): Input text for the query.
+            prompt (str): Input text for the query.
             image (bytes): Input image bytes for the query, support image types: jpeg, png, webp
             image_name (str): Short file name
             tool : tool to use can be one of Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, Youtube
@@ -213,11 +213,6 @@ class Gemini:
                     "status_code": int
                 }
         """
-        params = {
-            "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
-            "_reqid": str(self._reqid),
-            "rt": "c",
-        }
         if self.google_translator_api_key is not None:
             google_official_translator = translate.Client(
                 api_key=self.google_translator_api_key
@@ -230,42 +225,25 @@ class Gemini:
             and self.google_translator_api_key is None
         ):
             translator_to_eng = GoogleTranslator(source="auto", target="en")
-            input_text = translator_to_eng.translate(input_text)
+            prompt = translator_to_eng.translate(prompt)
         elif (
             self.language is not None
             and self.language not in ALLOWED_LANGUAGES
             and self.google_translator_api_key is not None
         ):
-            input_text = google_official_translator.translate(
-                input_text, target_language="en"
+            prompt = google_official_translator.translate(
+                prompt, target_language="en"
             )
-
-        if image is not None:
-            image_url = upload_image(image)
-        else:
-            image_url = None
-
-        # Make post data structure and insert prompt
-        input_text_struct = build_input_text_struct(
-            input_text,
-            self.conversation_id,
-            self.response_id,
-            self.choice_id,
-            image_url,
-            image_name,
-            tools=[tool.value] if tool is not None else None,
-        )
-
         data = {
-            "f.req": json.dumps([None, json.dumps(input_text_struct)]),
             "at": self.SNlM0e,
-        }
-
+            "f.req": json.dumps(
+                        [None, json.dumps([[prompt], None, session and session.metadata])]
+                    ),
+                }
         # Get response
         try:
             response = self.session.post(
                 "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-                params=params,
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
@@ -275,27 +253,25 @@ class Gemini:
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
 
-        # Refer to https://github.com/HanaokaYuzu/Gemini-API/
         if response.status_code != 200:
             raise APIError(f"Request failed with status code {response.status_code}")
         else:
             try:
                 body = json.loads(
                     json.loads(response.text.split("\n")[2])[0][2]
-                )  # Texts
-
+                )  # Generated texts
                 if not body[4]:
                     body = json.loads(
                         json.loads(response.text.split("\n")[2])[4][2]
-                    )  # Requests using extensions
+                    )  # Non-textual data formats.
                 if not body[4]:
                     raise APIError(
                         "Failed to parse body. The response body is unstructured. Please try again."
-                    )
+                    ) # Fail to parse
             except Exception:
                 raise APIError(
-                    "Failed to generate contents. Structured body not returned. Please try again."
-                )
+                    "Failed to parse candidates. Unexpected structured response returned. Please try again."
+                ) # Unexpected structured
 
             try:
                 candidates = []
@@ -317,7 +293,7 @@ class Gemini:
                         and [
                             GeneratedImage(
                                 url=image[0][3][3],
-                                title=f"[Generated Image {image[3][6]}]",
+                                title=f"[Generated image {image[3][6]}]",
                                 alt=image[3][5][i],
                                 cookies=self.cookies,
                             )
@@ -335,17 +311,16 @@ class Gemini:
                     )
                 if not candidates:
                     raise GeminiError(
-                        "Failed to generate contents. No data of any kind returned."
+                        "Failed to generate candidates. No data of any kind returned."
                     )
-
-                generated_contents = GeminiOutput(metadata=body[1], candidates=candidates)
+                generated_content = GeminiOutput(metadata=body[1], candidates=candidates)
             except IndexError:
                 raise APIError(
                     "Failed to parse response body. Data structure is invalid."
                 )
-        return generated_contents
+        return generated_content
 
-    def speech(self, input_text: str, lang: str = "en-US") -> dict:
+    def speech(self, prompt: str, lang: str = "en-US") -> dict:
         """
         Get speech audio from Gemini API for the given input text.
 
@@ -357,7 +332,7 @@ class Gemini:
         >>>     f.write(bytes(audio['audio']))
 
         Args:
-            input_text (str): Input text for the query.
+            prompt (str): Input text for the query.
             lang (str, optional, default = "en-US"): Input language for the query.
 
         Returns:
@@ -373,12 +348,12 @@ class Gemini:
             "rt": "c",
         }
 
-        input_text_struct = [
-            [["XqA3Ic", json.dumps([None, input_text, lang, None, 2])]]
+        prompt_struct = [
+            [["XqA3Ic", json.dumps([None, prompt, lang, None, 2])]]
         ]
 
         data = {
-            "f.req": json.dumps(input_text_struct),
+            "f.req": json.dumps(prompt_struct),
             "at": self.SNlM0e,
         }
 
@@ -404,19 +379,19 @@ class Gemini:
         audio_bytes = base64.b64decode(audio_b64)
         return {"audio": audio_bytes, "status_code": response.status_code}
 
-    def export_conversation(self, generated_contents, title: str = "") -> dict:
+    def export_conversation(self, generated_content, title: str = "") -> dict:
         """
         Get Share URL for specific answer from Gemini
 
         Example:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
-        >>> generated_contents = Gemini.get_answer("hello!")
-        >>> url = Gemini.export_conversation(generated_contents, title="Export Conversation")
+        >>> generated_content = Gemini.get_answer("hello!")
+        >>> url = Gemini.export_conversation(generated_content, title="Export Conversation")
         >>> print(url['url'])
 
         Args:
-            generated_contents (dict): generated_contents returned from get_answer
+            generated_content (dict): generated_content returned from get_answer
             title (str, optional, default = ""): Title for URL
         Returns:
             dict: Answer from the Gemini API in the following format:
@@ -425,9 +400,9 @@ class Gemini:
                 "status_code": int
             }
         """
-        conv_id = generated_contents["conversation_id"]
-        resp_id = generated_contents["response_id"]
-        choice_id = generated_contents["choices"][0]["id"]
+        conv_id = generated_content["conversation_id"]
+        resp_id = generated_content["response_id"]
+        choice_id = generated_content["choices"][0]["id"]
         params = {
             "rpcids": "fuVx7",
             "source-path": "/",
@@ -462,7 +437,7 @@ class Gemini:
         return {"url": url, "status_code": response.status_code}
 
     def ask_about_image(
-        self, input_text: str, image: bytes, lang: Optional[str] = None
+        self, prompt: str, image: bytes, lang: Optional[str] = None
     ) -> dict:
         """
         Send Gemini image along with question and get answer
@@ -471,10 +446,10 @@ class Gemini:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
         >>> image = open('image.jpg', 'rb').read()
-        >>> generated_contents = Gemini.ask_about_image("what is in the image?", image)['content']
+        >>> generated_content = Gemini.ask_about_image("what is in the image?", image)['content']
 
         Args:
-            input_text (str): Input text for the query.
+            prompt (str): Input text for the query.
             image (bytes): Input image bytes for the query, support image types: jpeg, png, webp
             lang (str, optional): Language to use.
 
@@ -503,21 +478,21 @@ class Gemini:
 
         # [Optional] Set language
         if self.language is None and lang is None:
-            translated_input_text = input_text
+            translated_prompt = prompt
         elif (
             (self.language is not None or lang is not None)
             and self.language not in ALLOWED_LANGUAGES
             and self.google_translator_api_key is None
         ):
             translator_to_eng = GoogleTranslator(source="auto", target="en")
-            translated_input_text = translator_to_eng.translate(input_text)
+            translated_prompt = translator_to_eng.translate(prompt)
         elif (
             (self.language is not None or lang is not None)
             and self.language not in ALLOWED_LANGUAGES
             and self.google_translator_api_key is not None
         ):
-            translated_input_text = google_official_translator.translate(
-                input_text, target_language="en"
+            translated_prompt = google_official_translator.translate(
+                prompt, target_language="en"
             )
         elif (
             (self.language is None or lang is None)
@@ -525,7 +500,7 @@ class Gemini:
             and self.google_translator_api_key is None
         ):
             translator_to_eng = GoogleTranslator(source="auto", target="en")
-            translated_input_text = translator_to_eng.translate(input_text)
+            translated_prompt = translator_to_eng.translate(prompt)
 
         # Supported format: jpeg, png, webp
         image_url = upload_image(image)
@@ -534,7 +509,7 @@ class Gemini:
             None,
             [
                 [
-                    translated_input_text,
+                    translated_prompt,
                     0,
                     None,
                     [[[image_url, 1], "uploaded_photo.jpg"]],
@@ -593,7 +568,7 @@ class Gemini:
             elif (
                 lang is None and self.language is None
             ) and self.google_translator_api_key is None:
-                us_lang = detect(input_text)
+                us_lang = detect(prompt)
                 translator = GoogleTranslator(source="en", target=us_lang)
                 translated_content = translator.translate(content)
 
@@ -610,7 +585,7 @@ class Gemini:
             elif (
                 self.language is None and lang is None
             ) and self.google_translator_api_key is not None:
-                us_lang = detect(input_text)
+                us_lang = detect(prompt)
                 translated_content = google_official_translator.translate(
                     content, target_language=us_lang
                 )
@@ -619,7 +594,7 @@ class Gemini:
             translated_content = content
 
         # Returned dictionary object
-        generated_contents = {
+        generated_content = {
             "content": translated_content,
             "conversation_id": parsed_answer[1][0],
             "response_id": parsed_answer[1][1],
@@ -633,12 +608,12 @@ class Gemini:
             "status_code": response.status_code,
         }
         self.conversation_id, self.response_id, self.choice_id = (
-            generated_contents["conversation_id"],
-            generated_contents["response_id"],
-            generated_contents["choices"][0]["id"],
+            generated_content["conversation_id"],
+            generated_content["response_id"],
+            generated_content["choices"][0]["id"],
         )
         self._reqid += 100000
-        return generated_contents
+        return generated_content
 
     def export_replit(
         self,
@@ -653,8 +628,8 @@ class Gemini:
         Example:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
-        >>> generated_contents = Gemini.get_answer("Give me python code to print hello world")
-        >>> url = Gemini.export_replit(generated_contents['code'], generated_contents['program_lang'])
+        >>> generated_content = Gemini.get_answer("Give me python code to print hello world")
+        >>> url = Gemini.export_replit(generated_content['code'], generated_content['program_lang'])
         >>> print(url['url'])
 
         Args:
