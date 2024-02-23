@@ -2,6 +2,17 @@
 from enum import Enum
 from colorama import Fore
 
+
+SESSION_HEADERS = {
+    "Host": "gemini.google.com",
+    "X-Same-Domain": "1",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "Origin": "https://gemini.google.com",
+    "Referer": "https://gemini.google.com/",
+}
+
+
 # https://support.google.com/bard/answer/13575153?hl=en
 ALLOWED_LANGUAGES = {
     "korean",
@@ -109,16 +120,6 @@ SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
 TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20230912.07_p1"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
-
-
-SESSION_HEADERS = {
-    "Host": "gemini.google.com",
-    "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "Origin": "https://gemini.google.com",
-    "Referer": "https://gemini.google.com/",
-}
 
 IMG_UPLOAD_HEADERS = {
     "authority": "content-push.googleapis.com",

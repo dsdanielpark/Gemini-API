@@ -2,7 +2,7 @@
 import json
 import requests
 from typing import Optional
-from gemini.constants import IMG_UPLOAD_HEADERS, REQUIRED_COOKIE_LIST
+from gemini.constants import IMG_UPLOAD_HEADERS
 import browser_cookie3
 
 
@@ -157,38 +157,6 @@ def max_sentence(text: str, n: int):
             if sentence_count == n:
                 result = "".join(sentences).strip()
                 return result
-
-
-def build_input_text_struct(
-    input_text: str,
-    conversation_id: Optional[str],
-    response_id: Optional[str],
-    choice_id: Optional[str],
-    image_url: str = None,
-    image_name: str = None,
-    tools: list[list[str]] = None,
-) -> list:
-    image_arr = []
-    if image_url is not None:
-        image_arr = [[[image_url, 1], image_name]]
-
-    if tools is None:
-        tools = []
-
-    return [
-        [input_text, 0, None, image_arr, None, None, 0],
-        ["en"],
-        [conversation_id, response_id, choice_id, None, None, []],
-        None,  # Unknown random string value (1000 characters +) - If needed, can replace with a random string generator
-        None,  # Random uuidv4 (32 characters)
-        None,
-        [1],
-        0,
-        [],
-        tools,
-        1,
-        0,
-    ]
 
 
 def build_input_replit_data_struct(instructions: str, code: str, filename: str) -> list:
