@@ -30,7 +30,6 @@ from gemini.models.result import BardResult
 from gemini.utils import (
     extract_links,
     upload_image,
-    extract_bard_cookie,
     build_input_text_struct,
 )
 
