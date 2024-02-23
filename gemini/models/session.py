@@ -10,7 +10,7 @@ class GeminiSession:
     Parameters
     ----------
     gemini: `Gemini`
-        Async httpx client interface for gemini.google.com
+        Gemini client interface for https://gemini.google.com/
     metadata: `list[str]`, optional
         List of chat metadata `[cid, rid, rcid]`, can be shorter than 3 elements, like `[cid, rid]` or `[cid]` only
     cid: `str`, optional
@@ -56,7 +56,7 @@ class GeminiSession:
             self.metadata = value.metadata
             self.rcid = value.rcid
 
-    async def send_message(self, prompt: str) -> GeminiOutput:
+    def send_message(self, prompt: str) -> GeminiOutput:
         """
         Generates contents with prompt.
         Use as a shortcut for `Gemini.generate_content(prompt, self)`.
@@ -72,7 +72,7 @@ class GeminiSession:
             Output data from gemini.google.com, use `GeminiOutput.text` to get the default text reply, `GeminiOutput.images` to get a list
             of images in the default reply, `GeminiOutput.candidates` to get a list of all answer candidates in the output
         """
-        return await self.gemini.generate_content(prompt, self)
+        return self.gemini.generate_content(prompt, self)
 
     def choose_candidate(self, index: int) -> GeminiOutput:
         """
