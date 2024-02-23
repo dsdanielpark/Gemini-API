@@ -60,5 +60,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    entry_points={"console_scripts": ["bard_api=bard_api.cli:main"]},
+    entry_points={"console_scripts": ["gemini=gemini.cli:main"]},
 )
