@@ -5,7 +5,7 @@ from setuptools import setup
 
 
 def get_version():
-    filename = "geminiapi/__init__.py"
+    filename = "gemini/__init__.py"
     with open(filename) as f:
         match = re.search(r"""^__version__ = ['"]([^'"]*)['"]""", f.read(), re.M)
     if not match:
