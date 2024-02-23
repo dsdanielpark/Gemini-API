@@ -1,3 +1,4 @@
+# Legacy code from Bard, not used in Gemini.
 from typing import Optional
 
 
