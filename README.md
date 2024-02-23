@@ -7,7 +7,7 @@ A Python wrapper interacts with [Google Gemini](https://gemini.google.com) via r
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models.
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's Bard service was changed to Gemini.
 
 ## Installation
 ```
