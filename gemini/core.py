@@ -152,6 +152,8 @@ class Gemini:
         """
         if session is not None:
             return session
+        elif not self.cookies:
+            raise ValueError("'cookies' dictionary is empty.")
 
         session = requests.Session()
         session.headers = SESSION_HEADERS
@@ -159,8 +161,8 @@ class Gemini:
         session.proxies = self.proxies
 
         if self.cookies is not None:
-            for k, v in self.cookies.items():
-                session.cookies.set(k, v)
+            session.cookies.update(self.cookies)
+        
 
         return session
 
