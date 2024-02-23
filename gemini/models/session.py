@@ -22,7 +22,7 @@ class GeminiSession:
     """
 
     # @properties needn't have their slots pre-defined
-    __slots__ = ["__metadata", "gemini", "output"]
+    __slots__ = ["__metadata", "gemini", "gemini_output"]
 
     def __init__(
         self,
@@ -34,7 +34,7 @@ class GeminiSession:
     ):
         self.__metadata: list[Optional[str]] = [None, None, None]
         self.gemini: Gemini = gemini
-        self.output: Optional[GeminiOutput] = None
+        self.gemini_output: Optional[GeminiOutput] = None
 
         if metadata:
             self.metadata = metadata
@@ -52,7 +52,7 @@ class GeminiSession:
 
     def __setattr__(self, name: str, value: Any) -> None:
         super().__setattr__(name, value)
-        if name == "output" and isinstance(value, GeminiOutput):
+        if name == "gemini_output" and isinstance(value, GeminiOutput):
             self.metadata = value.metadata
             self.rcid = value.rcid
 
@@ -70,7 +70,7 @@ class GeminiSession:
         -------
         :class:`GeminiOutput`
             Output data from gemini.google.com, use `GeminiOutput.text` to get the default text reply, `GeminiOutput.images` to get a list
-            of images in the default reply, `GeminiOutput.candidates` to get a list of all answer candidates in the output
+            of images in the default reply, `GeminiOutput.candidates` to get a list of all answer candidates in the gemini_output
         """
         return self.gemini.generate_content(prompt, self)
 
@@ -83,17 +83,17 @@ class GeminiSession:
         index: `int`
             Index of the candidate to choose, starting from 0
         """
-        if not self.output:
-            raise ValueError("No previous output data found in this chat session.")
+        if not self.gemini_output:
+            raise ValueError("No previous gemini_output data found in this chat session.")
 
-        if index >= len(self.output.candidates):
+        if index >= len(self.gemini_output.candidates):
             raise ValueError(
-                f"Index {index} exceeds the number of candidates in last model output."
+                f"Index {index} exceeds the number of candidates in last model gemini_output."
             )
 
-        self.output.chosen = index
-        self.rcid = self.output.rcid
-        return self.output
+        self.gemini_output.chosen = index
+        self.rcid = self.gemini_output.rcid
+        return self.gemini_output
 
     @property
     def metadata(self):
