@@ -2,6 +2,7 @@ import functools
 import time
 import requests
 
+
 def retry(attempts=3, delay=2, backoff=2):
     def retry_decorator(func):
         @functools.wraps(func)
@@ -16,8 +17,11 @@ def retry(attempts=3, delay=2, backoff=2):
                     _attempts -= 1
                     _delay *= backoff
             return func(*args, **kwargs)  # Last attempt without catching exceptions
+
         return wrapper
+
     return retry_decorator
+
 
 def log_method(func):
     @functools.wraps(func)
@@ -31,7 +35,9 @@ def log_method(func):
         except Exception as e:
             print(f"Exception in {className}.{func.__name__}: {e}")
             raise
+
     return wrapper
+
 
 def time_execution(func):
     @functools.wraps(func)
@@ -41,7 +47,9 @@ def time_execution(func):
         end_time = time.time()
         print(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
         return result
+
     return wrapper
+
 
 def handle_errors(func):
     @functools.wraps(func)
@@ -54,4 +62,5 @@ def handle_errors(func):
         except Exception as e:
             print(f"Unexpected error: {e}")
             raise
+
     return wrapper

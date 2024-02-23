@@ -5,16 +5,17 @@ import os
 import random
 import re
 import string
-import uuid
-import requests
 from typing import Optional
 
+import requests
+
 try:
-    from langdetect import detect
     from deep_translator import GoogleTranslator
     from google.cloud import translate_v2 as translate
+    from langdetect import detect
 except ImportError:
     pass
+
 from .constants import (
     ALLOWED_LANGUAGES,
     REPLIT_SUPPORT_PROGRAM_LANGUAGES,
@@ -22,22 +23,22 @@ from .constants import (
     TEXT_GENERATION_WEB_SERVER_PARAM,
     Tool,
 )
-from .utils import (
-    build_export_data_structure,
-    build_input_replit_data_struct,
-    extract_cookies_from_brwoser,
-    upload_image,
-)
 from .models.base import (
-    GeminiOutput,
     Candidate,
-    WebImage,
+    GeminiOutput,
     GeneratedImage,
+    WebImage,
 )
 from .models.exceptions import (
     APIError,
     GeminiError,
     TimeoutError,
+)
+from .utils import (
+    build_export_data_structure,
+    build_input_replit_data_struct,
+    extract_cookies_from_brwoser,
+    upload_image,
 )
 
 
@@ -95,7 +96,12 @@ class Gemini:
             run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
             auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
-        self.cookies = cookies or os.getenv("GEMINI_COOKIES") or self._get_auto_cookies(auto_cookies) or {}
+        self.cookies = (
+            cookies
+            or os.getenv("GEMINI_COOKIES")
+            or self._get_auto_cookies(auto_cookies)
+            or {}
+        )
         self.session = self._get_session(session)
         self.timeout = timeout
         self.proxies = proxies or {}
@@ -126,7 +132,9 @@ class Gemini:
             Exception: If the token is not provided and can't be extracted from the browser.
         """
         if not self.auto_cookies:
-            raise ValueError("auto_cookies is disabled, cannot retrieve cookies automatically.")
+            raise ValueError(
+                "auto_cookies is disabled, cannot retrieve cookies automatically."
+            )
 
         if auto_cookies:
             extracted_cookie_dict = extract_cookies_from_brwoser()
@@ -331,7 +339,9 @@ class Gemini:
                 )
         # Retry to generate content by updating cookies and session
         if not generated_content:
-            print("Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again.")
+            print(
+                "Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
+            )
             for _ in range(2):
                 self.cookies = self._get_auto_cookies(True)
                 self.session = self._get_session(None)
@@ -341,7 +351,9 @@ class Gemini:
                     )
                     break
                 except:
-                    print("Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues.")
+                    print(
+                        "Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
+                    )
             else:
                 raise APIError("Failed to generate content.")
 
