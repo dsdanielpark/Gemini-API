@@ -21,7 +21,6 @@ from .constants import (
     TEXT_GENERATION_WEB_SERVER_PARAM,
     Tool,
 )
-from .models.result import BardResult
 from .utils import (
     build_export_data_structure,
     build_input_replit_data_struct,
@@ -283,19 +282,19 @@ class Gemini:
             try:
                 body = json.loads(
                     json.loads(response.text.split("\n")[2])[0][2]
-                )  # Plain text
+                )  # Texts
 
                 if not body[4]:
                     body = json.loads(
                         json.loads(response.text.split("\n")[2])[4][2]
-                    )  # Request with extensions as middleware
+                    )  # Requests using extensions
                 if not body[4]:
                     raise APIError(
-                        "Failed to parse response body. Data structure is invalid."
+                        "Failed to parse body. The response body is unstructured. Please try again."
                     )
             except Exception:
                 raise APIError(
-                    "Failed to generate contents. Invalid response data received."
+                    "Failed to generate contents. Structured body not returned. Please try again."
                 )
 
             try:
@@ -336,15 +335,15 @@ class Gemini:
                     )
                 if not candidates:
                     raise GeminiError(
-                        "Failed to generate contents. No output data found in response."
+                        "Failed to generate contents. No data of any kind returned."
                     )
 
-                generated_output = GeminiOutput(metadata=body[1], candidates=candidates)
+                generated_contents = GeminiOutput(metadata=body[1], candidates=candidates)
             except IndexError:
                 raise APIError(
                     "Failed to parse response body. Data structure is invalid."
                 )
-        return generated_output
+        return generated_contents
 
     def speech(self, input_text: str, lang: str = "en-US") -> dict:
         """
@@ -405,19 +404,19 @@ class Gemini:
         audio_bytes = base64.b64decode(audio_b64)
         return {"audio": audio_bytes, "status_code": response.status_code}
 
-    def export_conversation(self, bard_answer, title: str = "") -> dict:
+    def export_conversation(self, generated_contents, title: str = "") -> dict:
         """
         Get Share URL for specific answer from Gemini
 
         Example:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
-        >>> bard_answer = Gemini.get_answer("hello!")
-        >>> url = Gemini.export_conversation(bard_answer, title="Export Conversation")
+        >>> generated_contents = Gemini.get_answer("hello!")
+        >>> url = Gemini.export_conversation(generated_contents, title="Export Conversation")
         >>> print(url['url'])
 
         Args:
-            bard_answer (dict): bard_answer returned from get_answer
+            generated_contents (dict): generated_contents returned from get_answer
             title (str, optional, default = ""): Title for URL
         Returns:
             dict: Answer from the Gemini API in the following format:
@@ -426,9 +425,9 @@ class Gemini:
                 "status_code": int
             }
         """
-        conv_id = bard_answer["conversation_id"]
-        resp_id = bard_answer["response_id"]
-        choice_id = bard_answer["choices"][0]["id"]
+        conv_id = generated_contents["conversation_id"]
+        resp_id = generated_contents["response_id"]
+        choice_id = generated_contents["choices"][0]["id"]
         params = {
             "rpcids": "fuVx7",
             "source-path": "/",
@@ -472,7 +471,7 @@ class Gemini:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
         >>> image = open('image.jpg', 'rb').read()
-        >>> bard_answer = Gemini.ask_about_image("what is in the image?", image)['content']
+        >>> generated_contents = Gemini.ask_about_image("what is in the image?", image)['content']
 
         Args:
             input_text (str): Input text for the query.
@@ -620,7 +619,7 @@ class Gemini:
             translated_content = content
 
         # Returned dictionary object
-        bard_answer = {
+        generated_contents = {
             "content": translated_content,
             "conversation_id": parsed_answer[1][0],
             "response_id": parsed_answer[1][1],
@@ -634,86 +633,12 @@ class Gemini:
             "status_code": response.status_code,
         }
         self.conversation_id, self.response_id, self.choice_id = (
-            bard_answer["conversation_id"],
-            bard_answer["response_id"],
-            bard_answer["choices"][0]["id"],
+            generated_contents["conversation_id"],
+            generated_contents["response_id"],
+            generated_contents["choices"][0]["id"],
         )
         self._reqid += 100000
-        return bard_answer
-
-    def ask(
-        self,
-        text: str,
-        image: Optional[bytes] = None,
-        image_name: Optional[str] = None,
-        tool: Optional[Tool] = None,
-    ) -> BardResult:
-        if image is not None:
-            image_url = upload_image(image)
-        else:
-            image_url = None
-
-        # Make post data structure and insert prompt
-        input_text_struct = build_input_text_struct(
-            text,
-            self.conversation_id,
-            self.response_id,
-            self.choice_id,
-            image_url,
-            image_name,
-            tools=[tool.value] if tool is not None else None,
-        )
-
-        # Get response
-        response = self.session.post(
-            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-            params={
-                "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
-                "_reqid": str(self._reqid),
-                "rt": "c",
-            },
-            data={
-                "f.req": json.dumps([None, json.dumps(input_text_struct)]),
-                "at": self.SNlM0e,
-            },
-            timeout=self.timeout,
-            proxies=self.proxies,
-        )
-
-        if response.status_code != 200:
-            raise Exception(
-                f"Response status code is not 200. Response Status is {response.status_code}"
-            )
-
-        lines = [
-            line
-            for line in response.content.splitlines()
-            if line.startswith(b'[["wrb.fr')
-        ]
-        jsons = [json.loads(json.loads(line)[0][2]) for line in lines]
-        # Post-processing of response
-        resp_json = jsons[-1]
-
-        if not resp_json:
-            raise {
-                "content": f"Response Error: {response.content}. "
-                f"\nUnable to get response."
-                f"\nPlease double-check the cookie values and verify your network environment or google account."
-            }
-
-        res = BardResult(resp_json)
-        if not res.drafts:
-            res = BardResult(jsons[-2])
-
-        # Update params
-        self.conversation_id, self.response_id, self.choice_id = (
-            res.conversation_id,
-            res.response_id,
-            res.drafts[0].id,
-        )
-        self._reqid += 100000
-
-        return res
+        return generated_contents
 
     def export_replit(
         self,
@@ -728,8 +653,8 @@ class Gemini:
         Example:
         >>> cookies = Dict()
         >>> Gemini = Gemini(cookies = cookies)
-        >>> bard_answer = Gemini.get_answer("Give me python code to print hello world")
-        >>> url = Gemini.export_replit(bard_answer['code'], bard_answer['program_lang'])
+        >>> generated_contents = Gemini.get_answer("Give me python code to print hello world")
+        >>> url = Gemini.export_replit(generated_contents['code'], generated_contents['program_lang'])
         >>> print(url['url'])
 
         Args:
