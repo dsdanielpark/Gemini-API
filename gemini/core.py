@@ -44,7 +44,18 @@ from .models.session import GeminiSession
 
 class Gemini:
     """
-    Gemini class for interacting with Google Gemini service.
+    Represents a Gemini instance for interacting with the Google Gemini service.
+
+    Attributes:
+        session (requests.Session): Requests session object.
+        cookies (dict): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) with their respective values.
+        timeout (int): Request timeout in seconds. Defaults to 20.
+        proxies (dict): Proxy configuration for requests.
+        language (str): Natural language code for translation (e.g., "en", "ko", "ja").
+        conversation_id (str): ID for fetching conversational context.
+        auto_cookies (bool): Flag indicating whether to retrieve a token from the browser.
+        google_translator_api_key (str): Google Cloud Translation API key.
+        run_code (bool): Flag indicating whether to execute code included in the answer (IPython only).
     """
 
     __slots__ = [
@@ -75,32 +86,32 @@ class Gemini:
         Initialize the Gemini instance.
 
         Args:
-            cookies (dict, optional): Pass 3 cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) as keys with their respective values.
-            timeout (int, optional, default = 20): Request timeout in seconds.
-            proxies (dict, optional): Proxy configuration for requests.
             session (requests.Session, optional): Requests session object.
+            cookies (dict, optional): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) with their respective values.
+            timeout (int, optional): Request timeout in seconds. Defaults to 20.
+            proxies (dict, optional): Proxy configuration for requests.
+            language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja").
             conversation_id (str, optional): ID for fetching conversational context.
             google_translator_api_key (str, optional): Google Cloud Translation API key.
-            language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja").
-            run_code (bool, optional, default = False): Whether to directly execute the code included in the answer (IPython only).
-            auto_cookies (bool, optional, default = False): Retrieve a token from the browser.
+            run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
+            auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
-        self.cookies = cookies or self._get_auto_cookies(auto_cookies)
         self.session = self._get_session(session)
-        self.proxies = proxies
+        self.cookies = cookies or self._get_auto_cookies(auto_cookies)
         self.timeout = timeout
-        self.SNlM0e = self._get_snim0e()
+        self.proxies = proxies
         self.language = language or os.getenv("GEMINI_LANGUAGE")
-        self.run_code = run_code
-        self.google_translator_api_key = google_translator_api_key
-        self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.conversation_id = conversation_id or ""
+        self.google_translator_api_key = google_translator_api_key
+        self.run_code = run_code
+        self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.response_id = ""
         self.choice_id = ""
         self.og_pid = ""
         self.rot = ""
         self.exp_id = ""
         self.init_value = ""
+
 
     def _get_auto_cookies(self, auto_cookies: bool) -> dict:
         """
@@ -239,6 +250,7 @@ class Gemini:
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
         }
+
         # Get response
         try:
             response = self.session.post(
@@ -270,7 +282,7 @@ class Gemini:
             except Exception:
                 raise APIError(
                     "Failed to parse candidates. Unexpected structured response returned. Please try again."
-                )  # Unexpected structured
+                )  # Unexpected structured response
 
             try:
                 candidates = []
