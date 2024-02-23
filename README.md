@@ -2,9 +2,12 @@
 
 
 
-A Python wrapper interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
+A Python wrapper, python-gemini-api, interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
 
 <br>
+
+## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's Bard service was changed to Gemini.
 
 ## Installation
 ```
@@ -13,8 +16,6 @@ $ pip install python-gemini-api
 ```
 $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
-
-<br>
 
 ## Authentication
 
@@ -33,7 +34,7 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 <br>
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
-Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
+You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
 
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
@@ -55,6 +56,8 @@ We would like to express my sincere gratitude to all the contributors.
 ## References
 [1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
 [2] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[3] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[3] Github [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+
 
 
