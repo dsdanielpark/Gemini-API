@@ -1,8 +1,6 @@
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
-
 from os import environ
 from gemini.core import Gemini
-from gemini.async_core import BardAsync
 from gemini.constants import (
     SESSION_HEADERS,
     ALLOWED_LANGUAGES,
@@ -20,15 +18,14 @@ from gemini.utils import (
     max_sentence,
 )
 
-# Get the API key from the environment variable
-bard_api_key = environ.get("_BARD_API_KEY")
+gemini_api_key = environ.get("Gemini_cookies")
 
 __all__ = [
     "Gemini",
-    "ChatBard",
-    "BardAsync",
-    "BardCookies",
-    "BardAsyncCookies",
+    "ChatGemini",
+    "GeminiAsync",
+    "GeminiCookies",
+    "GeminiAsyncCookies",
     "SESSION_HEADERS",
     "ALLOWED_LANGUAGES",
     "DEFAULT_LANGUAGE",
@@ -37,7 +34,6 @@ __all__ = [
     "USER_PROMPT",
     "extract_links",
     "upload_image",
-    "extract_bard_cookie",
     "max_token",
     "max_sentence",
     "Tool",
