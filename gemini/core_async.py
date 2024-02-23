@@ -23,8 +23,8 @@ from gemini.constants import (
     ALLOWED_LANGUAGES,
     SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
-    Tool,
     POST_ENDPOINT,
+    Tool,
 )
 from gemini.models.result import BardResult
 from gemini.utils import (
