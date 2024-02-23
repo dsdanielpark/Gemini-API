@@ -100,15 +100,15 @@ def extract_cookies_from_brwoser() -> dict:
                     cookie_dict[cookie.name] = cookie.value
         except Exception as e:
             print(
-                "No supported browser found or issue with cookie extraction. Report issue at https://github.com/borisbabic/browser_cookie3/issues"
+                "Failed to extract cookies automatically. Report the issue at https://github.com/borisbabic/browser_cookie3/issues if the problem persists."
             )
             continue  # Ignore exceptions and try the next browser function
 
     # Ensure all required cookies are present
     required_cookies = {"__Secure-1PSIDTS", "__Secure-1PSIDCC", "__Secure-1PSID", "NID"}
     if not required_cookies.issubset(cookie_dict.keys()):
-        raise ValueError(
-            "Cookies '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID' and 'NID' are required but not found."
+        print(
+            "Some of recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
         )
 
     return cookie_dict

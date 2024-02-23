@@ -9,7 +9,6 @@ import uuid
 import requests
 from typing import Optional
 
-# from urllib.parse import parse_qs, urlparse
 try:
     from langdetect import detect
     from deep_translator import GoogleTranslator
@@ -46,7 +45,7 @@ from .models.exceptions import (
 
 class Gemini:
     """
-    Gemini class for interacting with Google Gemini.
+    Gemini class for interacting with Google Gemini service.
     """
 
     __slots__ = [
@@ -54,22 +53,22 @@ class Gemini:
         "cookies_dict",
         "timeout",
         "proxies",
+        "language",
         "conversation_id",
         "auto_cookies",
         "google_translator_api_key",
-        "language",
         "run_code",
     ]
 
     def __init__(
         self,
+        session: Optional[requests.Session] = None,
         cookies_dict: dict = None,
         timeout: int = 20,
         proxies: Optional[dict] = None,
-        session: Optional[requests.Session] = None,
+        language: Optional[str] = None,
         conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
-        language: Optional[str] = None,
         run_code: bool = False,
         auto_cookies: bool = False,
     ):
@@ -88,9 +87,9 @@ class Gemini:
             auto_cookies (bool, optional, default = False): Retrieve a token from the browser.
         """
         self.cookies_dict = cookies_dict or self._get_cookies_auto(auto_cookies)
+        self.session = self._get_session(session)
         self.proxies = proxies
         self.timeout = timeout
-        self.session = self._get_session(session)
         self.SNlM0e = self._get_snim0e()
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.run_code = run_code
