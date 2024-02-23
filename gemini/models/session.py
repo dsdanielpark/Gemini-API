@@ -84,7 +84,9 @@ class GeminiSession:
             Index of the candidate to choose, starting from 0
         """
         if not self.gemini_output:
-            raise ValueError("No previous gemini_output data found in this chat session.")
+            raise ValueError(
+                "No previous gemini_output data found in this chat session."
+            )
 
         if index >= len(self.gemini_output.candidates):
             raise ValueError(

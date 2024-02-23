@@ -8,6 +8,7 @@ import string
 import uuid
 import requests
 from typing import Optional
+
 try:
     from langdetect import detect
     from deep_translator import GoogleTranslator
@@ -231,15 +232,13 @@ class Gemini:
             and self.language not in ALLOWED_LANGUAGES
             and self.google_translator_api_key is not None
         ):
-            prompt = google_official_translator.translate(
-                prompt, target_language="en"
-            )
+            prompt = google_official_translator.translate(prompt, target_language="en")
         data = {
             "at": self.SNlM0e,
             "f.req": json.dumps(
-                        [None, json.dumps([[prompt], None, session and session.metadata])]
-                    ),
-                }
+                [None, json.dumps([[prompt], None, session and session.metadata])]
+            ),
+        }
         # Get response
         try:
             response = self.session.post(
@@ -267,11 +266,11 @@ class Gemini:
                 if not body[4]:
                     raise APIError(
                         "Failed to parse body. The response body is unstructured. Please try again."
-                    ) # Fail to parse
+                    )  # Fail to parse
             except Exception:
                 raise APIError(
                     "Failed to parse candidates. Unexpected structured response returned. Please try again."
-                ) # Unexpected structured
+                )  # Unexpected structured
 
             try:
                 candidates = []
@@ -313,7 +312,9 @@ class Gemini:
                     raise GeminiError(
                         "Failed to generate candidates. No data of any kind returned."
                     )
-                generated_content = GeminiOutput(metadata=body[1], candidates=candidates)
+                generated_content = GeminiOutput(
+                    metadata=body[1], candidates=candidates
+                )
             except IndexError:
                 raise APIError(
                     "Failed to parse response body. Data structure is invalid."
@@ -348,9 +349,7 @@ class Gemini:
             "rt": "c",
         }
 
-        prompt_struct = [
-            [["XqA3Ic", json.dumps([None, prompt, lang, None, 2])]]
-        ]
+        prompt_struct = [[["XqA3Ic", json.dumps([None, prompt, lang, None, 2])]]]
 
         data = {
             "f.req": json.dumps(prompt_struct),

@@ -44,6 +44,8 @@ class Image(BaseModel):
         os.makedirs(path, exist_ok=True)
         with open(os.path.join(path, filename), "wb") as file:
             file.write(response.content)
+
+
 class WebImage(Image):
     """Image from the web."""
 
@@ -55,7 +57,7 @@ class GeneratedImage(Image):
 
     cookies: Dict[str, str]
 
-    @validator('cookies', pre=True, always=True)
+    @validator("cookies", pre=True, always=True)
     def validate_cookies(cls, values: Dict[str, str]) -> Dict[str, str]:
         if "__Secure-1PSID" not in values or "__Secure-1PSIDTS" not in values:
             raise ValueError(

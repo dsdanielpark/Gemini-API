@@ -5,6 +5,7 @@ from typing import Optional
 from gemini.constants import IMG_UPLOAD_HEADERS, REQUIRED_COOKIE_LIST
 import browser_cookie3
 
+
 def extract_links(data: list) -> list:
     """
     Extract links from the given data.
@@ -75,7 +76,6 @@ def extract_cookies_from_brwoser() -> dict:
     Raises:
         Exception: If no supported browser is found or if there's an issue with cookie extraction.
     """
-
 
     supported_browsers = [
         browser_cookie3.chrome,
