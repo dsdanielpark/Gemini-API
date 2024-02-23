@@ -14,9 +14,17 @@ $ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 ## Authentication
 
+> **Warning** *DO NOT* expose your cookies. You can also use Google official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart). 
+
+- Depending on the region and Google account status, multiple cookies may be required, including `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID`, **or more**.
+- You must appropriately set the `cookies_dict` parameter to `Gemini` class. However, since cookie values can change very quickly, it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package.
+
+
+## Usage
+
 
             
-## Bugs and [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
+## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated.
 
 ## Contacts
@@ -24,9 +32,7 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 - **E-mail:** parkminwoo1991@gmail.com
 
 
-## Usage
-
 
 ## References
 [1] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
-[2] [acheong08/Bard](https://github.com/acheong08/Bard) <br>
+[2] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
