@@ -2,8 +2,8 @@ import re
 from datetime import datetime
 from typing import List, Dict
 from loguru import logger
-from httpx import AsyncClient, HTTPError
-from pydantic import BaseModel, root_validator
+from httpx import AsyncClient
+from pydantic import BaseModel, validator
 
 
 class Image(BaseModel):
@@ -53,7 +53,7 @@ class GeneratedImage(Image):
 
     cookies: Dict[str, str]
 
-    @root_validator
+    @validator('cookies', pre=True, always=True)
     def validate_cookies(cls, values: Dict[str, str]) -> Dict[str, str]:
         if "__Secure-1PSID" not in values or "__Secure-1PSIDTS" not in values:
             raise ValueError(
