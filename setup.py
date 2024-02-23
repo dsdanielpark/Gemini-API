@@ -1,5 +1,4 @@
-# Copyright 2023 Daniel Park, MIT License
-
+# Copyright 2024 Daniel Park, MIT License
 import re
 from setuptools import find_packages
 from setuptools import setup
@@ -28,26 +27,26 @@ setup(
     version="0.1.0",
     author="daniel park",
     author_email="parkminwoo1991@gmail.com",
-    description="The python package that returns Response of Google Bard through API.",
+    description="The python package that returns Response of Google Gemini through API.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/dsdanielpark/Bard-API",
+    url="https://github.com/dsdanielpark/Gemini-API",
     packages=find_packages(exclude=[]),
     python_requires=">=3.6",
     install_requires=[
         "httpx[http2]>=0.20.0",
         "requests",
         "colorama",
+        "browser_cookie3",
     ],
     extras_require={
         "translate": [
-            "browser_cookie3",
             "deep_translator",
             "google-cloud-translate",
             "langdetect",
         ]
     },
-    keywords="Python, API, Bard, Google Bard, Large Language Model, Chatbot API, Google API, Chatbot",
+    keywords="Python, API, Gemini, Google Gemini, Large Language Model, Chatbot API, Google API, Chatbot",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",

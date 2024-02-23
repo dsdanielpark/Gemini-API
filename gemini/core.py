@@ -8,7 +8,6 @@ import string
 import uuid
 import requests
 from typing import Optional
-
 try:
     from langdetect import detect
     from deep_translator import GoogleTranslator
@@ -50,7 +49,7 @@ class Gemini:
 
     __slots__ = [
         "session",
-        "cookies_dict",
+        "cookies",
         "timeout",
         "proxies",
         "language",
@@ -63,7 +62,7 @@ class Gemini:
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        cookies_dict: dict = None,
+        cookies: dict = None,
         timeout: int = 20,
         proxies: Optional[dict] = None,
         language: Optional[str] = None,
@@ -76,7 +75,7 @@ class Gemini:
         Initialize the Gemini instance.
 
         Args:
-            cookies_dict (dict, optional): Pass 3 cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) as keys with their respective values.
+            cookies (dict, optional): Pass 3 cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) as keys with their respective values.
             timeout (int, optional, default = 20): Request timeout in seconds.
             proxies (dict, optional): Proxy configuration for requests.
             session (requests.Session, optional): Requests session object.
@@ -86,7 +85,7 @@ class Gemini:
             run_code (bool, optional, default = False): Whether to directly execute the code included in the answer (IPython only).
             auto_cookies (bool, optional, default = False): Retrieve a token from the browser.
         """
-        self.cookies_dict = cookies_dict or self._get_cookies_auto(auto_cookies)
+        self.cookies = cookies or self._auto_get_cookies(auto_cookies)
         self.session = self._get_session(session)
         self.proxies = proxies
         self.timeout = timeout
@@ -122,12 +121,12 @@ class Gemini:
 
         if auto_cookies:
             extracted_cookie_dict = extract_cookies_from_brwoser()
-            self.cookies_dict = extracted_cookie_dict
+            self.cookies = extracted_cookie_dict
             if extracted_cookie_dict:
                 return extracted_cookie_dict
 
         raise Exception(
-            "Gemini cookies must be provided as the 'cookies_dict' argument or extracted from the browser."
+            "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
         )
 
     def _get_session(self, session: Optional[requests.Session]) -> requests.Session:
@@ -148,8 +147,8 @@ class Gemini:
         session.cookies.set("__Secure-1PSID", self.cookies["__Secure-1PSID"])
         session.proxies = self.proxies
 
-        if self.cookies_dict is not None:
-            for k, v in self.cookies_dict.items():
+        if self.cookies is not None:
+            for k, v in self.cookies.items():
                 session.cookies.set(k, v)
 
         return session
@@ -173,7 +172,7 @@ class Gemini:
         snim0e = re.search(r"SNlM0e\":\"(.*?)\"", response.text)
         if not snim0e:
             raise Exception(
-                "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookies_dict=Dict())"
+                "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
             )
         return snim0e.group(1)
 
@@ -188,8 +187,8 @@ class Gemini:
         Get an answer from the Gemini API for the given input text.
 
         Example:
-        >>> cookies_dict = Dict()
-        >>> Gemini = Gemini(cookies_dict=cookies_dict)
+        >>> cookies = Dict()
+        >>> Gemini = Gemini(cookies=cookies)
         >>> response = Gemini.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
         >>> print(response['content'])
 
@@ -352,8 +351,8 @@ class Gemini:
         Get speech audio from Gemini API for the given input text.
 
         Example:
-        >>> cookies_dict = Dict()
-        >>> Gemini = Gemini(cookies_dict=cookies_dict)
+        >>> cookies = Dict()
+        >>> Gemini = Gemini(cookies=cookies)
         >>> audio = Gemini.speech("Say hello!")
         >>> with open("Gemini.ogg", "wb") as f:
         >>>     f.write(bytes(audio['audio']))
@@ -411,8 +410,8 @@ class Gemini:
         Get Share URL for specific answer from Gemini
 
         Example:
-        >>> cookies_dict = Dict()
-        >>> Gemini = Gemini(cookies_dict = cookies_dict)
+        >>> cookies = Dict()
+        >>> Gemini = Gemini(cookies = cookies)
         >>> bard_answer = Gemini.get_answer("hello!")
         >>> url = Gemini.export_conversation(bard_answer, title="Export Conversation")
         >>> print(url['url'])
@@ -470,8 +469,8 @@ class Gemini:
         Send Gemini image along with question and get answer
 
         Example:
-        >>> cookies_dict = Dict()
-        >>> Gemini = Gemini(cookies_dict = cookies_dict)
+        >>> cookies = Dict()
+        >>> Gemini = Gemini(cookies = cookies)
         >>> image = open('image.jpg', 'rb').read()
         >>> bard_answer = Gemini.ask_about_image("what is in the image?", image)['content']
 
@@ -727,8 +726,8 @@ class Gemini:
         Get export URL to repl.it from code
 
         Example:
-        >>> cookies_dict = Dict()
-        >>> Gemini = Gemini(cookies_dict = cookies_dict)
+        >>> cookies = Dict()
+        >>> Gemini = Gemini(cookies = cookies)
         >>> bard_answer = Gemini.get_answer("Give me python code to print hello world")
         >>> url = Gemini.export_replit(bard_answer['code'], bard_answer['program_lang'])
         >>> print(url['url'])

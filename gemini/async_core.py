@@ -1,5 +1,3 @@
-# The asynchronous bard may not yield significant benefits and may not be perfectly implemented.
-# You can contribute a more optimized implementation anytime through a Pull Request.
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
 import os
 import re
