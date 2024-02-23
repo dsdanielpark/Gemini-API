@@ -39,7 +39,6 @@ from .models.exceptions import (
     GeminiError,
     TimeoutError,
 )
-from .models.session import GeminiSession
 
 
 class Gemini:
