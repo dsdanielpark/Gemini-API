@@ -33,45 +33,54 @@ from flask import Flask, request, redirect
 
 print("L Done")
 
-#Google
+# Google
 r = sr.Recognizer()
-token = 'YwhXxoHIAg68RXgIOt2PoFtNQe944EI-ug3weQGUZXLmI_UyPzHeCPXyowhxRonyWlugfg.'
+token = "YwhXxoHIAg68RXgIOt2PoFtNQe944EI-ug3weQGUZXLmI_UyPzHeCPXyowhxRonyWlugfg."
 chatbot = Chatbot(token)
-small_model = whisper.load_model('small')
-base_model = whisper.load_model('base')
+small_model = whisper.load_model("small")
+base_model = whisper.load_model("base")
 
-if sys.platform != 'darwin':
+if sys.platform != "darwin":
     import pyttsx3
-    engine = pyttsx3.init() 
+
+    engine = pyttsx3.init()
     # Get the current speech rate
-    rate = engine.getProperty('rate')
+    rate = engine.getProperty("rate")
     # Decrease speech rate by 50 words per minute (Change as desired)
-    engine.setProperty('rate', rate-50)
+    engine.setProperty("rate", rate - 50)
+
 
 def prompt_bard(prompt):
     response = chatbot.ask(prompt)
-    return response['content']
+    return response["content"]
+
+
 print("G Done")
+
 
 def speak(text):
     # If Mac OS use system messages for TTS
-    if sys.platform == 'darwin':
-        ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?!-_$: ")
-        clean_text = ''.join(c for c in text if c in ALLOWED_CHARS)
+    if sys.platform == "darwin":
+        ALLOWED_CHARS = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?!-_$: "
+        )
+        clean_text = "".join(c for c in text if c in ALLOWED_CHARS)
         system(f"say '{clean_text}'")
     # Use pyttsx3 for other operating sytstems
     else:
         engine.say(text)
         engine.runAndWait()
 
+
 # Spotify API credentials
-client_id = 'a1004960c590470db66ffef7e4e260d4'
-client_secret = 'cf3e9a286bc245d2b015e755663adda8'
-redirect_uri = 'http://localhost:5420/callback'
-username = 'euqf7m7eo8hgdyqc5pmlcw8fz'
-scope = 'user-modify-playback-state'
-access_token = ''
+client_id = "a1004960c590470db66ffef7e4e260d4"
+client_secret = "cf3e9a286bc245d2b015e755663adda8"
+redirect_uri = "http://localhost:5420/callback"
+username = "euqf7m7eo8hgdyqc5pmlcw8fz"
+scope = "user-modify-playback-state"
+access_token = ""
 sp = None  # Define sp globally
+
 
 # Function to obtain an access token from Spotify
 def get_access_token():
@@ -81,7 +90,7 @@ def get_access_token():
         redirect_uri=redirect_uri,
         scope=scope,
         cache_path=".spotifycache",
-        show_dialog=True
+        show_dialog=True,
     )
     auth_url = sp_oauth.get_authorize_url()
     print(f"Please visit this URL to authorize your application: {auth_url}")
@@ -90,36 +99,44 @@ def get_access_token():
     sp_oauth.get_access_token(code)
     return spotipy.Spotify(auth_manager=sp_oauth)
 
+
 # Call the function to retrieve the access token and assign the returned value to the global sp object
 sp = get_access_token()
+
 
 # Function to play Spotify
 def play_spotify():
     sp.start_playback()
 
+
 # Function to pause Spotify
 def pause_spotify():
     sp.pause_playback()
+
 
 # Function to skip to the next track on Spotify
 def skip_spotify():
     sp.next_track()
 
+
 # Function to rewind to the previous track on Spotify
 def rewind_spotify():
     sp.previous_track()
-     
+
+
 # Function to open Spotify
 def open_spotify():
     current_platform = platform.system()
-    if current_platform == 'Darwin':  # macOS
-        subprocess.call(['open', '-a', 'Spotify'])
-    elif current_platform == 'Windows':
-        subprocess.call(['start', 'spotify'])
+    if current_platform == "Darwin":  # macOS
+        subprocess.call(["open", "-a", "Spotify"])
+    elif current_platform == "Windows":
+        subprocess.call(["start", "spotify"])
     else:
         print("Unsupported platform.")
 
+
 print("S Done")
+
 
 def main():
     # Initialize microphone object
@@ -135,10 +152,10 @@ def main():
                     with open("detect.wav", "wb") as f:
                         f.write(audio.get_wav_data())
                     # Transcribe wake word using whisper tiny model
-                    result = small_model.transcribe('detect.wav')
-                    text_input = result['text']
+                    result = small_model.transcribe("detect.wav")
+                    text_input = result["text"]
                     # If wake word is found, break out of loop
-                    if 'elora' in text_input.lower().strip():
+                    if "elora" in text_input.lower().strip():
                         text_input.replace("elora", "google")
                         break
                     else:
@@ -147,17 +164,17 @@ def main():
                     print("Error transcribing audio: ", e)
                     continue
             try:
-                # Play wake word detected notification sound 
-                playsound('wake_detected.mp3')
+                # Play wake word detected notification sound
+                playsound("wake_detected.mp3")
                 print("Detected. Please speak your prompt. \n")
                 # Record prompt
                 audio = r.listen(source)
                 with open("prompt.wav", "wb") as f:
                     f.write(audio.get_wav_data())
                 # Transcribe prompt using whisper base model
-                result = base_model.transcribe('prompt.wav')
-                prompt_text = result['text']
-                print("Sending to Bard:", prompt_text, '\n')
+                result = base_model.transcribe("prompt.wav")
+                prompt_text = result["text"]
+                print("Sending to Bard:", prompt_text, "\n")
                 # If prompt is empty, start listening for wake word again
                 if len(prompt_text.strip()) == 0:
                     print("Empty")
@@ -166,22 +183,25 @@ def main():
             except Exception as e:
                 print("Error transcribing audio: ", e)
                 continue
-            # Prompt Bard. 
+            # Prompt Bard.
             response = prompt_bard(prompt_text)
             # Prints Bard response normal if windows (cannot ASCII delete in command prompt to change font color)
-            if sys.platform.startswith('win'):
-                 print('Bards response: ', response)
+            if sys.platform.startswith("win"):
+                print("Bards response: ", response)
             else:
                 # Prints Bard response in red for linux & mac terminal
-                print("\033[31m" + 'Bards response: ', response, '\n' + "\033[0m")
+                print("\033[31m" + "Bards response: ", response, "\n" + "\033[0m")
             speak(response)
 
-# Function to play audio using pydub
-#def play_audio(audio):
+    # Function to play audio using pydub
+    # def play_audio(audio):
     audio.export("output.wav", format="wav")
     audio = AudioSegment.from_wav("output.wav")
     play(audio)
+
+
 print("A Done")
+
 
 # Function to search the web
 def search_web(query):
@@ -189,17 +209,18 @@ def search_web(query):
     url = f"https://www.google.com/search?q={query}"
     webbrowser.open(url)
 
+
 # Function to search images
 def search_images(query):
     response = google_images_download.googleimagesdownload()
 
     # Configure the search parameters
     search_params = {
-        'keywords': query,
-        'limit': 5,  # Number of images to retrieve
-        'safe_search': True,  # Safe search filter
-        'format': 'jpg',  # Limit search to JPEG format
-        'output_directory': 'images'  # Directory to save the images
+        "keywords": query,
+        "limit": 5,  # Number of images to retrieve
+        "safe_search": True,  # Safe search filter
+        "format": "jpg",  # Limit search to JPEG format
+        "output_directory": "images",  # Directory to save the images
     }
 
     # Perform the search
@@ -213,11 +234,15 @@ def search_images(query):
         image_path = image_paths[0]
         webbrowser.open(image_path)
 
+
 # Function to set up the image search client
 def setup_image_search_client(api_key, cx):
     gis = GoogleImagesSearch(api_key, cx)
     return gis
+
+
 print("I Done")
+
 
 # Function to run the Elora interactive window
 def run_elora():
@@ -238,28 +263,34 @@ def run_elora():
     # Start the main loop of the GUI
     window.mainloop()
 
+
 def update_speech_text(speech_text):
     def update_text():
         command = asyncio.run(main())
         speech_text.delete("1.0", "end")
         speech_text.insert("end", command)
         speech_text.after(1000, update_speech_text, speech_text)
+
     threading.Thread(target=update_text).start()
+
+
 print("W Done")
 
 # Create the Flask app
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    return 'Hello, world!'  # Replace with your desired response
+    return "Hello, world!"  # Replace with your desired response
+
 
 # Callback route for Spotify authentication
-@app.route('/callback')
+@app.route("/callback")
 def callback():
     global sp
     # Retrieve the authorization code
-    code = request.args.get('code')
+    code = request.args.get("code")
 
     # Use the authorization code to obtain an access token
     sp_oauth = spotipy.oauth2.SpotifyOAuth(
@@ -268,21 +299,22 @@ def callback():
         redirect_uri=redirect_uri,
         scope=scope,
         cache_path=".spotifycache",
-        show_dialog=True
+        show_dialog=True,
     )
     token_info = sp_oauth.get_access_token(code, as_dict=False)
-    access_token = token_info['access_token'][0]
+    access_token = token_info["access_token"][0]
     sp = spotipy.Spotify(auth=access_token)
-    
-    return 'Authentication successful! You can close this window.'
+
+    return "Authentication successful! You can close this window."
+
 
 # Add the routes before starting the app
-app.add_url_rule('/', 'home', home)
+app.add_url_rule("/", "home", home)
 print("O Done")
 
 app.run(port=5420)
 print("Port Done")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     print("M Done")

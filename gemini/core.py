@@ -43,6 +43,7 @@ from .models.exceptions import (
     TimeoutError,
 )
 
+
 class Gemini:
     """
     Gemini class for interacting with Google Gemini.
@@ -103,10 +104,7 @@ class Gemini:
         self.exp_id = ""
         self.init_value = ""
 
-
-    def _auto_get_cookies(
-        self, auto_cookies: bool
-    ) -> dict:
+    def _auto_get_cookies(self, auto_cookies: bool) -> dict:
         """
         Get the Gemini API token either from the provided token or from the browser cookie.
 
@@ -133,7 +131,6 @@ class Gemini:
             "Gemini cookies must be provided as the 'cookies_dict' argument or extracted from the browser."
         )
 
-
     def _get_session(self, session: Optional[requests.Session]) -> requests.Session:
         """
         Get the requests Session object.
@@ -149,7 +146,7 @@ class Gemini:
 
         session = requests.Session()
         session.headers = SESSION_HEADERS
-        session.cookies.set("__Secure-1PSID", self.cookies['__Secure-1PSID'])
+        session.cookies.set("__Secure-1PSID", self.cookies["__Secure-1PSID"])
         session.proxies = self.proxies
 
         if self.cookies_dict is not None:
@@ -280,18 +277,20 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
-        
+
         # Refer to https://github.com/HanaokaYuzu/Gemini-API/
         if response.status_code != 200:
-            raise APIError(
-                f"Request failed with status code {response.status_code}"
-            )
+            raise APIError(f"Request failed with status code {response.status_code}")
         else:
             try:
-                body = json.loads(json.loads(response.text.split("\n")[2])[0][2])  # Plain text
+                body = json.loads(
+                    json.loads(response.text.split("\n")[2])[0][2]
+                )  # Plain text
 
                 if not body[4]:
-                    body = json.loads(json.loads(response.text.split("\n")[2])[4][2])  # Request with extensions as middleware
+                    body = json.loads(
+                        json.loads(response.text.split("\n")[2])[4][2]
+                    )  # Request with extensions as middleware
                 if not body[4]:
                     raise APIError(
                         "Failed to parse response body. Data structure is invalid."
@@ -307,7 +306,9 @@ class Gemini:
                     web_images = (
                         candidate[4]
                         and [
-                            WebImage(url=image[0][0][0], title=image[2], alt=image[0][4])
+                            WebImage(
+                                url=image[0][0][0], title=image[2], alt=image[0][4]
+                            )
                             for image in candidate[4]
                         ]
                         or []
@@ -687,7 +688,9 @@ class Gemini:
             )
 
         lines = [
-            line for line in response.content.splitlines() if line.startswith(b'[["wrb.fr')
+            line
+            for line in response.content.splitlines()
+            if line.startswith(b'[["wrb.fr')
         ]
         jsons = [json.loads(json.loads(line)[0][2]) for line in lines]
         # Post-processing of response

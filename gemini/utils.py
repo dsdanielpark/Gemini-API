@@ -99,16 +99,19 @@ def extract_cookies_from_brwoser() -> dict:
                 if cookie.name.startswith("__Secure-1PSID") or cookie.name == "NID":
                     cookie_dict[cookie.name] = cookie.value
         except Exception as e:
-            print("No supported browser found or issue with cookie extraction. Report issue at https://github.com/borisbabic/browser_cookie3/issues")
+            print(
+                "No supported browser found or issue with cookie extraction. Report issue at https://github.com/borisbabic/browser_cookie3/issues"
+            )
             continue  # Ignore exceptions and try the next browser function
-    
+
     # Ensure all required cookies are present
     required_cookies = {"__Secure-1PSIDTS", "__Secure-1PSIDCC", "__Secure-1PSID", "NID"}
     if not required_cookies.issubset(cookie_dict.keys()):
-        raise ValueError("Cookies '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID' and 'NID' are required but not found.")
-    
-    return cookie_dict
+        raise ValueError(
+            "Cookies '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID' and 'NID' are required but not found."
+        )
 
+    return cookie_dict
 
 
 def max_token(text: str, n: int) -> str:
