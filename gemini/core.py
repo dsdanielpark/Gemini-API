@@ -162,7 +162,6 @@ class Gemini:
 
         if self.cookies is not None:
             session.cookies.update(self.cookies)
-        
 
         return session
 
@@ -188,7 +187,7 @@ class Gemini:
                 "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
             )
         return snim0e.group(1)
-
+    
     def generate_content(
         self,
         prompt: str,
@@ -333,7 +332,22 @@ class Gemini:
                 raise APIError(
                     "Failed to parse response body. Data structure is invalid."
                 )
+        
+        if not generated_content:
+            # Retry to generate content by updating cookies and session
+            for _ in range(2):
+                self.cookies = self._get_auto_cookies(True)
+                self.session = self._get_session(None)
+                try:
+                    generated_content = self.generate_content(prompt, session, image, tool)
+                    break
+                except:
+                    continue
+            else:
+                raise APIError("Failed to establish session connection after retrying.")
+        
         return generated_content
+
 
     def speech(self, prompt: str, lang: str = "en-US") -> dict:
         """
@@ -448,185 +462,6 @@ class Gemini:
         # Increment request ID
         self._reqid += 100000
         return {"url": url, "status_code": response.status_code}
-
-    def ask_about_image(
-        self, prompt: str, image: bytes, lang: Optional[str] = None
-    ) -> dict:
-        """
-        Send Gemini image along with question and get answer
-
-        Example:
-        >>> cookies = Dict()
-        >>> Gemini = Gemini(cookies = cookies)
-        >>> image = open('image.jpg', 'rb').read()
-        >>> generated_content = Gemini.ask_about_image("what is in the image?", image)['content']
-
-        Args:
-            prompt (str): Input text for the query.
-            image (bytes): Input image bytes for the query, support image types: jpeg, png, webp
-            lang (str, optional): Language to use.
-
-        Returns:
-            dict: Answer from the Gemini API in the following format:
-                {
-                    "content": str,
-                    "conversation_id": str,
-                    "response_id": str,
-                    "factuality_queries": list,
-                    "text_query": str,
-                    "choices": list,
-                    "links": list,
-                    "images": list,
-                    "program_lang": str,
-                    "code": str,
-                    "status_code": int
-                }
-        """
-        if self.google_translator_api_key is not None:
-            google_official_translator = translate.Client(
-                api_key=self.google_translator_api_key
-            )
-        elif self.language is not None or lang is not None:
-            translator_to_eng = GoogleTranslator(source="auto", target="en")
-
-        # [Optional] Set language
-        if self.language is None and lang is None:
-            translated_prompt = prompt
-        elif (
-            (self.language is not None or lang is not None)
-            and self.language not in ALLOWED_LANGUAGES
-            and self.google_translator_api_key is None
-        ):
-            translator_to_eng = GoogleTranslator(source="auto", target="en")
-            translated_prompt = translator_to_eng.translate(prompt)
-        elif (
-            (self.language is not None or lang is not None)
-            and self.language not in ALLOWED_LANGUAGES
-            and self.google_translator_api_key is not None
-        ):
-            translated_prompt = google_official_translator.translate(
-                prompt, target_language="en"
-            )
-        elif (
-            (self.language is None or lang is None)
-            and self.language not in ALLOWED_LANGUAGES
-            and self.google_translator_api_key is None
-        ):
-            translator_to_eng = GoogleTranslator(source="auto", target="en")
-            translated_prompt = translator_to_eng.translate(prompt)
-
-        # Supported format: jpeg, png, webp
-        image_url = upload_image(image)
-
-        input_data_struct = [
-            None,
-            [
-                [
-                    translated_prompt,
-                    0,
-                    None,
-                    [[[image_url, 1], "uploaded_photo.jpg"]],
-                ],
-                [lang if lang is not None else self.language],
-                ["", "", ""],
-                "",  # Unknown random string value (1000 characters +)
-                uuid.uuid4().hex,  # Should be random uuidv4 (32 characters)
-                None,
-                [1],
-                0,
-                [],
-                [],
-            ],
-        ]
-        params = {
-            "bl": "boq_assistant-Gemini-web-server_20230716.16_p2",
-            "_reqid": str(self._reqid),
-            "rt": "c",
-        }
-        input_data_struct[1] = json.dumps(input_data_struct[1])
-        data = {
-            "f.req": json.dumps(input_data_struct),
-            "at": self.SNlM0e,
-        }
-
-        response = self.session.post(
-            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-            params=params,
-            data=data,
-            timeout=self.timeout,
-            proxies=self.proxies,
-        )
-
-        # Post-processing of response
-        response_dict = json.loads(response.content.splitlines()[3])[0][2]
-        if not response_dict:
-            return {
-                "content": f"Response Error: {response.content}. "
-                f"\nUnable to get response."
-                f"\nPlease double-check the cookie values and verify your network environment or google account."
-            }
-        parsed_answer = json.loads(response_dict)
-        content = parsed_answer[4][0][1][0]
-        try:
-            if self.language is None and self.google_translator_api_key is None:
-                translated_content = content
-            elif self.language is not None and self.google_translator_api_key is None:
-                translator = GoogleTranslator(source="en", target=self.language)
-                translated_content = translator.translate(content)
-
-            elif lang is not None and self.google_translator_api_key is None:
-                translator = GoogleTranslator(source="en", target=lang)
-                translated_content = translator.translate(content)
-
-            elif (
-                lang is None and self.language is None
-            ) and self.google_translator_api_key is None:
-                us_lang = detect(prompt)
-                translator = GoogleTranslator(source="en", target=us_lang)
-                translated_content = translator.translate(content)
-
-            elif (
-                self.language is not None and self.google_translator_api_key is not None
-            ):
-                translated_content = google_official_translator.translate(
-                    content, target_language=self.language
-                )
-            elif lang is not None and self.google_translator_api_key is not None:
-                translated_content = google_official_translator.translate(
-                    content, target_language=lang
-                )
-            elif (
-                self.language is None and lang is None
-            ) and self.google_translator_api_key is not None:
-                us_lang = detect(prompt)
-                translated_content = google_official_translator.translate(
-                    content, target_language=us_lang
-                )
-        except Exception as e:
-            print(f"Translation failed, and the original text has been returned. \n{e}")
-            translated_content = content
-
-        # Returned dictionary object
-        generated_content = {
-            "content": translated_content,
-            "conversation_id": parsed_answer[1][0],
-            "response_id": parsed_answer[1][1],
-            "factuality_queries": parsed_answer[3],
-            "text_query": parsed_answer[2][0] if parsed_answer[2] else "",
-            "choices": [{"id": x[0], "content": x[1]} for x in parsed_answer[4]],
-            "links": self._extract_links(parsed_answer[4]),
-            "images": [""],
-            "program_lang": "",
-            "code": "",
-            "status_code": response.status_code,
-        }
-        self.conversation_id, self.response_id, self.choice_id = (
-            generated_content["conversation_id"],
-            generated_content["response_id"],
-            generated_content["choices"][0]["id"],
-        )
-        self._reqid += 100000
-        return generated_content
 
     def export_replit(
         self,
