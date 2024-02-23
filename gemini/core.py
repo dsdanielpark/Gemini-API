@@ -48,7 +48,7 @@ class Gemini:
 
     Attributes:
         session (requests.Session): Requests session object.
-        cookies (dict): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) with their respective values.
+        cookies (dict): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC, NID) with their respective values.
         timeout (int): Request timeout in seconds. Defaults to 20.
         proxies (dict): Proxy configuration for requests.
         language (str): Natural language code for translation (e.g., "en", "ko", "ja").
@@ -87,7 +87,7 @@ class Gemini:
 
         Args:
             session (requests.Session, optional): Requests session object.
-            cookies (dict, optional): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC) with their respective values.
+            cookies (dict, optional): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC, NID) with their respective values.
             timeout (int, optional): Request timeout in seconds. Defaults to 20.
             proxies (dict, optional): Proxy configuration for requests.
             language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja").
@@ -96,11 +96,12 @@ class Gemini:
             run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
             auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
+        self.cookies = cookies or os.getenv("GEMINI_COOKIES") or self._get_auto_cookies(auto_cookies) or {}
         self.session = self._get_session(session)
-        self.cookies = cookies or self._get_auto_cookies(auto_cookies)
         self.timeout = timeout
-        self.proxies = proxies
+        self.proxies = proxies or {}
         self.language = language or os.getenv("GEMINI_LANGUAGE")
+        self.SNlM0e = self._get_snim0e()
         self.conversation_id = conversation_id or ""
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
@@ -125,9 +126,8 @@ class Gemini:
         Raises:
             Exception: If the token is not provided and can't be extracted from the browser.
         """
-        env_cookies = os.getenv("GEMINI_COOKIES_DICT")
-        if env_cookies:
-            return env_cookies
+        if not self.auto_cookies:
+            raise ValueError("auto_cookies is disabled, cannot retrieve cookies automatically.")
 
         if auto_cookies:
             extracted_cookie_dict = extract_cookies_from_brwoser()
@@ -156,7 +156,6 @@ class Gemini:
 
         session = requests.Session()
         session.headers = SESSION_HEADERS
-        session.cookies.set("__Secure-1PSID", self.cookies["__Secure-1PSID"])
         session.proxies = self.proxies
 
         if self.cookies is not None:
@@ -322,18 +321,18 @@ class Gemini:
                     )
                 if not candidates:
                     raise GeminiError(
-                        "Failed to generate candidates. No data of any kind returned."
+                        "Failed to generate candidates. No data of any kind returned. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
                     )
                 generated_content = GeminiOutput(
                     metadata=body[1], candidates=candidates
                 )
             except IndexError:
                 raise APIError(
-                    "Failed to parse response body. Data structure is invalid."
+                    "Failed to parse response body. Data structure is invalid. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
                 )
-
+        # Retry to generate content by updating cookies and session
         if not generated_content:
-            # Retry to generate content by updating cookies and session
+            print("Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again.")
             for _ in range(2):
                 self.cookies = self._get_auto_cookies(True)
                 self.session = self._get_session(None)
@@ -343,9 +342,9 @@ class Gemini:
                     )
                     break
                 except:
-                    continue
+                    print("Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues.")
             else:
-                raise APIError("Failed to establish session connection after retrying.")
+                raise APIError("Failed to generate content.")
 
         return generated_content
 
