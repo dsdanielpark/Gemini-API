@@ -112,7 +112,6 @@ class Gemini:
         self.exp_id = ""
         self.init_value = ""
 
-
     def _get_auto_cookies(self, auto_cookies: bool) -> dict:
         """
         Get the Gemini API token either from the provided token or from the browser cookie.
@@ -187,7 +186,7 @@ class Gemini:
                 "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
             )
         return snim0e.group(1)
-    
+
     def generate_content(
         self,
         prompt: str,
@@ -332,22 +331,23 @@ class Gemini:
                 raise APIError(
                     "Failed to parse response body. Data structure is invalid."
                 )
-        
+
         if not generated_content:
             # Retry to generate content by updating cookies and session
             for _ in range(2):
                 self.cookies = self._get_auto_cookies(True)
                 self.session = self._get_session(None)
                 try:
-                    generated_content = self.generate_content(prompt, session, image, tool)
+                    generated_content = self.generate_content(
+                        prompt, session, image, tool
+                    )
                     break
                 except:
                     continue
             else:
                 raise APIError("Failed to establish session connection after retrying.")
-        
-        return generated_content
 
+        return generated_content
 
     def speech(self, prompt: str, lang: str = "en-US") -> dict:
         """
@@ -561,7 +561,6 @@ class Gemini:
                 ):
                     links.append(item)
         return links
-
 
 
 class GeminiSession:
