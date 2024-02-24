@@ -182,6 +182,8 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
+## Sponsor
+Use Crawlbase API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
