@@ -27,7 +27,7 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie.
     - Depending on the region and Google account status, *multiple cookies may be required*.
     - You must appropriately set the `cookies_dict` parameter to `Gemini` class.
-    - Cookie values can be changed frequently, thus it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package.
+    - Cookie values can be changed frequently, thus it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package. (This feature is still under investigation for better methods.)
 
 <br>
 
