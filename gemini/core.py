@@ -71,6 +71,7 @@ class Gemini:
 
     def __init__(
         self,
+        auto_cookies: bool = False,
         session: Optional[requests.Session] = None,
         cookies: dict = None,
         timeout: int = 20,
@@ -79,7 +80,6 @@ class Gemini:
         conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
         run_code: bool = False,
-        auto_cookies: bool = False,
     ):
         """
         Initialize the Gemini instance.
@@ -95,6 +95,7 @@ class Gemini:
             run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
             auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
+        self.auto_cookies = auto_cookies
         self.cookies = cookies or self._get_cookies(auto_cookies) or {}
         self.session = self._get_session(session)
         self.timeout = timeout
@@ -125,24 +126,17 @@ class Gemini:
         Raises:
             Exception: If the token is not provided and can't be extracted from the browser.
         """
-        if not self.auto_cookies:
-            raise ValueError(
-                "auto_cookies is disabled, cannot retrieve cookies automatically."
-            )
-
-        if os.getenv("__Secure-1PSID") is not None:
-            for c in REQUIRED_COOKIE_LIST:
-                self.cookies[c] = os.getenv(c)
-
+        if os.getenv("__Secure-1PSID"):
+            self.cookies.update({c: os.getenv(c) for c in REQUIRED_COOKIE_LIST})
         elif auto_cookies:
-            extracted_cookie_dict = extract_cookies_from_brwoser()
-            self.cookies = extracted_cookie_dict
-            if extracted_cookie_dict:
-                return extracted_cookie_dict
-
-        raise Exception(
-            "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
-        )
+            self.cookies = extract_cookies_from_brwoser()
+        elif not self.auto_cookies:
+            self.auto_cookies = True
+            print("Cookie loading issue, auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open.")
+        else:
+            raise Exception(
+                "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
+            )
 
     def _get_session(self, session: Optional[requests.Session]) -> requests.Session:
         """
