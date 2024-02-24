@@ -1,9 +1,10 @@
 Development Status :: 2 - Pre-Alpha
 
+Development and QA for the service underway from March 1st.
+
+<br>
+
 # <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API
-
-
-
 A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
 
 <br>
