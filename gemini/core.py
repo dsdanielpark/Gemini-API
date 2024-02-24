@@ -94,7 +94,7 @@ class Gemini:
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = self._set_session(session)
-        self.SNlM0e = self._get_snim0e()
+        self.token = self._get_snim0e()
         self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
@@ -127,7 +127,9 @@ class Gemini:
             raise ValueError(
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
-        elif not REQUIRED_COOKIE_LIST.issubset(self.cookies.keys()):
+        required_cookie_set = set(REQUIRED_COOKIE_LIST)
+        current_cookie_keys = set(self.cookies.keys())
+        if not required_cookie_set.issubset(current_cookie_keys):
             print(
                 "Some recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
             )
@@ -200,12 +202,12 @@ class Gemini:
 
     def _get_snim0e(self) -> str:
         """
-        Get the Token(SNlM0e) value from the Gemini API response.
+        Get the SNlM0e Token value from the Gemini API response.
 
         Returns:
-            str: SNlM0e value.
+            str: SNlM0e token value.
         Raises:
-            Exception: If the __Secure-1PSID value is invalid or SNlM0e value is not found in the response.
+            Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
         response = self.session.get(
             "https://gemini.google.com/app", timeout=self.timeout, proxies=self.proxies
@@ -214,10 +216,10 @@ class Gemini:
             raise Exception(
                 f"Response status code is not 200. Response Status is {response.status_code}"
             )
-        snim0e = re.search(r"SNlM0e\":\"(.*?)\"", response.text)
+        snim0e = re.search(r"token\":\"(.*?)\"", response.text)
         if not snim0e:
             raise Exception(
-                "SNlM0e value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
+                "token value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
             )
         return snim0e.group(1)
 
@@ -260,7 +262,7 @@ class Gemini:
         ):
             prompt = google_official_translator.translate(prompt, target_language="en")
         data = {
-            "at": self.SNlM0e,
+            "at": self.token,
             "f.req": json.dumps(
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
@@ -393,7 +395,7 @@ class Gemini:
 
         data = {
             "f.req": json.dumps(prompt_struct),
-            "at": self.SNlM0e,
+            "at": self.token,
         }
 
         # Get response
