@@ -1,18 +1,16 @@
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
-import base64
-import json
 import os
-import random
 import re
+import json
+import base64
+import random
 import string
-from typing import Optional, Any
-
 import requests
+from typing import Optional, Any
 
 try:
     from deep_translator import GoogleTranslator
     from google.cloud import translate_v2 as translate
-    from langdetect import detect
 except ImportError:
     pass
 
@@ -35,8 +33,6 @@ from .models.exceptions import (
     TimeoutError,
 )
 from .utils import (
-    build_export_data_structure,
-    build_input_replit_data_struct,
     extract_cookies_from_brwoser,
 )
 
@@ -132,7 +128,9 @@ class Gemini:
             self.cookies = extract_cookies_from_brwoser()
         elif not self.auto_cookies and self.cookies == {}:
             self.auto_cookies = True
-            print("Cookie loading issue, try auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open.")
+            print(
+                "Cookie loading issue, try auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open."
+            )
         else:
             raise Exception(
                 "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
