@@ -45,13 +45,13 @@ cookies = {
 
 GeminiClient = Gemini(cookies=cookies)
 ```
-Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (This feature is still under investigation for better methods.)
+Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (under investigation for better methods.)
 ```python
 from gemini import Gemini
 
 GeminiClient = Gemini(auto_cookies=True)
 ```
- However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
+However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
 
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
