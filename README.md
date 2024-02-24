@@ -1,6 +1,6 @@
 Development Status :: 2 - Pre-Alpha
 
-Development and QA for the service underway from March 1st.
+Development and QA for the service underway from March 1st, 2024.
 
 <br>
 
