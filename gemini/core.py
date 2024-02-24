@@ -18,7 +18,7 @@ except ImportError:
 
 from .constants import (
     ALLOWED_LANGUAGES,
-    REPLIT_SUPPORT_PROGRAM_LANGUAGES,
+    REQUIRED_COOKIE_LIST,
     SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
     Tool,
@@ -95,12 +95,7 @@ class Gemini:
             run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
             auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
-        self.cookies = (
-            cookies
-            or os.getenv("GEMINI_COOKIES")
-            or self._get_auto_cookies(auto_cookies)
-            or {}
-        )
+        self.cookies = cookies or self._get_cookies(auto_cookies) or {}
         self.session = self._get_session(session)
         self.timeout = timeout
         self.proxies = proxies or {}
@@ -117,7 +112,7 @@ class Gemini:
         self.exp_id = ""
         self.init_value = ""
 
-    def _get_auto_cookies(self, auto_cookies: bool) -> dict:
+    def _get_cookies(self, auto_cookies: bool) -> dict:
         """
         Get the Gemini API token either from the provided token or from the browser cookie.
 
@@ -135,7 +130,11 @@ class Gemini:
                 "auto_cookies is disabled, cannot retrieve cookies automatically."
             )
 
-        if auto_cookies:
+        if os.getenv("__Secure-1PSID") is not None:
+            for c in REQUIRED_COOKIE_LIST:
+                self.cookies[c] = os.getenv(c)
+
+        elif auto_cookies:
             extracted_cookie_dict = extract_cookies_from_brwoser()
             self.cookies = extracted_cookie_dict
             if extracted_cookie_dict:
@@ -342,7 +341,7 @@ class Gemini:
                 "Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
             )
             for _ in range(2):
-                self.cookies = self._get_auto_cookies(True)
+                self.cookies = self._get_cookies(True)
                 self.session = self._get_session(None)
                 try:
                     generated_content = self.generate_content(
