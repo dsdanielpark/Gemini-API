@@ -218,7 +218,7 @@ We would like to express my sincere gratitude to all the contributors.
 > **Warning** 
 Users bear all legal responsibilities when using the BardAPI package, which offers easy access to Google Bard for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies.
 
-<br><br>
+<br>
 
 
 *Copyright (c) 2024 MinWoo Park, South Korea*<br>
