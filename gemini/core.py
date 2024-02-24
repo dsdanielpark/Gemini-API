@@ -6,6 +6,7 @@ import base64
 import random
 import string
 import requests
+import browser_cookie3
 from typing import Optional, Any
 
 try:
@@ -19,6 +20,7 @@ from .constants import (
     REQUIRED_COOKIE_LIST,
     SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
+    SUPPORTED_BROWSERS,
     Tool,
 )
 from .models.base import (
@@ -70,7 +72,7 @@ class Gemini:
         auto_cookies: bool = False,
         session: Optional[requests.Session] = None,
         cookies: dict = None,
-        timeout: int = 20,
+        timeout: int = 30,
         proxies: Optional[dict] = None,
         language: Optional[str] = None,
         conversation_id: Optional[str] = None,
@@ -92,13 +94,13 @@ class Gemini:
             auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
         """
         self.auto_cookies = auto_cookies
+        self.proxies = proxies or {}
+        self.timeout = timeout
         self.cookies = cookies or self._get_cookies(auto_cookies) or {}
         self.session = self._set_session(session)
-        self.timeout = timeout
-        self.proxies = proxies or {}
-        self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.SNlM0e = self._get_snim0e()
         self.conversation_id = conversation_id or ""
+        self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
         self._reqid = int("".join(random.choices(string.digits, k=4)))
@@ -108,6 +110,46 @@ class Gemini:
         self.rot = ""
         self.exp_id = ""
         self.init_value = ""
+
+    def _get_cookies_from_browser(self) -> None:
+        """
+        Extracts the specified Bard cookies from the browser's cookies.
+
+        This function searches for the specified Bard cookies in various web browsers
+        installed on the system. It supports modern web browsers and operating systems.
+
+        Returns:
+            dict: A dictionary containing the extracted Bard cookies.
+
+        Raises:
+            Exception: If no supported browser is found or if there's an issue with cookie extraction.
+        """
+
+        for browser_fn in SUPPORTED_BROWSERS:
+            try:
+                print(
+                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
+                )
+                cj = browser_fn(domain_name=".google.com")
+                found_cookies = {
+                    cookie.name: cookie.value
+                    for cookie in cj
+                    if cookie.name.startswith("__Secure-1PSID")
+                }
+                self.cookies.update(found_cookies)
+                if REQUIRED_COOKIE_LIST.issubset(found_cookies.keys()):
+                    break
+            except Exception as e:
+                continue  # Ignore exceptions and try the next browser function
+
+        if not self.cookies:
+            raise ValueError(
+                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
+            )
+        elif not REQUIRED_COOKIE_LIST.issubset(self.cookies.keys()):
+            print(
+                "Some recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
+            )
 
     def _get_cookies(self, auto_cookies: bool) -> dict:
         """

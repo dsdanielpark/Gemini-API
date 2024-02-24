@@ -1,7 +1,7 @@
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
 from enum import Enum
 from colorama import Fore
-
+import browser_cookie3
 
 SESSION_HEADERS = {
     "Host": "gemini.google.com",
@@ -166,6 +166,19 @@ REQUIRED_COOKIE_LIST = [
     "__Secure-1PSIDTS",
     "__Secure-1PSIDCC",
     "NID",
+]
+
+SUPPORTED_BROWSERS = [
+    browser_cookie3.chrome,
+    browser_cookie3.chromium,
+    browser_cookie3.opera,
+    browser_cookie3.opera_gx,
+    browser_cookie3.brave,
+    browser_cookie3.edge,
+    browser_cookie3.vivaldi,
+    browser_cookie3.firefox,
+    browser_cookie3.librewolf,
+    browser_cookie3.safari,
 ]
 
 

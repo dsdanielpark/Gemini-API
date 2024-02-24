@@ -94,9 +94,12 @@ def extract_cookies_from_brwoser() -> dict:
 
     for browser_fn in supported_browsers:
         try:
+            print(
+                "Try to automatically retrieve cookies from the browser for the Gemini web UI service using the browser_cookie3 package."
+            )
             cj = browser_fn(domain_name=".google.com")
             for cookie in cj:
-                if cookie.name.startswith("__Secure-1PSID") or cookie.name == "NID":
+                if cookie.name.startswith("__Secure-1PSID"):
                     cookie_dict[cookie.name] = cookie.value
         except Exception as e:
             print(
