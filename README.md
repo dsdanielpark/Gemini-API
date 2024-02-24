@@ -79,7 +79,7 @@ for i, image in enumerate(response.images): # Save images
 
 ### Generate content with image
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
-As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
+As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
 
 ```python
 prompt = "What is in the image?"
@@ -110,7 +110,7 @@ proxies = {
 }
 
 GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
-GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul"s scenery.")
+GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
 ```
 
 ### Use rotating proxies
@@ -216,7 +216,7 @@ We would like to express my sincere gratitude to all the contributors.
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 > **Warning** 
-Users bear all legal responsibilities when using the BardAPI package, which offers easy access to Google Bard for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies.
+Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
 
 <br>
 
