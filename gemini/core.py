@@ -5,7 +5,7 @@ import json
 import base64
 import requests
 import browser_cookie3
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 try:
     from deep_translator import GoogleTranslator
@@ -94,7 +94,7 @@ class Gemini:
         self.auto_cookies = auto_cookies
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.cookies = cookies or self._get_cookies(auto_cookies) or {}
+        self.cookies = cookies or self._set_cookies(auto_cookies) or {}
         self.session = self._set_session(session)
         self.SNlM0e = self._get_snim0e()
         self.conversation_id = conversation_id or ""
@@ -102,7 +102,7 @@ class Gemini:
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
 
-    def _get_cookies_from_browser(self) -> None:
+    def _set_cookies_from_browser(self) -> None:
         """
         Extracts the specified Bard cookies from the browser's cookies.
 
@@ -142,7 +142,7 @@ class Gemini:
                 "Some recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
             )
 
-    def _get_cookies(self, auto_cookies: bool) -> dict:
+    def _set_cookies(self, auto_cookies: bool) -> dict:
         """
         Get the Gemini API token either from the provided token or from the browser cookie.
 
@@ -366,7 +366,7 @@ class Gemini:
                 "Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
             )
             for _ in range(2):
-                self.cookies = self._get_cookies(True)
+                self.cookies = self._set_cookies(True)
                 self.session = self._set_session(None)
                 try:
                     generated_content = self.generate_content(
@@ -464,7 +464,7 @@ class GeminiSession:
     def __init__(
         self,
         gemini: Gemini,
-        metadata: Optional[list[str]] = None,
+        metadata: Optional[List[str]] = None,
         cid: Optional[str] = None,  # chat id
         rid: Optional[str] = None,  # reply id
         rcid: Optional[str] = None,  # reply candidate id
@@ -539,7 +539,7 @@ class GeminiSession:
         return self.__metadata
 
     @metadata.setter
-    def metadata(self, value: list[str]):
+    def metadata(self, value: List[str]):
         if len(value) > 3:
             raise ValueError("metadata cannot exceed 3 elements")
         self.__metadata[: len(value)] = value
