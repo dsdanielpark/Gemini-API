@@ -89,9 +89,10 @@ class Gemini:
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
+        self.cookies = cookies or {}
+        self._set_cookies(auto_cookies)
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.cookies = cookies or self._set_cookies(auto_cookies) or {}
         self.session = self._set_session(session)
         self.SNlM0e = self._get_snim0e()
         self.conversation_id = conversation_id or ""
@@ -119,8 +120,6 @@ class Gemini:
                 cj = browser_fn(domain_name=".google.com")
                 found_cookies = {cookie.name: cookie.value for cookie in cj}
                 self.cookies.update(found_cookies)
-                if REQUIRED_COOKIE_LIST.issubset(found_cookies.keys()):
-                    break
             except Exception as e:
                 continue  # Ignore exceptions and try the next browser function
 
