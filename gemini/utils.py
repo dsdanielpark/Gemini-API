@@ -5,7 +5,6 @@ from typing import Optional
 from gemini.constants import IMG_UPLOAD_HEADERS
 
 
-
 def extract_links(data: list) -> list:
     """
     Extract links from the given data.
@@ -61,9 +60,6 @@ def upload_image(image: bytes, filename: str = "Photo.jpg"):
     resp = requests.post(upload_url, headers=headers, data=image)
     resp.raise_for_status()
     return resp.text
-
-
-
 
 
 def max_token(text: str, n: int) -> str:
