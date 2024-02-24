@@ -3,6 +3,38 @@ from enum import Enum
 from colorama import Fore
 import browser_cookie3
 
+
+class Tool(Enum):
+    GMAIL = ["workspace_tool", "Gmail"]
+    GOOGLE_DOCS = ["workspace_tool", "Google Docs"]
+    GOOGLE_DRIVE = ["workspace_tool", "Google Drive"]
+    GOOGLE_FLIGHTS = ["google_flights_tool"]
+    GOOGLE_HOTELS = ["google_hotels_tool"]
+    GOOGLE_MAPS = ["google_map_tool"]
+    YOUTUBE = ["youtube_tool"]
+
+
+DEFAULT_LANGUAGE = "en"
+SEPARATOR_LINE = "=" * 36
+USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
+TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20230912.07_p1"
+POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
+
+IMG_UPLOAD_HEADERS = {
+    "authority": "content-push.googleapis.com",
+    "accept": "*/*",
+    "accept-language": "en-US,en;q=0.7",
+    "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",  # Constant Authorization Key
+    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "origin": "https://gemini.google.com",
+    "push-id": "feeds/mcudyrk2a4khkz",  # Constant
+    "referer": "https://gemini.google.com/",
+    "x-goog-upload-command": "start",
+    "x-goog-upload-header-content-length": "",
+    "x-goog-upload-protocol": "resumable",
+    "x-tenant-id": "bard-storage",
+}
+
 SESSION_HEADERS = {
     "Host": "gemini.google.com",
     "X-Same-Domain": "1",
@@ -115,27 +147,6 @@ ALLOWED_LANGUAGES = {
     "vi",
 }
 
-DEFAULT_LANGUAGE = "en"
-SEPARATOR_LINE = "=" * 36
-USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
-TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20230912.07_p1"
-POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
-
-IMG_UPLOAD_HEADERS = {
-    "authority": "content-push.googleapis.com",
-    "accept": "*/*",
-    "accept-language": "en-US,en;q=0.7",
-    "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",  # Constant Authorization Key
-    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "origin": "https://gemini.google.com",
-    "push-id": "feeds/mcudyrk2a4khkz",  # Constant
-    "referer": "https://gemini.google.com/",
-    "x-goog-upload-command": "start",
-    "x-goog-upload-header-content-length": "",
-    "x-goog-upload-protocol": "resumable",
-    "x-tenant-id": "bard-storage",
-}
-
 REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
     "python": "main.py",
     "javascript": "index.js",
@@ -180,13 +191,3 @@ SUPPORTED_BROWSERS = [
     browser_cookie3.librewolf,
     browser_cookie3.safari,
 ]
-
-
-class Tool(Enum):
-    GMAIL = ["workspace_tool", "Gmail"]
-    GOOGLE_DOCS = ["workspace_tool", "Google Docs"]
-    GOOGLE_DRIVE = ["workspace_tool", "Google Drive"]
-    GOOGLE_FLIGHTS = ["google_flights_tool"]
-    GOOGLE_HOTELS = ["google_hotels_tool"]
-    GOOGLE_MAPS = ["google_map_tool"]
-    YOUTUBE = ["youtube_tool"]

@@ -32,25 +32,22 @@ from .models.exceptions import (
     GeminiError,
     TimeoutError,
 )
-from .utils import (
-    extract_cookies_from_brwoser,
-)
 
 
 class Gemini:
     """
-    Represents a Gemini instance for interacting with the Google Gemini service.
+    Represents a Gemini instance for interacting with services, supporting features like automatic cookie handling, proxy configuration, Google Cloud Translation integration, and optional code execution within IPython environments.
 
     Attributes:
-        session (requests.Session): Requests session object.
-        cookies (dict): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC, NID) with their respective values.
-        timeout (int): Request timeout in seconds. Defaults to 20.
-        proxies (dict): Proxy configuration for requests.
-        language (str): Natural language code for translation (e.g., "en", "ko", "ja").
-        conversation_id (str): ID for fetching conversational context.
-        auto_cookies (bool): Flag indicating whether to retrieve a token from the browser.
-        google_translator_api_key (str): Google Cloud Translation API key.
-        run_code (bool): Flag indicating whether to execute code included in the answer (IPython only).
+        session (requests.Session): A requests session object for making HTTP requests.
+        cookies (dict): A dictionary containing cookies with their respective values. Important for maintaining session state.
+        timeout (int): Request timeout in seconds. Defaults to 30.
+        proxies (dict): Proxy configuration for requests. Useful for routing requests through specific network interfaces.
+        language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja"). Used for specifying the desired language for translation services.
+        conversation_id (str, optional): An identifier for fetching conversational context. Useful in applications requiring context-aware interactions.
+        auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies. Defaults to False.
+        google_translator_api_key (str, optional): Specifies the Google Cloud Translation API key for translation services.
+        run_code (bool): Indicates whether to execute code included in the response. This is applicable only in IPython environments.
     """
 
     __slots__ = [
@@ -69,7 +66,7 @@ class Gemini:
         self,
         auto_cookies: bool = False,
         session: Optional[requests.Session] = None,
-        cookies: dict = None,
+        cookies: Optional[dict] = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
         language: Optional[str] = None,
@@ -78,18 +75,18 @@ class Gemini:
         run_code: bool = False,
     ):
         """
-        Initialize the Gemini instance.
+        Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
 
-        Args:
-            session (requests.Session, optional): Requests session object.
-            cookies (dict, optional): Dictionary containing cookies (__Secure-1PSID, __Secure-1PSIDTS, __Secure-1PSIDCC, NID) with their respective values.
-            timeout (int, optional): Request timeout in seconds. Defaults to 20.
-            proxies (dict, optional): Proxy configuration for requests.
-            language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja").
-            conversation_id (str, optional): ID for fetching conversational context.
-            google_translator_api_key (str, optional): Google Cloud Translation API key.
-            run_code (bool, optional): Flag indicating whether to execute code included in the answer (IPython only).
-            auto_cookies (bool, optional): Flag indicating whether to retrieve a token from the browser.
+        Parameters:
+            auto_cookies (bool): Whether to automatically manage cookies.
+            session (Optional[requests.Session]): A custom session object. If not provided, a new session will be created.
+            cookies (Optional[dict]): Initial cookie values. If auto_cookies is True, cookies are managed automatically.
+            timeout (int): Request timeout in seconds. Defaults to 30.
+            proxies (Optional[dict]): Proxy configurations for the requests.
+            language (Optional[str]): Default language for translation services.
+            conversation_id (Optional[str]): ID for fetching conversational context.
+            google_translator_api_key (Optional[str]): Google Cloud Translation API key.
+            run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
         self.proxies = proxies or {}
@@ -104,16 +101,14 @@ class Gemini:
 
     def _set_cookies_from_browser(self) -> None:
         """
-        Extracts the specified Bard cookies from the browser's cookies.
+        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
 
-        This function searches for the specified Bard cookies in various web browsers
-        installed on the system. It supports modern web browsers and operating systems.
+        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
 
-        Returns:
-            dict: A dictionary containing the extracted Bard cookies.
+        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
 
         Raises:
-            Exception: If no supported browser is found or if there's an issue with cookie extraction.
+            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
         """
 
         for browser_fn in SUPPORTED_BROWSERS:
@@ -122,11 +117,7 @@ class Gemini:
                     f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
                 )
                 cj = browser_fn(domain_name=".google.com")
-                found_cookies = {
-                    cookie.name: cookie.value
-                    for cookie in cj
-                    if cookie.name.startswith("__Secure-1PSID")
-                }
+                found_cookies = {cookie.name: cookie.value for cookie in cj}
                 self.cookies.update(found_cookies)
                 if REQUIRED_COOKIE_LIST.issubset(found_cookies.keys()):
                     break
@@ -142,60 +133,75 @@ class Gemini:
                 "Some recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
             )
 
-    def _set_cookies(self, auto_cookies: bool) -> dict:
+    def _set_cookies(self, auto_cookies: bool) -> None:
         """
-        Get the Gemini API token either from the provided token or from the browser cookie.
+        Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
 
         Args:
-            auto_cookies (bool): Whether to extract the token from the browser cookie.
-
-        Returns:
-            dict: The dictionary containing the extracted cookies.
+            auto_cookies (bool): Indicates whether to attempt automatic extraction of tokens from the browser's cookies.
 
         Raises:
-            Exception: If the token is not provided and can't be extracted from the browser.
+            Exception: If no cookies are provided through environment variables or cannot be extracted from the browser when auto_cookies is True.
         """
-        if os.getenv("__Secure-1PSID"):
-            self.cookies.update({c: os.getenv(c) for c in REQUIRED_COOKIE_LIST})
-        elif auto_cookies:
-            self.cookies = extract_cookies_from_brwoser()
-        elif not self.auto_cookies and self.cookies == {}:
-            self.auto_cookies = True
-            print(
-                "Cookie loading issue, try auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open."
-            )
-        else:
-            raise Exception(
-                "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
+        if not self.cookies:
+            self.cookies.update(
+                {
+                    cookie: os.getenv(cookie)
+                    for cookie in REQUIRED_COOKIE_LIST
+                    if os.getenv(cookie)
+                }
             )
 
-    def _set_session(self, session: Optional[requests.Session]) -> requests.Session:
+        if auto_cookies and not self.cookies:
+            try:
+                self._set_cookies_from_browser()  # Assuming this updates self.cookies directly
+            except (
+                Exception
+            ) as e:  # Consider specifying more precise exceptions if possible
+                raise Exception("Failed to extract cookies from browser.") from e
+        if not auto_cookies and not self.cookies:
+            print(
+                "Cookie loading issue, try setting auto_cookies to True. Restart browser, log out, log in for Gemini Web UI to work. Keep a single browser open."
+            )
+        if not self.cookies:
+            raise Exception(
+                "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
+            )
+
+    def _set_session(
+        self, session: Optional[requests.Session] = None
+    ) -> requests.Session:
         """
-        Get the requests Session object.
+        Initializes or uses a provided requests.Session object. If a session is not provided, a new one is created.
+        The new or provided session is configured with predefined session headers, proxies, and cookies from the instance.
 
         Args:
-            session (requests.Session): Requests session object.
+            session (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
 
         Returns:
-            requests.Session: The Session object.
+            requests.Session: The session object, either the one provided or a newly created and configured session.
+
+        Raises:
+            ValueError: If 'session' is None and the 'cookies' dictionary is empty, indicating that there's insufficient information to properly set up a new session.
         """
         if session is not None:
             return session
-        elif not self.cookies:
+
+        if not self.cookies:
             raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
         session = requests.Session()
-        session.headers = SESSION_HEADERS
-        session.proxies = self.proxies
-
-        if self.cookies is not None:
-            session.cookies.update(self.cookies)
+        session.headers.update(
+            SESSION_HEADERS
+        )  # Use `update` to ensure we're adding to any existing headers
+        session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
+        session.cookies.update(self.cookies)
 
         return session
 
     def _get_snim0e(self) -> str:
         """
-        Get the SNlM0e value from the Gemini API response.
+        Get the Token(SNlM0e) value from the Gemini API response.
 
         Returns:
             str: SNlM0e value.
@@ -224,35 +230,16 @@ class Gemini:
         tool: Optional[Tool] = None,
     ) -> dict:
         """
-        Get an answer from the Gemini API for the given input text.
-
-        Example:
-        >>> cookies = Dict()
-        >>> Gemini = Gemini(cookies=cookies)
-        >>> response = Gemini.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
-        >>> print(response['content'])
+        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
 
         Args:
-            prompt (str): Input text for the query.
-            image (bytes): Input image bytes for the query, support image types: jpeg, png, webp
-            image_name (str): Short file name
-            tool : tool to use can be one of Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, Youtube
+            prompt (str): The input text for the content generation query.
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
+            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
 
         Returns:
-            dict: Answer from the Gemini API in the following format:
-                {
-                    "content": str,
-                    "conversation_id": str,
-                    "response_id": str,
-                    "factuality_queries": list,
-                    "text_query": str,
-                    "choices": list,
-                    "links": list,
-                    "images": list,
-                    "program_lang": str,
-                    "code": str,
-                    "status_code": int
-                }
+            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
         """
         if self.google_translator_api_key is not None:
             google_official_translator = translate.Client(
@@ -386,13 +373,6 @@ class Gemini:
         """
         Get speech audio from Gemini API for the given input text.
 
-        Example:
-        >>> cookies = Dict()
-        >>> Gemini = Gemini(cookies=cookies)
-        >>> audio = Gemini.speech("Say hello!")
-        >>> with open("Gemini.ogg", "wb") as f:
-        >>>     f.write(bytes(audio['audio']))
-
         Args:
             prompt (str): Input text for the query.
             lang (str, optional, default = "en-US"): Input language for the query.
@@ -442,23 +422,23 @@ class Gemini:
 
 class GeminiSession:
     """
-    Chat data to retrieve conversation history. Only if all 3 ids are provided will the conversation history be retrieved.
+    Represents a session to manage and retrieve conversation history in the context of Gemini services. This class facilitates interaction with the Gemini API, allowing for the retrieval of conversation history based on specified metadata identifiers.
 
-    Parameters
-    ----------
-    gemini: `Gemini`
-        Gemini client interface for https://gemini.google.com/
-    metadata: `list[str]`, optional
-        List of chat metadata `[cid, rid, rcid]`, can be shorter than 3 elements, like `[cid, rid]` or `[cid]` only
-    cid: `str`, optional
-        Chat id, if provided together with metadata, will override the first value in it
-    rid: `str`, optional
-        Reply id, if provided together with metadata, will override the second value in it
-    rcid: `str`, optional
-        Reply candidate id, if provided together with metadata, will override the third value in it
+    Attributes:
+        gemini (Gemini): An instance of the Gemini client interface used for interactions with https://gemini.google.com/. This attribute is essential for making API calls and retrieving data.
+        __metadata (list[str], optional): A list of strings representing chat metadata, potentially including chat ID (`cid`), reply ID (`rid`), and reply candidate ID (`rcid`). This list can vary in length, accommodating fewer than three elements to match provided identifiers.
+        gemini_output: Stores the output from the Gemini API calls. This attribute is managed internally and populated based on interactions facilitated by the session.
+
+    Parameters:
+        gemini (Gemini): The Gemini client interface, providing the necessary functionality to interact with the Gemini API.
+        metadata (list[str], optional): A list containing identifiers for chat metadata, such as `[cid, rid, rcid]`. The list can be shorter, with one or two elements like `[cid]` or `[cid, rid]`, depending on the available information.
+        cid (str, optional): A specific chat ID. If provided along with `metadata`, it will replace the first element in the metadata list, signifying the chat ID.
+        rid (str, optional): A specific reply ID. If provided along with `metadata`, it will replace the second element in the metadata list, indicating the reply ID.
+        rcid (str, optional): A specific reply candidate ID. If provided along with `metadata`, it will replace the third element in the metadata list, denoting the reply candidate ID.
+
+    The class requires a Gemini instance to function correctly. It uses the provided metadata, along with optional specific identifiers (`cid`, `rid`, `rcid`), to manage and retrieve conversation history. Only when all three identifiers are provided will the complete conversation history be retrieved.
     """
 
-    # @properties needn't have their slots pre-defined
     __slots__ = ["__metadata", "gemini", "gemini_output"]
 
     def __init__(
@@ -495,30 +475,33 @@ class GeminiSession:
 
     def send_message(self, prompt: str) -> GeminiOutput:
         """
-        Generates contents with prompt.
-        Use as a shortcut for `Gemini.generate_content(prompt, self)`.
+        Generates content by submitting a prompt to the Gemini API, acting as a shortcut method for `Gemini.generate_content(prompt, self)`.
 
-        Parameters
-        ----------
-        prompt: `str`
-            Prompt provided by user
+        This method simplifies the process of content generation by directly accepting a user-provided prompt and leveraging the Gemini API to generate relevant content. The output encompasses a variety of content forms, including text responses, images, and a list of all answer candidates.
 
-        Returns
-        -------
-        :class:`GeminiOutput`
-            Output data from gemini.google.com, use `GeminiOutput.text` to get the default text reply, `GeminiOutput.images` to get a list
-            of images in the default reply, `GeminiOutput.candidates` to get a list of all answer candidates in the gemini_output
+        Parameters:
+            prompt (str): The input text provided by the user, serving as the basis for content generation.
+
+        Returns:
+            GeminiOutput: An object encapsulating the output data from gemini.google.com. The `GeminiOutput` object offers several attributes for accessing different parts of the response:
+                - `text` for retrieving the default text reply.
+                - `images` for obtaining a list of images included in the default reply.
+                - `candidates` for accessing a comprehensive list of all answer candidates within the gemini_output.
+
+        The method ensures a streamlined interface for interacting with the Gemini API, facilitating the retrieval of diverse content types based on the input prompt.
         """
         return self.gemini.generate_content(prompt, self)
 
     def choose_candidate(self, index: int) -> GeminiOutput:
         """
-        Choose a candidate from the last `GeminiOutput` to control the ongoing conversation flow.
+        Selects a specific candidate from the most recent `GeminiOutput` to direct the flow of an ongoing conversation.
 
-        Parameters
-        ----------
-        index: `int`
-            Index of the candidate to choose, starting from 0
+        This method allows the user to influence the direction of the conversation by choosing one of the answer candidates provided by the last Gemini API call. By specifying the index of the desired candidate, the conversation can be steered towards a particular topic or response style.
+
+        Parameters:
+            index (int): The zero-based index of the candidate to be selected. This index corresponds to the position of the candidate within the list of answer candidates provided in the last `GeminiOutput`.
+
+        The chosen candidate will affect subsequent interactions with the Gemini API, guiding the content and responses generated based on the selected conversational path.
         """
         if not self.gemini_output:
             raise ValueError(
