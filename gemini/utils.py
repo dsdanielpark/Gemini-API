@@ -3,7 +3,7 @@ import json
 import requests
 from typing import Optional
 from gemini.constants import IMG_UPLOAD_HEADERS
-import browser_cookie3
+
 
 
 def extract_links(data: list) -> list:
@@ -63,58 +63,7 @@ def upload_image(image: bytes, filename: str = "Photo.jpg"):
     return resp.text
 
 
-def extract_cookies_from_brwoser() -> dict:
-    """
-    Extracts the specified Bard cookies from the browser's cookies.
 
-    This function searches for the specified Bard cookies in various web browsers
-    installed on the system. It supports modern web browsers and operating systems.
-
-    Returns:
-        dict: A dictionary containing the extracted Bard cookies.
-
-    Raises:
-        Exception: If no supported browser is found or if there's an issue with cookie extraction.
-    """
-
-    supported_browsers = [
-        browser_cookie3.chrome,
-        browser_cookie3.chromium,
-        browser_cookie3.opera,
-        browser_cookie3.opera_gx,
-        browser_cookie3.brave,
-        browser_cookie3.edge,
-        browser_cookie3.vivaldi,
-        browser_cookie3.firefox,
-        browser_cookie3.librewolf,
-        browser_cookie3.safari,
-    ]
-
-    cookie_dict = {}
-
-    for browser_fn in supported_browsers:
-        try:
-            print(
-                "Try to automatically retrieve cookies from the browser for the Gemini web UI service using the browser_cookie3 package."
-            )
-            cj = browser_fn(domain_name=".google.com")
-            for cookie in cj:
-                if cookie.name.startswith("__Secure-1PSID"):
-                    cookie_dict[cookie.name] = cookie.value
-        except Exception as e:
-            print(
-                "Failed to extract cookies automatically. Report the issue at https://github.com/borisbabic/browser_cookie3/issues if the problem persists."
-            )
-            continue  # Ignore exceptions and try the next browser function
-
-    # Ensure all required cookies are present
-    required_cookies = {"__Secure-1PSIDTS", "__Secure-1PSIDCC", "__Secure-1PSID", "NID"}
-    if not required_cookies.issubset(cookie_dict.keys()):
-        print(
-            "Some of recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
-        )
-
-    return cookie_dict
 
 
 def max_token(text: str, n: int) -> str:
