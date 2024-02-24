@@ -24,7 +24,7 @@ version = get_version()
 
 setup(
     name="python-gemini-api",
-    version="0.1.1",
+    version="0.1.2",
     author="daniel park",
     author_email="parkminwoo1991@gmail.com",
     description="The python package that returns Response of Google Gemini through API.",
