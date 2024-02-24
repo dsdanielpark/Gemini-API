@@ -215,5 +215,10 @@ We would like to express my sincere gratitude to all the contributors.
 [3] Github [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
+> **Warning** 
+Users bear all legal responsibilities when using the BardAPI package, which offers easy access to Google Bard for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies.
+
+<br><br>
 
 
+*Copyright (c) 2024 MinWoo Park, South Korea*<br>
