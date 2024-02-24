@@ -76,7 +76,7 @@ for i, image in enumerate(response.images): # Save images
 
 ```
 
-### Generate content about image
+### Generate content with image
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
 
