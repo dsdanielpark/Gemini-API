@@ -30,7 +30,7 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 <br>
 
 ## Usage
-
+After Bard's update to Gemini, multiple cookies, often updated, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Innitiallization
 ```python
 from gemini import Gemini
@@ -44,13 +44,16 @@ cookies = {
 
 GeminiClient = Gemini(cookies=cookies)
 ```
-Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). However, this feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
+Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3).
 ```python
 from gemini import Gemini
 
 GeminiClient = Gemini(auto_cookies=True)
 ```
+ However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
 
+
+*Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
 
 ### Text generation
@@ -72,7 +75,7 @@ for i, image in enumerate(response.images): # Save images
 
 ```
 
-### Generate contents about image
+### Generate content about image
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
 
@@ -87,15 +90,16 @@ response = GeminiClient.generate_content(prompt, image)
 Business users and high traffic volume may be subject to account restrictions according to Google"s policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
 The user is solely responsible for all code, and it is imperative to consult Google"s official services and policies. Furthermore, the code in this repository is provided under the MIT license, and it disclaims any liability, including explicit or implied legal responsibilities.
 ```python
-text = "Read this sentence: Hello, I'm developer in seoul"
+text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
 response = GeminiClient.generate_content(prompt, image)
 audio = GeminiClient.speech(text)
 with open("speech.ogg", "wb") as f:
-    f.write(bytes(audio["audio"]))with open("speech.ogg", "wb") as f:
+    f.write(bytes(audio["audio"]))
 ```
 
+<br>
 
-## More Features
+## Further
 ### Behind a proxy
 If you are working behind a proxy, use the following.
 ```python
