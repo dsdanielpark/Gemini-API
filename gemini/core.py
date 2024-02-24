@@ -97,7 +97,7 @@ class Gemini:
         """
         self.auto_cookies = auto_cookies
         self.cookies = cookies or self._get_cookies(auto_cookies) or {}
-        self.session = self._get_session(session)
+        self.session = self._set_session(session)
         self.timeout = timeout
         self.proxies = proxies or {}
         self.language = language or os.getenv("GEMINI_LANGUAGE")
@@ -130,15 +130,15 @@ class Gemini:
             self.cookies.update({c: os.getenv(c) for c in REQUIRED_COOKIE_LIST})
         elif auto_cookies:
             self.cookies = extract_cookies_from_brwoser()
-        elif not self.auto_cookies:
+        elif not self.auto_cookies and self.cookies == {}:
             self.auto_cookies = True
-            print("Cookie loading issue, auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open.")
+            print("Cookie loading issue, try auto_cookies set to True. Restart browser, log out, log in for Gemini Web UI to work. Keep single browser open.")
         else:
             raise Exception(
                 "Gemini cookies must be provided as the 'cookies' argument or extracted from the browser."
             )
 
-    def _get_session(self, session: Optional[requests.Session]) -> requests.Session:
+    def _set_session(self, session: Optional[requests.Session]) -> requests.Session:
         """
         Get the requests Session object.
 
@@ -151,7 +151,7 @@ class Gemini:
         if session is not None:
             return session
         elif not self.cookies:
-            raise ValueError("'cookies' dictionary is empty.")
+            raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
         session = requests.Session()
         session.headers = SESSION_HEADERS
@@ -336,7 +336,7 @@ class Gemini:
             )
             for _ in range(2):
                 self.cookies = self._get_cookies(True)
-                self.session = self._get_session(None)
+                self.session = self._set_session(None)
                 try:
                     generated_content = self.generate_content(
                         prompt, session, image, tool
