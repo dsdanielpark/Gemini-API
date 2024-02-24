@@ -12,7 +12,6 @@ from gemini.constants import (
 from gemini.utils import (
     extract_links,
     upload_image,
-    extract_cookies_from_brwoser,
     max_token,
     max_sentence,
 )
@@ -24,7 +23,6 @@ __all__ = [
     "GeminiSession",
     "extract_links",
     "upload_image",
-    "extract_cookies_from_brwoser",
     "max_token",
     "max_sentence",
     "DEFAULT_LANGUAGE",
