@@ -72,6 +72,29 @@ for i, image in enumerate(response.images): # Save images
 
 ```
 
+### Generate contents about image
+*It may not work as it is only available for certain accounts, regions, and other restrictions.*
+As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
+
+```python
+prompt = "What is in the image?"
+image = open("folder_path/image.jpg", "rb").read() # (jpeg, png, webp) are supported.
+
+response = GeminiClient.generate_content(prompt, image)
+```
+
+### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
+Business users and high traffic volume may be subject to account restrictions according to Google"s policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
+The user is solely responsible for all code, and it is imperative to consult Google"s official services and policies. Furthermore, the code in this repository is provided under the MIT license, and it disclaims any liability, including explicit or implied legal responsibilities.
+```python
+text = "Read this sentence: Hello, I'm developer in seoul"
+response = GeminiClient.generate_content(prompt, image)
+audio = GeminiClient.speech(text)
+with open("speech.ogg", "wb") as f:
+    f.write(bytes(audio["audio"]))with open("speech.ogg", "wb") as f:
+```
+
+
 ## More Features
 ### Behind a proxy
 If you are working behind a proxy, use the following.
@@ -123,27 +146,6 @@ response = GeminiClient.generate_content("Hello, Gemini. What's the weather like
 response = GeminiClient.generate_content("What was my last prompt?")
 ```
 
-### Generate contents about image
-*It may not work as it is only available for certain accounts, regions, and other restrictions.*
-As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
-
-```python
-prompt = "What is in the image?"
-image = open("folder_path/image.jpg", "rb").read() # (jpeg, png, webp) are supported.
-
-response = GeminiClient.generate_content(prompt, image)
-```
-
-### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
-Business users and high traffic volume may be subject to account restrictions according to Google"s policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
-The user is solely responsible for all code, and it is imperative to consult Google"s official services and policies. Furthermore, the code in this repository is provided under the MIT license, and it disclaims any liability, including explicit or implied legal responsibilities.
-```python
-text = "Read this sentence: Hello, I'm developer in seoul"
-response = GeminiClient.generate_content(prompt, image)
-audio = GeminiClient.speech(text)
-with open("speech.ogg", "wb") as f:
-    f.write(bytes(audio["audio"]))with open("speech.ogg", "wb") as f:
-```
 
 <br>
 
