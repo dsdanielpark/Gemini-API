@@ -219,7 +219,7 @@ class Gemini:
         snim0e = re.search(r"token\":\"(.*?)\"", response.text)
         if not snim0e:
             raise Exception(
-                "token value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
+                "SNlM0e token value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
             )
         return snim0e.group(1)
 
