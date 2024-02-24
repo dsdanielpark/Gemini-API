@@ -3,8 +3,6 @@ import os
 import re
 import json
 import base64
-import random
-import string
 import requests
 import browser_cookie3
 from typing import Optional, Any
@@ -103,13 +101,6 @@ class Gemini:
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
-        self._reqid = int("".join(random.choices(string.digits, k=4)))
-        self.response_id = ""
-        self.choice_id = ""
-        self.og_pid = ""
-        self.rot = ""
-        self.exp_id = ""
-        self.init_value = ""
 
     def _get_cookies_from_browser(self) -> None:
         """
