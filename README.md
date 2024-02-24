@@ -29,7 +29,134 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 ## Usage
 
+### Innitiallization
+```python
+from gemini import Gemini
 
+cookies = {
+    "__Secure-1PSID": "value",
+    "__Secure-1PSIDTS": "value",
+    "__Secure-1PSIDCC": "value",
+    "NID": "value",
+}
+
+GeminiClient = Gemini(cookies=cookies)
+```
+or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). However, this feature is incomplete, and you may need to periodically update cookie values in a .env file or JSON. You'll need to develop a logic that suits you for automatically updating cookies.
+```python
+from gemini import Gemini
+
+GeminiClient = Gemini(auto_cookies=True)
+```
+
+### Text generation
+```python
+prompt = "Hello, Gemini. What's the weather like in Seoul today?"
+response = GeminiClient.generate_content(prompt)
+```
+
+### Image generation
+```python
+prompt = "Hello, Gemini. Give me a beautiful photo of Seoul's scenery."
+response = GeminiClient.generate_content(prompt)
+
+print("\n".join(response.images)) # Print images
+
+for i, image in enumerate(response.images): # Save images
+    image.save(path="folder_path/", filename=f"seoul_{i}.png")
+
+```
+
+## More Features
+### Behind a proxy
+If you are working behind a proxy, use the following.
+```python
+proxies = {
+    'http': 'http://proxy.example.com:8080',
+    'https': 'https://proxy.example.com:8080'
+}
+
+GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
+GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
+```
+
+### Use rotating proxies
+
+If you want to **avoid blocked requests** and bans, then use [Smart Proxy by Crawlbase](https://crawlbase.com/docs/smart-proxy/?utm_source=github_ad&utm_medium=social&utm_campaign=bard_api). It forwards your connection requests to a **randomly rotating IP address** in a pool of proxies before reaching the target website. The combination of AI and ML make it more effective to **avoid CAPTCHAs and blocks**.
+
+```python
+# Get your proxy url at crawlbase https://crawlbase.com/docs/smart-proxy/get/
+proxy_url = "http://xxxxx:@smartproxy.crawlbase.com:8012" 
+proxies = {"http": proxy_url, "https": proxy_url}
+
+GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
+GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
+```
+
+
+### Reusable session object
+You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain conversation_id and context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
+```python
+from gemini import Gemini, SESSION_HEADERS
+import requests
+
+cookies = {
+    "__Secure-1PSID": "value",
+    "__Secure-1PSIDTS": "value",
+    "__Secure-1PSIDCC": "value",
+    "NID": "value",
+}
+
+session = requests.Session()
+session.headers = SESSION_HEADERS
+session.cookies.update(cookies)
+
+GeminiClient = Gemini(session=session, timeout=30)
+GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")['content']
+
+# Continued conversation without set new session
+GeminiClient.generate_content("What was my last prompt??")['content']
+```
+
+### Generate contents about image
+*It may not work as it is only available for certain accounts, regions, and other restrictions.*
+As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Bard's web UI. 
+
+```python
+prompt = "What is in the image?"
+image = open('folder_path/image.jpg', 'rb').read() # (jpeg, png, webp) are supported.
+
+response = GeminiClient.generate_content(prompt, image)
+```
+
+### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Bard
+Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
+The user is solely responsible for all code, and it is imperative to consult Google's official services and policies. Furthermore, the code in this repository is provided under the MIT license, and it disclaims any liability, including explicit or implied legal responsibilities.
+```python
+text = "Read this sentence: Hello, I'm developer in seoul"
+response = GeminiClient.generate_content(prompt, image)
+audio = GeminiClient.speech(text)
+with open("speech.ogg", "wb") as f:
+  f.write(bytes(audio['audio']))
+```
+
+<br>
+
+## [More features](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md)
+- [Multi-cookie Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#multi-cookie-bard)
+- [Auto Cookie Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#auto-cookie-bard)
+- [TTS from Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#text-to-speechtts)
+- [Multi-language Bard API](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#multi-language-bard-api)
+- [Get image links](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#get-image-links)
+- [ChatBard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#chatbard)
+- [Export Conversation](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#export-conversation)
+- [Export Code to Repl.it](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#export-code-to-replit)
+- [Executing Python code received as a response from Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#chatbard)
+- [Using Bard Asynchronously](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#using-bard-asynchronously)
+- [Bard Cookies](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#bard-which-can-get-cookies)
+- [Fix Coversation ID (Fix Context)](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#fix-conversation-id-fix-context)
+- [Max_token, Max_sentences](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
+- [Translation to another programming language](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#translation-to-another-programming-language)
 
 <br>
 
