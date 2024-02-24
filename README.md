@@ -9,7 +9,7 @@ A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google"s **Gemini** service was changed to **Gemini**. <br> [Paper](https://arxiv.org/abs/2312.11805), [Official Web](https://deepmind.google/technologies/gemini/#introduction), [Open-source Gemma-7b](https://huggingface.co/google/gemma-7b)
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. <br> [Paper](https://arxiv.org/abs/2312.11805), [Official Web](https://deepmind.google/technologies/gemini/#introduction)
 
 ## Installation
 ```
@@ -25,15 +25,14 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 1. Visit https://gemini.google.com/
 2. F12 for console
 3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie.
-    - Depending on the region and Google account status, *multiple cookies may be required*.
-    - You must appropriately set the `cookies_dict` parameter to `Gemini` class.
-    - Cookie values can be changed frequently, thus it is recommended to automatically update them through the [browser_cookie3](https://github.com/borisbabic/browser_cookie3) package. (This feature is still under investigation for better methods.)
+Depending on the region and Google account status, *multiple cookies may be required*.
 
 <br>
 
 ## Usage
-After Bard's update to Gemini, multiple cookies, often updated, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
+After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Innitiallization
+You must appropriately set the `cookies_dict` parameter to `Gemini` class.
 ```python
 from gemini import Gemini
 
@@ -46,7 +45,7 @@ cookies = {
 
 GeminiClient = Gemini(cookies=cookies)
 ```
-Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3).
+Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (This feature is still under investigation for better methods.)
 ```python
 from gemini import Gemini
 
@@ -89,8 +88,7 @@ response = GeminiClient.generate_content(prompt, image)
 ```
 
 ### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
-Business users and high traffic volume may be subject to account restrictions according to Google"s policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
-The user is solely responsible for all code, and it is imperative to consult Google"s official services and policies. Furthermore, the code in this repository is provided under the MIT license, and it disclaims any liability, including explicit or implied legal responsibilities.
+Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
 ```python
 text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
 response = GeminiClient.generate_content(prompt, image)
@@ -116,7 +114,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 
 ### Use rotating proxies
 
-If you want to **avoid blocked requests** and bans, then use [Smart Proxy by Crawlbase](https://crawlbase.com/docs/smart-proxy/?utm_source=github_ad&utm_medium=social&utm_campaign=bard_api). It forwards your connection requests to a **randomly rotating IP address** in a pool of proxies before reaching the target website. The combination of AI and ML make it more effective to **avoid CAPTCHAs and blocks**.
+If you want to **avoid blocked requests** and bans, then use [Smart Proxy by Crawlbase](https://crawlbase.com/docs/smart-proxy/?utm_source=github_ad&utm_medium=social&utm_campaign=bard_api). It forwards your connection requests to a **randomly rotating IP address** in a pool of proxies before reaching the target website. The combination of AI and ML make it more effective to avoid CAPTCHAs and blocks.
 
 ```python
 # Get your proxy url at crawlbase https://crawlbase.com/docs/smart-proxy/get/
@@ -129,7 +127,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 
 
 ### Reusable session object
-You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain conversation_id and context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
+You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
 ```python
 from gemini import Gemini, SESSION_HEADERS
 import requests
@@ -167,12 +165,31 @@ response = GeminiClient.generate_content("What was my last prompt?")
 
 <br>
 
+
+## How to use Open-source [Gemma](https://huggingface.co/google/gemma-7b)
+Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more usage, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
+
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tokenizer = AutoTokenizer.from_pretrained("google/gemma-7b")
+model = AutoModelForCausalLM.from_pretrained("google/gemma-7b")
+
+input_text = "Write me a poem about Machine Learning."
+input_ids = tokenizer(input_text, return_tensors="pt")
+
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+
+
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
 You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
 
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
-Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google"s service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
+Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 
 ## Contributors
