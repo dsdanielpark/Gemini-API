@@ -23,7 +23,7 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ## Authentication
 > **Warning** *DO NOT* expose your cookies.
 
-Cookie requirements may vary based on country/account and the status of your Google account.
+Cookie requirements may vary based on country/regions and the status of your Google account.
 1. Visit https://gemini.google.com/
 2. F12 for console
 3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie.
