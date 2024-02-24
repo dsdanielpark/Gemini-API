@@ -49,10 +49,13 @@ from gemini import Gemini
 GeminiClient = Gemini(auto_cookies=True)
 ```
 
+<br>
+
 ### Text generation
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
+print(response)
 ```
 
 ### Image generation
@@ -112,10 +115,10 @@ session.headers = SESSION_HEADERS
 session.cookies.update(cookies)
 
 GeminiClient = Gemini(session=session, timeout=30)
-GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")['content']
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")['content']
 
 # Continued conversation without set new session
-GeminiClient.generate_content("What was my last prompt??")['content']
+response = GeminiClient.generate_content("What was my last prompt?")
 ```
 
 ### Generate contents about image
@@ -143,18 +146,12 @@ with open("speech.ogg", "wb") as f:
 <br>
 
 ## [More features](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md)
-- [Multi-cookie Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#multi-cookie-bard)
-- [Auto Cookie Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#auto-cookie-bard)
-- [TTS from Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#text-to-speechtts)
 - [Multi-language Bard API](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#multi-language-bard-api)
 - [Get image links](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#get-image-links)
 - [ChatBard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#chatbard)
 - [Export Conversation](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#export-conversation)
 - [Export Code to Repl.it](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#export-code-to-replit)
 - [Executing Python code received as a response from Bard](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#chatbard)
-- [Using Bard Asynchronously](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#using-bard-asynchronously)
-- [Bard Cookies](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#bard-which-can-get-cookies)
-- [Fix Coversation ID (Fix Context)](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#fix-conversation-id-fix-context)
 - [Max_token, Max_sentences](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
 - [Translation to another programming language](https://github.com/dsdanielpark/Bard-API/blob/main/documents/README_DEV.md#translation-to-another-programming-language)
 
