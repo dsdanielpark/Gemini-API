@@ -91,7 +91,7 @@ response = GeminiClient.generate_content(prompt, image)
 Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
 ```python
 text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
-response = GeminiClient.generate_content(prompt, image)
+response = GeminiClient.generate_content(prompt)
 audio = GeminiClient.speech(text)
 with open("speech.ogg", "wb") as f:
     f.write(bytes(audio["audio"]))
