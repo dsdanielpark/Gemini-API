@@ -166,7 +166,7 @@ response = GeminiClient.generate_content("What was my last prompt?")
 <br>
 
 
-## How to use Open-source [Gemma](https://huggingface.co/google/gemma-7b)
+## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
 Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more usage, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
 ```python
