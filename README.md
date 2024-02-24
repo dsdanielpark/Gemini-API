@@ -169,7 +169,7 @@ response = GeminiClient.generate_content("What was my last prompt?")
 
 
 ## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
-Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more usage, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
+Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -222,4 +222,4 @@ Users bear all legal responsibilities when using the GeminiAPI package, which of
 <br>
 
 
-*Copyright (c) 2024 MinWoo Park, South Korea*<br>
+*Copyright (c) 2024 Minwoo(Daniel) Park, South Korea*<br>
