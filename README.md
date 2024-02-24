@@ -45,7 +45,7 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 We would like to express my sincere gratitude to all the contributors.
 
 ## Contacts
-- **Core Maintainer:** [Daniel Park](https://github.com/dsdanielpark)
+- **Core Maintainer:** Minwoo(Daniel) Park, [@dsdanielpark](https://github.com/dsdanielpark)
 - **E-mail:** parkminwoo1991@gmail.com
 
 ## License
