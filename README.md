@@ -9,7 +9,7 @@ A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. <br> [Paper](https://arxiv.org/abs/2312.11805), [Official Web](https://deepmind.google/technologies/gemini/#introduction)
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Web](https://deepmind.google/technologies/gemini/#introduction)
 
 ## Installation
 ```
@@ -31,7 +31,7 @@ Depending on the region and Google account status, *multiple cookies may be requ
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
-### Innitiallization
+### Initialization
 You must appropriately set the `cookies_dict` parameter to `Gemini` class.
 ```python
 from gemini import Gemini
@@ -45,13 +45,13 @@ cookies = {
 
 GeminiClient = Gemini(cookies=cookies)
 ```
-Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (This feature is still under investigation for better methods.)
+Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (under investigation for better methods.)
 ```python
 from gemini import Gemini
 
 GeminiClient = Gemini(auto_cookies=True)
 ```
- However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
+However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
 
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
@@ -76,7 +76,7 @@ for i, image in enumerate(response.images): # Save images
 
 ```
 
-### Generate content about image
+### Generate content with image
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
 
@@ -91,7 +91,7 @@ response = GeminiClient.generate_content(prompt, image)
 Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
 ```python
 text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
-response = GeminiClient.generate_content(prompt, image)
+response = GeminiClient.generate_content(prompt)
 audio = GeminiClient.speech(text)
 with open("speech.ogg", "wb") as f:
     f.write(bytes(audio["audio"]))
@@ -166,7 +166,7 @@ response = GeminiClient.generate_content("What was my last prompt?")
 <br>
 
 
-## How to use Open-source [Gemma](https://huggingface.co/google/gemma-7b)
+## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
 Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more usage, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
 ```python
@@ -182,6 +182,8 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
+## Sponsor
+Use Crawlbase API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
