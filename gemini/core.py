@@ -6,8 +6,6 @@ import base64
 import requests
 import aiohttp
 import asyncio
-import http.server
-import socketserver
 from typing import Optional, Any, List
 
 try:
@@ -19,21 +17,16 @@ except ImportError:
 from .constants import (
     ALLOWED_LANGUAGES,
     REQUIRED_COOKIE_LIST,
-    SESSION_HEADERS,
-    SHARE_SESSION_HEADERS,
+    HEADERS,
+    SHARE_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
     SUPPORTED_BROWSERS,
     Tool,
 )
 from .models.base import (
-    Candidate,
     GeminiOutput,
-    GeneratedImage,
-    WebImage,
 )
 from .models.exceptions import (
-    APIError,
-    GeminiError,
     TimeoutError,
 )
 
@@ -227,7 +220,7 @@ class Gemini:
 
         session = requests.Session()
         session.headers.update(
-            SESSION_HEADERS
+            HEADERS
         )  # Use `update` to ensure we're adding to any existing headers
         session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
         session.cookies.update(self.cookies)
@@ -258,7 +251,7 @@ class Gemini:
 
         session = requests.Session()
         session.headers.update(
-            SHARE_SESSION_HEADERS
+            SHARE_HEADERS
         )  # Use `update` to ensure we're adding to any existing headers
         session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
         session.cookies.update(self.cookies)
@@ -310,6 +303,7 @@ class Gemini:
             "f.req": json.dumps(
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
+            "rpcids": "ESY5D"
         }
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
@@ -327,6 +321,43 @@ class Gemini:
             )
         
         return _post_prompt_response
+    
+    def _request_copy_to_clipboard(
+        self,
+        prompt: str,
+        session: Optional["GeminiSession"] = None,
+    ) -> dict:
+        """
+        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+
+        Args:
+            prompt (str): The input text for the content generation query.
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
+            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
+
+        Returns:
+            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
+        """
+        data = {
+            "at": self.token,
+        }
+
+        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
+        try:
+            _request_copy_to_clipboard_response = self.session.post(
+                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                data=data,
+                timeout=self.timeout,
+                proxies=self.proxies,
+                verify=self.verify,
+            )
+        except:
+            raise TimeoutError(
+                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+            )
+        
+        return _request_copy_to_clipboard_response
     
 
     async def request_share(
