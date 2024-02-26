@@ -146,7 +146,7 @@ session.headers = SESSION_HEADERS
 session.cookies.update(cookies)
 
 GeminiClient = Gemini(session=session, timeout=30)
-response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")["content"]
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
 
 # Continued conversation without set new session
 response = GeminiClient.generate_content("What was my last prompt?")
