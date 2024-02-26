@@ -16,7 +16,7 @@ class Tool(Enum):
 DEFAULT_LANGUAGE = "en"
 SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
-TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20230912.07_p1"
+TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240222.09_p2"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
 
 IMG_UPLOAD_HEADERS = {
@@ -37,7 +37,7 @@ IMG_UPLOAD_HEADERS = {
 SESSION_HEADERS = {
     "Host": "gemini.google.com",
     "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
     "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     "Origin": "https://gemini.google.com",
     "Referer": "https://gemini.google.com/",
