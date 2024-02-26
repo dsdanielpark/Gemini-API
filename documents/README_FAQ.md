@@ -69,3 +69,6 @@ Both are not package-related issues and are unsolvable problems. It is recommend
 - `The HTTP 429`: Too Many Requests response status code indicates the user has sent too many requests in a given amount of time ("rate limiting")
 
 ***
+
+### #03. Google RotateCookies
+- With the change from bard to gemini, cookie values are refreshed and patched with every response. Therefore, it's necessary to automatically set new cookies for each request.
