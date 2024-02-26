@@ -13,7 +13,6 @@ class Tool(Enum):
     GOOGLE_MAPS = ["google_map_tool"]
     YOUTUBE = ["youtube_tool"]
 
-
 DEFAULT_LANGUAGE = "en"
 SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
@@ -44,6 +43,49 @@ SESSION_HEADERS = {
     "Referer": "https://gemini.google.com/",
 }
 
+REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
+    "python": "main.py",
+    "javascript": "index.js",
+    "go": "main.go",
+    "java": "Main.java",
+    "kotlin": "Main.kt",
+    "php": "index.php",
+    "c#": "main.cs",
+    "swift": "main.swift",
+    "r": "main.r",
+    "ruby": "main.rb",
+    "c": "main.c",
+    "c++": "main.cpp",
+    "matlab": "main.m",
+    "typescript": "main.ts",
+    "scala": "main.scala",
+    "sql": "main.sql",
+    "html": "index.html",
+    "css": "style.css",
+    "nosql": "main.nosql",
+    "rust": "main.rs",
+    "perl": "main.pl",
+}
+
+REQUIRED_COOKIE_LIST = [
+    "__Secure-1PSID",
+    "__Secure-1PSIDTS",
+    "__Secure-1PSIDCC",
+    "NID",
+]
+
+SUPPORTED_BROWSERS = [
+    browser_cookie3.chrome,
+    browser_cookie3.chromium,
+    browser_cookie3.opera,
+    browser_cookie3.opera_gx,
+    browser_cookie3.brave,
+    browser_cookie3.edge,
+    browser_cookie3.vivaldi,
+    browser_cookie3.firefox,
+    browser_cookie3.librewolf,
+    browser_cookie3.safari,
+]
 
 # https://support.google.com/bard/answer/13575153?hl=en
 ALLOWED_LANGUAGES = {
@@ -147,47 +189,4 @@ ALLOWED_LANGUAGES = {
     "vi",
 }
 
-REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
-    "python": "main.py",
-    "javascript": "index.js",
-    "go": "main.go",
-    "java": "Main.java",
-    "kotlin": "Main.kt",
-    "php": "index.php",
-    "c#": "main.cs",
-    "swift": "main.swift",
-    "r": "main.r",
-    "ruby": "main.rb",
-    "c": "main.c",
-    "c++": "main.cpp",
-    "matlab": "main.m",
-    "typescript": "main.ts",
-    "scala": "main.scala",
-    "sql": "main.sql",
-    "html": "index.html",
-    "css": "style.css",
-    "nosql": "main.nosql",
-    "rust": "main.rs",
-    "perl": "main.pl",
-}
 
-
-REQUIRED_COOKIE_LIST = [
-    "__Secure-1PSID",
-    "__Secure-1PSIDTS",
-    "__Secure-1PSIDCC",
-    "NID",
-]
-
-SUPPORTED_BROWSERS = [
-    browser_cookie3.chrome,
-    browser_cookie3.chromium,
-    browser_cookie3.opera,
-    browser_cookie3.opera_gx,
-    browser_cookie3.brave,
-    browser_cookie3.edge,
-    browser_cookie3.vivaldi,
-    browser_cookie3.firefox,
-    browser_cookie3.librewolf,
-    browser_cookie3.safari,
-]
