@@ -211,7 +211,7 @@ We would like to express my sincere gratitude to all the contributors.
 
 
 ## References
-[1] Github [acheong08/Gemini](https://github.com/acheong08/Gemini) <br>
+[1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
 [2] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [3] Github [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
