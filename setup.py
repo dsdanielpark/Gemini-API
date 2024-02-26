@@ -38,6 +38,8 @@ setup(
         "requests",
         "colorama",
         "browser_cookie3",
+        "loguru",
+        "pydantic",
     ],
     extras_require={
         "translate": [
