@@ -280,8 +280,8 @@ class Gemini:
                 "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
         return nonce
-
-    def _post_prompt(
+    
+    def __execute_prompt(
         self,
         prompt: str,
         session: Optional["GeminiSession"] = None,
@@ -308,8 +308,8 @@ class Gemini:
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
-            _post_prompt_response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+            execute_response = self.session.post(
+                "https://gemini.google.com//_/BardChatUi/data/batchexecute",
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
@@ -320,9 +320,9 @@ class Gemini:
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
         
-        return _post_prompt_response
-    
-    def _request_copy_to_clipboard(
+        return execute_response
+
+    def _post_prompt(
         self,
         prompt: str,
         session: Optional["GeminiSession"] = None,
@@ -341,24 +341,33 @@ class Gemini:
         """
         data = {
             "at": self.token,
+            "f.req": json.dumps(
+                [None, json.dumps([[prompt], None, session and session.metadata])]
+            ),
+            "rpcids": "ESY5D"
         }
-
-        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
-            _request_copy_to_clipboard_response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-                verify=self.verify,
-            )
+            execute_response = self.__execute_prompt(prompt)
         except:
-            raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-            )
-        
-        return _request_copy_to_clipboard_response
-    
+            pass
+
+        if execute_response == 200:
+            # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
+            try:
+                post_prompt_response = self.session.post(
+                    "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                    data=data,
+                    timeout=self.timeout,
+                    proxies=self.proxies,
+                    verify=self.verify,
+                )
+            except:
+                raise TimeoutError(
+                    "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+                )
+            
+        return post_prompt_response
+
 
     async def request_share(
             self,
@@ -411,7 +420,7 @@ class Gemini:
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
-            _post_conversation_response = self.session.post(
+            post_conversation_response = self.session.post(
                 "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
                 data=data,
                 timeout=self.timeout,
@@ -422,7 +431,7 @@ class Gemini:
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
         
-        return _post_conversation_response
+        return post_conversation_response
 
 
 
