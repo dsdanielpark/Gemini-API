@@ -219,7 +219,7 @@ class Gemini:
         snim0e = re.search(r"token\":\"(.*?)\"", response.text)
         if not snim0e:
             raise Exception(
-                "SNlM0e token value not found. Double-check cookies dict value or pass it as Gemini(cookies=Dict())"
+                "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
         return snim0e.group(1)
 
@@ -351,7 +351,7 @@ class Gemini:
         # Retry to generate content by updating cookies and session
         if not generated_content:
             print(
-                "Using the `browser_cookie3` package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
+                "Using 'browser_cookie3' package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
             )
             for _ in range(2):
                 self.cookies = self._set_cookies(True)
