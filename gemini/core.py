@@ -4,7 +4,6 @@ import re
 import json
 import base64
 import requests
-import browser_cookie3
 from typing import Optional, Any, List
 
 try:
@@ -52,6 +51,7 @@ class Gemini:
 
     __slots__ = [
         "session",
+        "token",
         "cookies",
         "timeout",
         "proxies",
@@ -65,6 +65,7 @@ class Gemini:
     def __init__(
         self,
         auto_cookies: bool = False,
+        token: str = None,
         session: Optional[requests.Session] = None,
         cookies: Optional[dict] = None,
         timeout: int = 30,
@@ -94,7 +95,8 @@ class Gemini:
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = self._set_session(session)
-        self.token = self._get_snim0e()
+        self.token = token
+        self.token = self._get_token()
         self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
@@ -119,7 +121,9 @@ class Gemini:
                 )
                 cj = browser_fn(domain_name=".google.com")
                 found_cookies = {cookie.name: cookie.value for cookie in cj}
+                
                 self.cookies.update(found_cookies)
+                print(f"Automatically configure cookies with detected ones.\n{found_cookies}")
             except Exception as e:
                 continue  # Ignore exceptions and try the next browser function
 
@@ -200,7 +204,7 @@ class Gemini:
 
         return session
 
-    def _get_snim0e(self) -> str:
+    def _get_token(self) -> str:
         """
         Get the SNlM0e Token value from the Gemini API response.
 
@@ -210,18 +214,18 @@ class Gemini:
             Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
         response = self.session.get(
-            "https://gemini.google.com/app", timeout=self.timeout, proxies=self.proxies
+            "https://gemini.google.com/", timeout=self.timeout, proxies=self.proxies
         )
         if response.status_code != 200:
             raise Exception(
                 f"Response status code is not 200. Response Status is {response.status_code}"
             )
-        snim0e = re.search(r"token\":\"(.*?)\"", response.text)
-        if not snim0e:
+        snim0e = re.findall(r'nonce="([^"]+)"', response.text)
+        if snim0e == None:
             raise Exception(
                 "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
-        return snim0e.group(1)
+        return snim0e
 
     def generate_content(
         self,
