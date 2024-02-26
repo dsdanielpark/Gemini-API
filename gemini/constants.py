@@ -37,10 +37,19 @@ IMG_UPLOAD_HEADERS = {
 SESSION_HEADERS = {
     "Host": "gemini.google.com",
     "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
     "Origin": "https://gemini.google.com",
     "Referer": "https://gemini.google.com/",
+}
+
+SHARE_SESSION_HEADERS = {
+    "Alt-Used": "clients6.google.com",
+    "Content-Type": 'multipart/mixed; boundary="-------314159265358979323846"',
+    "Host": "clients6.google.com",
+    "Origin": "https://gemini.google.com",
+    "Referer": "https://gemini.google.com/",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
 }
 
 REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
