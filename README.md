@@ -1,6 +1,6 @@
 Development Status :: 1 - Planning
 
-*Not ready ready*. Development and QA for the service underway from March 1st, 2024.
+*Not ready yet*. Development and QA for the service underway from March 1st, 2024.
 
 <br>
 
