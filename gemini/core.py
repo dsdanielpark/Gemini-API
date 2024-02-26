@@ -4,6 +4,10 @@ import re
 import json
 import base64
 import requests
+import aiohttp
+import asyncio
+import http.server
+import socketserver
 from typing import Optional, Any, List
 
 try:
@@ -16,6 +20,7 @@ from .constants import (
     ALLOWED_LANGUAGES,
     REQUIRED_COOKIE_LIST,
     SESSION_HEADERS,
+    SHARE_SESSION_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
     SUPPORTED_BROWSERS,
     Tool,
@@ -60,6 +65,8 @@ class Gemini:
         "auto_cookies",
         "google_translator_api_key",
         "run_code",
+        "share_session",
+        "verify",
     ]
 
     def __init__(
@@ -67,6 +74,7 @@ class Gemini:
         auto_cookies: bool = False,
         token: str = None,
         session: Optional[requests.Session] = None,
+        share_session: Optional[requests.Session] = None,
         cookies: Optional[dict] = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
@@ -74,6 +82,7 @@ class Gemini:
         conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
         run_code: bool = False,
+        verify: bool = True,
     ):
         """
         Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
@@ -95,19 +104,21 @@ class Gemini:
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = self._set_session(session)
+        self.share_session = self._set_share_session(share_session)
         self.token = token
         self.token = self._get_token()
         self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
+        self.verify = verify
 
     def check_session_cookies(self):
         """Prints the current session's cookies with each key-value pair on a new line."""
         if self.session:
             cookies = self.session.cookies.get_dict()
             cookies_str = "\n".join([f"{key}: {value}" for key, value in cookies.items()])
-            print("Session Cookies:\n", cookies_str)
+            print("Session Cookies:\n" + cookies_str)
         else:
             print("Session not initialized.")
 
@@ -116,7 +127,7 @@ class Gemini:
         if self.session:
             headers = self.session.headers
             headers_str = "\n".join([f"{key}: {value}" for key, value in headers.items()])
-            print("Session Headers:\n", headers_str)
+            print("Session Headers:\n" + headers_str)
         else:
             print("Session not initialized.")
 
@@ -190,6 +201,7 @@ class Gemini:
             raise Exception(
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
+        
 
     def _set_session(
         self, session: Optional[requests.Session] = None
@@ -221,6 +233,37 @@ class Gemini:
         session.cookies.update(self.cookies)
 
         return session
+    
+    def _set_share_session(
+        self, session: Optional[requests.Session] = None
+    ) -> requests.Session:
+        """
+        Initializes or uses a provided requests.Session object. If a session is not provided, a new one is created.
+        The new or provided session is configured with predefined session headers, proxies, and cookies from the instance.
+
+        Args:
+            session (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
+
+        Returns:
+            requests.Session: The session object, either the one provided or a newly created and configured session.
+
+        Raises:
+            ValueError: If 'session' is None and the 'cookies' dictionary is empty, indicating that there's insufficient information to properly set up a new session.
+        """
+        if session is not None:
+            return session
+
+        if not self.cookies:
+            raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
+
+        session = requests.Session()
+        session.headers.update(
+            SHARE_SESSION_HEADERS
+        )  # Use `update` to ensure we're adding to any existing headers
+        session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
+        session.cookies.update(self.cookies)
+
+        return session
 
     def _get_token(self) -> str:
         """
@@ -238,12 +281,119 @@ class Gemini:
             raise Exception(
                 f"Response status code is not 200. Response Status is {response.status_code}"
             )
-        snim0e = re.findall(r'nonce="([^"]+)"', response.text)
-        if snim0e == None:
+        nonce = re.findall(r'nonce="([^"]+)"', response.text)
+        if nonce == None:
             raise Exception(
                 "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
-        return snim0e
+        return nonce
+
+    def _post_prompt(
+        self,
+        prompt: str,
+        session: Optional["GeminiSession"] = None,
+    ) -> dict:
+        """
+        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+
+        Args:
+            prompt (str): The input text for the content generation query.
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
+            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
+
+        Returns:
+            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
+        """
+        data = {
+            "at": self.token,
+            "f.req": json.dumps(
+                [None, json.dumps([[prompt], None, session and session.metadata])]
+            ),
+        }
+
+        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
+        try:
+            _post_prompt_response = self.session.post(
+                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                data=data,
+                timeout=self.timeout,
+                proxies=self.proxies,
+                verify=self.verify,
+            )
+        except:
+            raise TimeoutError(
+                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+            )
+        
+        return _post_prompt_response
+    
+
+    async def request_share(
+            self,
+            session: Optional["GeminiSession"] = None,
+        ) -> dict:
+            """
+            Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+
+            Args:
+                session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+
+            Returns:
+                dict: A dictionary containing the response from the Gemini API.
+            """
+            url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
+            
+            # Use aiohttp.ClientSession for asynchronous HTTP requests
+            async with aiohttp.ClientSession() as session:
+                try:
+                    async with session.post(url, timeout=self.timeout) as response:
+                        return await response.json()
+                except asyncio.TimeoutError:
+                    raise TimeoutError(
+                        "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+                    )
+        
+    def _post_conversation(
+        self,
+        prompt: str,
+        session: Optional["GeminiSession"] = None,
+    ) -> dict:
+        """
+        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+
+        Args:
+            prompt (str): The input text for the content generation query.
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
+            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
+
+        Returns:
+            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
+        """
+        data = {
+            "at": self.token,
+            "f.req": json.dumps(
+                [None, json.dumps([[prompt], None, session and session.metadata])]
+            ),
+        }
+
+        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
+        try:
+            _post_conversation_response = self.session.post(
+                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                data=data,
+                timeout=self.timeout,
+                proxies=self.proxies,
+            )
+        except:
+            raise TimeoutError(
+                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+            )
+        
+        return _post_conversation_response
+
+
 
     def generate_content(
         self,
@@ -290,7 +440,7 @@ class Gemini:
             ),
         }
 
-        # Get response
+        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
             response = self.session.post(
                 "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
@@ -302,95 +452,96 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
+        
+        # if response.status_code != 200:
+        #     raise APIError(f"Request failed with status code {response.status_code}")
+        # else:
+        #     try:
+        #         body = json.loads(
+        #             json.loads(response.text.split("\n")[2])[0][2]
+        #         )  # Generated texts
+        #         if not body[4]:
+        #             body = json.loads(
+        #                 json.loads(response.text.split("\n")[2])[4][2]
+        #             )  # Non-textual data formats.
+        #         if not body[4]:
+        #             raise APIError(
+        #                 "Failed to parse body. The response body is unstructured. Please try again."
+        #             )  # Fail to parse
+        #     except Exception:
+        #         raise APIError(
+        #             "Failed to parse candidates. Unexpected structured response returned. Please try again."
+        #         )  # Unexpected structured response
 
-        if response.status_code != 200:
-            raise APIError(f"Request failed with status code {response.status_code}")
-        else:
-            try:
-                body = json.loads(
-                    json.loads(response.text.split("\n")[2])[0][2]
-                )  # Generated texts
-                if not body[4]:
-                    body = json.loads(
-                        json.loads(response.text.split("\n")[2])[4][2]
-                    )  # Non-textual data formats.
-                if not body[4]:
-                    raise APIError(
-                        "Failed to parse body. The response body is unstructured. Please try again."
-                    )  # Fail to parse
-            except Exception:
-                raise APIError(
-                    "Failed to parse candidates. Unexpected structured response returned. Please try again."
-                )  # Unexpected structured response
+        #     try:
+        #         candidates = []
+        #         for candidate in body[4]:
+        #             web_images = (
+        #                 candidate[4]
+        #                 and [
+        #                     WebImage(
+        #                         url=image[0][0][0], title=image[2], alt=image[0][4]
+        #                     )
+        #                     for image in candidate[4]
+        #                 ]
+        #                 or []
+        #             )
+        #             generated_images = (
+        #                 candidate[12]
+        #                 and candidate[12][7]
+        #                 and candidate[12][7][0]
+        #                 and [
+        #                     GeneratedImage(
+        #                         url=image[0][3][3],
+        #                         title=f"[Generated image {image[3][6]}]",
+        #                         alt=image[3][5][i],
+        #                         cookies=self.cookies,
+        #                     )
+        #                     for i, image in enumerate(candidate[12][7][0])
+        #                 ]
+        #                 or []
+        #             )
+        #             candidates.append(
+        #                 Candidate(
+        #                     rcid=candidate[0],
+        #                     text=candidate[1][0],
+        #                     web_images=web_images,
+        #                     generated_images=generated_images,
+        #                 )
+        #             )
+        #         if not candidates:
+        #             raise GeminiError(
+        #                 "Failed to generate candidates. No data of any kind returned. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
+        #             )
+        #         generated_content = GeminiOutput(
+        #             metadata=body[1], candidates=candidates
+        #         )
+        #     except IndexError:
+        #         raise APIError(
+        #             "Failed to parse response body. Data structure is invalid. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
+        #         )
+        # # Retry to generate content by updating cookies and session
+        # if not generated_content:
+        #     print(
+        #         "Using 'browser_cookie3' package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
+        #     )
+        #     for _ in range(2):
+        #         self.cookies = self._set_cookies(True)
+        #         self.session = self._set_session(None)
+        #         try:
+        #             generated_content = self.generate_content(
+        #                 prompt, session, image, tool
+        #             )
+        #             break
+        #         except:
+        #             print(
+        #                 "Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
+        #             )
+        #     else:
+        #         raise APIError("Failed to generate content.")
 
-            try:
-                candidates = []
-                for candidate in body[4]:
-                    web_images = (
-                        candidate[4]
-                        and [
-                            WebImage(
-                                url=image[0][0][0], title=image[2], alt=image[0][4]
-                            )
-                            for image in candidate[4]
-                        ]
-                        or []
-                    )
-                    generated_images = (
-                        candidate[12]
-                        and candidate[12][7]
-                        and candidate[12][7][0]
-                        and [
-                            GeneratedImage(
-                                url=image[0][3][3],
-                                title=f"[Generated image {image[3][6]}]",
-                                alt=image[3][5][i],
-                                cookies=self.cookies,
-                            )
-                            for i, image in enumerate(candidate[12][7][0])
-                        ]
-                        or []
-                    )
-                    candidates.append(
-                        Candidate(
-                            rcid=candidate[0],
-                            text=candidate[1][0],
-                            web_images=web_images,
-                            generated_images=generated_images,
-                        )
-                    )
-                if not candidates:
-                    raise GeminiError(
-                        "Failed to generate candidates. No data of any kind returned. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-                    )
-                generated_content = GeminiOutput(
-                    metadata=body[1], candidates=candidates
-                )
-            except IndexError:
-                raise APIError(
-                    "Failed to parse response body. Data structure is invalid. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-                )
-        # Retry to generate content by updating cookies and session
-        if not generated_content:
-            print(
-                "Using 'browser_cookie3' package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
-            )
-            for _ in range(2):
-                self.cookies = self._set_cookies(True)
-                self.session = self._set_session(None)
-                try:
-                    generated_content = self.generate_content(
-                        prompt, session, image, tool
-                    )
-                    break
-                except:
-                    print(
-                        "Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-                    )
-            else:
-                raise APIError("Failed to generate content.")
-
-        return generated_content
+        # return generated_content
+        
 
     def speech(self, prompt: str, lang: str = "en-US") -> dict:
         """
