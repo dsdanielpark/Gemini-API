@@ -102,6 +102,24 @@ class Gemini:
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
 
+    def check_session_cookies(self):
+        """Prints the current session's cookies with each key-value pair on a new line."""
+        if self.session:
+            cookies = self.session.cookies.get_dict()
+            cookies_str = "\n".join([f"{key}: {value}" for key, value in cookies.items()])
+            print("Session Cookies:\n", cookies_str)
+        else:
+            print("Session not initialized.")
+
+    def check_session_headers(self):
+        """Prints the current session's headers with each key-value pair on a new line."""
+        if self.session:
+            headers = self.session.headers
+            headers_str = "\n".join([f"{key}: {value}" for key, value in headers.items()])
+            print("Session Headers:\n", headers_str)
+        else:
+            print("Session not initialized.")
+
     def _set_cookies_from_browser(self) -> None:
         """
         Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
