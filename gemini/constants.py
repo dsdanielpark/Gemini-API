@@ -34,6 +34,15 @@ IMG_UPLOAD_HEADERS = {
     "x-tenant-id": "bard-storage",
 }
 
+
+EXECUTE_HEADERS = {
+    "Host": "gemini.google.com",
+    "X-Same-Domain": "1",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+    "Origin": "https://gemini.google.com",
+    "Referer": "https://gemini.google.com/",
+}
 HEADERS = {
     "Host": "gemini.google.com",
     "X-Same-Domain": "1",
@@ -77,6 +86,7 @@ REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
 }
 
 REQUIRED_COOKIE_LIST = [
+    "SIDCC",
     "__Secure-1PSID",
     "__Secure-1PSIDTS",
     "__Secure-1PSIDCC",
