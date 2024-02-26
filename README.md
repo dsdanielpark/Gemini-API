@@ -1,9 +1,10 @@
-Development Status :: 3 - Alpha
+Development Status :: 1 - Planning
 
-# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Gemini API
+*Not ready yet*. Development and QA for the service underway from March 1st, 2024.
 
+<br>
 
-
+# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API
 A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
 
 <br>
@@ -20,8 +21,9 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
 ## Authentication
-> **Warning** *DO NOT* expose your cookies. 
+> **Warning** *DO NOT* expose your cookies.
 
+Cookie requirements may vary based on country/regions and the status of your Google account.
 1. Visit https://gemini.google.com/
 2. F12 for console
 3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie.
@@ -78,7 +80,7 @@ for i, image in enumerate(response.images): # Save images
 
 ### Generate content with image
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
-As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini"s web UI. 
+As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
 
 ```python
 prompt = "What is in the image?"
@@ -109,7 +111,7 @@ proxies = {
 }
 
 GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
-GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul"s scenery.")
+GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
 ```
 
 ### Use rotating proxies
@@ -167,7 +169,7 @@ response = GeminiClient.generate_content("What was my last prompt?")
 
 
 ## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
-Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more usage, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
+Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -185,7 +187,7 @@ print(tokenizer.decode(outputs[0]))
 ## Sponsor
 ![(https://crawlbase.com/)](assets/crawlbase_logo.png)
 
-Use Crawlbase API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
+Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
@@ -214,5 +216,10 @@ We would like to express my sincere gratitude to all the contributors.
 [3] Github [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
+> **Warning** 
+Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
+
+<br>
 
 
+*Copyright (c) 2024 Minwoo(Daniel) Park, South Korea*<br>
