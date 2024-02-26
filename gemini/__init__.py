@@ -2,13 +2,14 @@
 from os import environ
 from gemini.core import Gemini, GeminiSession
 from gemini.constants import (
-    SESSION_HEADERS,
+    HEADERS,
     ALLOWED_LANGUAGES,
     DEFAULT_LANGUAGE,
     REPLIT_SUPPORT_PROGRAM_LANGUAGES,
     REQUIRED_COOKIE_LIST,
     Tool,
 )
+from gemini.client import GeminiClient
 from gemini.utils import (
     extract_links,
     upload_image,
@@ -19,6 +20,7 @@ from gemini.utils import (
 gemini_api_key = environ.get("GEMINI_COOKIES")
 
 __all__ = [
+    "GeminiClient",
     "Gemini",
     "GeminiSession",
     "extract_links",
@@ -26,7 +28,7 @@ __all__ = [
     "max_token",
     "max_sentence",
     "DEFAULT_LANGUAGE",
-    "SESSION_HEADERS",
+    "HEADERS",
     "ALLOWED_LANGUAGES",
     "REPLIT_SUPPORT_PROGRAM_LANGUAGES",
     "REQUIRED_COOKIE_LIST",
