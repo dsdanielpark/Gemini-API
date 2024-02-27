@@ -1,4 +1,4 @@
-# Copyright 2024 Minwoo(Daniel) Park, MIT License, Revert checkpoint #1
+# Copyright 2024 Minwoo(Daniel) Park, MIT License, Revert checkpoint #2
 import os
 import re
 import json
@@ -56,6 +56,7 @@ class GeminiClient:
         "verify",
         "_reqid",
         "latency",
+        "running"
     ]
 
     def __init__(
@@ -89,6 +90,7 @@ class GeminiClient:
         """
         self.auto_cookies = auto_cookies
         self.latency = latency
+        self.running = False
         self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.cookies = cookies or {}
         self._get_cookies(auto_cookies)
@@ -104,13 +106,14 @@ class GeminiClient:
         self.verify = verify
         
 
-    async def async_init(self):
-        self.session = await self._create_async_session()
+    async def async_init(self, auto_close: bool = False, close_delay: int = 300):
+        self.session = await self._create_async_session(auto_close = auto_close, close_delay = close_delay)
 
     async def close_session(self):
         if self.session:
             await self.session.aclose()
             self.session = None
+            self.running = False
 
     def check_session_cookies(self):
         if self.session:
@@ -175,7 +178,7 @@ class GeminiClient:
         current_cookie_keys = set(self.cookies.keys())
         if not required_cookie_set.issubset(current_cookie_keys):
             print(
-                "Some recommended cookies not found: 'SIDCC', '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
+                "Some recommended cookies not found: 'SIDCC' or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'.\nIt depends on your Contries/Legions."
             )
 
     def _get_cookies(self, auto_cookies: bool) -> None:
@@ -219,7 +222,7 @@ class GeminiClient:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
-    async def _create_async_session(self) -> httpx.AsyncClient:
+    async def _create_async_session(self, auto_close: bool, close_delay: int) -> httpx.AsyncClient:
         """
         Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
 
@@ -246,14 +249,36 @@ class GeminiClient:
         if not hasattr(self, "session") or self.session is None:
             for i in range(2):
                 print(f"Re-try to create async client. ({i})")
-                self.session = httpx.AsyncClient(
-                    headers=HEADERS,
-                    cookies=self.cookies,
-                    proxies=self.proxies,
-                    timeout=self.timeout,
-                )
+                try:
+                    self.session = httpx.AsyncClient(
+                        headers=HEADERS,
+                        cookies=self.cookies,
+                        proxies=self.proxies,
+                        timeout=self.timeout,
+                    )
+                    self.auto_close = auto_close
+                    self.close_delay = close_delay
+                    if self.auto_close:
+                        await self.reset_close_task()
+                except Exception as e:
+                    await self.close(0)
+                    print(e)
+                    raise
+        if hasattr(self, "session"):
+            self.running = True
+        else:
+            self.running = False
 
         return self.session
+    
+    async def reset_close_task(self) -> None:
+        """
+        Reset the timer for closing the client when a new request is made.
+        """
+        if self.close_task:
+            self.close_task.cancel()
+            self.close_task = None
+        self.close_task = asyncio.create_task(self.close())
 
     def get_nonce_value(self) -> str:
         """
@@ -295,45 +320,36 @@ class GeminiClient:
             "_reqid": str(self._reqid),
             "rt": "c",
         }
+    
 
-    async def generate_content(
-        self,
-        prompt: str,
-    ) -> dict:
-        data = data = self._prepare_data(prompt)
+    async def post_prompt(self, prompt: str) -> dict:
+        data = self._prepare_data(prompt)
         params = self._prepare_params()
 
-        try:
-            request_batch_execute = await self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-                data=data,
-                params=params,
-                timeout=self.timeout,
-            )
-            self._reqid += 100000
-            try:
-                if request_batch_execute.status_code == 200:
-                    time.sleep(self.latency)
-                    try:
-                        stream_generate_response = await self.session.post(
-                            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-                            data=data,
-                            params=params,
-                            timeout=self.timeout,
-                        )
-                        self._reqid += 100000
-                        if stream_generate_response == None:
-                            raise(f"Faile to generate content: {stream_generate_response}")
-                        return stream_generate_response
-                    except Exception as e:
-                        raise (f"Fail to send request content. \nStream generate status: {stream_generate_response.status_code}\n{e}")
-                else:
-                    print(f"Batch execution failed: response status not 200. \nBatch execution status: {request_batch_execute.status_code}")
-            except Exception as e:
-                raise ("Fail to execute batch. {e}")
+        response = await self.session.post(
+            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+            data=data,
+            params=params,
+            timeout=self.timeout,
+        )
+        self._reqid += 100000
 
+        return response
+
+    async def generate_content(self, prompt: str) -> dict:
+        try:
+            request_batch_execute = await self.post_prompt(prompt)
+            if request_batch_execute.status == 200:
+                await asyncio.sleep(self.latency)
+                task = asyncio.create_task(self.post_prompt(prompt))
+                stream_generate_response = await task
+                if stream_generate_response is None:
+                    raise Exception("Stream generation failed: No response received")
+                return stream_generate_response
+            else:
+                print(f"Batch execution failed: Response status not 200.\nBatch execution status: {request_batch_execute.status}")
         except Exception as e:
-            raise ("")
+            raise Exception(f"Failed to process request: {e}")
 
     async def request_share(
         self,
@@ -389,7 +405,6 @@ class GeminiSession:
         cid: Optional[str] = None,  # chat id
         rid: Optional[str] = None,  # reply id
         rcid: Optional[str] = None,  # reply candidate id
-        _reqid: Optional[str] = None,
     ):
         self.__metadata: list[Optional[str]] = [None, None, None]
         self.gemini: GeminiClient = gemini
