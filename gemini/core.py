@@ -220,7 +220,7 @@ class Gemini:
         session.headers.update(
             HEADERS
         )  # Use `update` to ensure we're adding to any existing headers
-        session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
+        session.proxies.update(self.proxies)  
         session.cookies.update(self.cookies)
 
         return session
@@ -251,7 +251,7 @@ class Gemini:
         session.headers.update(
             SHARE_HEADERS
         )  # Use `update` to ensure we're adding to any existing headers
-        session.proxies.update(self.proxies)  # Similarly, use `update` for proxies
+        session.proxies.update(self.proxies)
         session.cookies.update(self.cookies)
 
         return session
