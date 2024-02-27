@@ -254,7 +254,7 @@ class GeminiClient:
             )
         return nonce
     
-    async def post_prompt(
+    async def generate_content(
         self,
         prompt: str,
         session: Optional["GeminiSession"] = None,
@@ -305,44 +305,6 @@ class GeminiClient:
                         "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
                     )
         
-    def generate_content(
-        self,
-        prompt: str,
-        session: Optional["GeminiSession"] = None,
-        image: Optional[bytes] = None,
-        tool: Optional[Tool] = None,
-    ) -> dict:
-        """
-        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
-
-        Args:
-            prompt (str): The input text for the content generation query.
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
-            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
-
-        Returns:
-            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
-        """
-        data = {
-            "at": self.token,
-            "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata])]
-            ),
-        }
-
-        try:
-            response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-            )
-        except:
-            raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-            )
-
 
 class GeminiSession:
     """
