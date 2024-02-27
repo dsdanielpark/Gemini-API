@@ -108,7 +108,9 @@ class Gemini:
         """Prints the current session's cookies"""
         if self.session:
             cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join([f"{key}: {value}" for key, value in cookies.items()])
+            cookies_str = "\n".join(
+                [f"{key}: {value}" for key, value in cookies.items()]
+            )
             print("Session Cookies:\n" + cookies_str)
         else:
             print("Session not initialized.")
@@ -117,7 +119,9 @@ class Gemini:
         """Prints the current session's headers"""
         if self.session:
             headers = self.session.headers
-            headers_str = "\n".join([f"{key}: {value}" for key, value in headers.items()])
+            headers_str = "\n".join(
+                [f"{key}: {value}" for key, value in headers.items()]
+            )
             print("Session Headers:\n" + headers_str)
         else:
             print("Session not initialized.")
@@ -141,9 +145,11 @@ class Gemini:
                 )
                 cj = browser_fn(domain_name=".google.com")
                 found_cookies = {cookie.name: cookie.value for cookie in cj}
-                
+
                 self.cookies.update(found_cookies)
-                print(f"Automatically configure cookies with detected ones.\n{found_cookies}")
+                print(
+                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
+                )
             except Exception as e:
                 continue  # Ignore exceptions and try the next browser function
 
@@ -192,7 +198,6 @@ class Gemini:
             raise Exception(
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
-        
 
     def _set_session(
         self, session: Optional[requests.Session] = None
@@ -220,11 +225,11 @@ class Gemini:
         session.headers.update(
             HEADERS
         )  # Use `update` to ensure we're adding to any existing headers
-        session.proxies.update(self.proxies)  
+        session.proxies.update(self.proxies)
         session.cookies.update(self.cookies)
 
         return session
-    
+
     def _set_share_session(
         self, session: Optional[requests.Session] = None
     ) -> requests.Session:
@@ -278,7 +283,7 @@ class Gemini:
                 "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
         return nonce
-    
+
     def __execute_prompt(
         self,
         prompt: str,
@@ -301,7 +306,7 @@ class Gemini:
             "f.req": json.dumps(
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
-            "rpcids": "ESY5D"
+            "rpcids": "ESY5D",
         }
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
@@ -317,7 +322,7 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
-        
+
         return execute_response
 
     def _post_prompt(
@@ -342,7 +347,7 @@ class Gemini:
             "f.req": json.dumps(
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
-            "rpcids": "ESY5D"
+            "rpcids": "ESY5D",
         }
         try:
             execute_response = self.__execute_prompt(prompt)
@@ -363,35 +368,34 @@ class Gemini:
                 raise TimeoutError(
                     "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
                 )
-            
+
         return post_prompt_response
 
-
     async def request_share(
-            self,
-            session: Optional["GeminiSession"] = None,
-        ) -> dict:
-            """
-            Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+        self,
+        session: Optional["GeminiSession"] = None,
+    ) -> dict:
+        """
+        Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
 
-            Args:
-                session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+        Args:
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
 
-            Returns:
-                dict: A dictionary containing the response from the Gemini API.
-            """
-            url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
-            
-            # Use aiohttp.ClientSession for asynchronous HTTP requests
-            async with aiohttp.ClientSession() as session:
-                try:
-                    async with session.post(url, timeout=self.timeout) as response:
-                        return await response.json()
-                except asyncio.TimeoutError:
-                    raise TimeoutError(
-                        "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-                    )
-        
+        Returns:
+            dict: A dictionary containing the response from the Gemini API.
+        """
+        url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
+
+        # Use aiohttp.ClientSession for asynchronous HTTP requests
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(url, timeout=self.timeout) as response:
+                    return await response.json()
+            except asyncio.TimeoutError:
+                raise TimeoutError(
+                    "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+                )
+
     def _post_conversation(
         self,
         prompt: str,
@@ -428,10 +432,8 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
-        
+
         return post_conversation_response
-
-
 
     def generate_content(
         self,
@@ -490,7 +492,7 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
-        
+
         # if response.status_code != 200:
         #     raise APIError(f"Request failed with status code {response.status_code}")
         # else:
@@ -579,7 +581,6 @@ class Gemini:
         #         raise APIError("Failed to generate content.")
 
         # return generated_content
-        
 
     def speech(self, prompt: str, lang: str = "en-US") -> dict:
         """
