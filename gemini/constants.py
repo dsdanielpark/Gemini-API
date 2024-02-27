@@ -19,6 +19,7 @@ SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
 TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240222.09_p2"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
+HOST = "https://gemini.google.com/"
 
 IMG_UPLOAD_HEADERS = {
     "authority": "content-push.googleapis.com",

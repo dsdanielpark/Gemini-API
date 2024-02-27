@@ -15,6 +15,8 @@ from .constants import (
     HEADERS,
     SUPPORTED_BROWSERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
+    POST_ENDPOINT,
+    HOST,
     Tool,
 )
 from .models.base import (
@@ -73,6 +75,7 @@ class GeminiClient:
         run_code: bool = False,
         verify: bool = True,
         latency: int = 10,
+        target_cookies: Optional[List] = {},
     ):
         """
         Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
@@ -89,6 +92,7 @@ class GeminiClient:
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
+        self.target_cookies = target_cookies
         self.latency = latency
         self.running = False
         self._reqid = int("".join(random.choices(string.digits, k=4)))
@@ -115,6 +119,12 @@ class GeminiClient:
             self.session = None
             self.running = False
 
+    async def reset_close_task(self) -> None:
+        if self.close_task:
+            self.close_task.cancel()
+            self.close_task = None
+        self.close_task = asyncio.create_task(self.close())
+
     def check_session_cookies(self):
         if self.session:
             cookies = self.session.cookies.get_dict()
@@ -133,7 +143,7 @@ class GeminiClient:
             print("Session not initialized.")
 
     def check_client_headers(self):
-        """Prints the current session's headers with each key-value pair on a new line."""
+        """Prints the current session's headers"""
         if self.session:
             headers = self.session.headers
             headers_str = "\n".join(
@@ -271,24 +281,38 @@ class GeminiClient:
 
         return self.session
     
-    async def reset_close_task(self) -> None:
+
+
+    async def update_target_cookies(self, target_cookies: dict = None):
         """
-        Reset the timer for closing the client when a new request is made.
+        Updates specified cookies in the httpx client. If target_cookies is not provided,
+        updates all cookies stored in self.cookies.
+
+        Parameters:
+        - target_cookies (dict, optional): A dictionary of cookie names and values to update.
+                                           If None, updates all cookies from self.cookies.
         """
-        if self.close_task:
-            self.close_task.cancel()
-            self.close_task = None
-        self.close_task = asyncio.create_task(self.close())
+        cookies_to_update = target_cookies if target_cookies is not None else self.cookies
+
+        self._get_cookies(True)
+
+        try:
+            for cookie_name, cookie_value in cookies_to_update.items():
+                if cookie_value:
+                    self.session.cookies.set(cookie_name, cookie_value)
+                else:
+                    print(f"Warning: Cookie value for {cookie_name} is missing; skipping update.")
+        except Exception as e:
+            print(f"An error occurred while updating cookies: {e}")
 
     def get_nonce_value(self) -> str:
         """
         Get the Nonce Token value from the Gemini API response.
         """
-        url = "https://gemini.google.com/"
         error_message = "Nonce token value not found or response status is not 200."
 
         with requests.Session() as session:
-            response = session.get(url, timeout=self.timeout, proxies=self.proxies)
+            response = session.get(HOST, timeout=self.timeout, proxies=self.proxies)
             if response.status_code == 200:
                 match = re.search(r'nonce="([^"]+)"', response.text)
                 if match:
@@ -317,7 +341,7 @@ class GeminiClient:
         params = self._prepare_params()
 
         response = await self.session.post(
-            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+            POST_ENDPOINT,
             data=data,
             params=params,
             timeout=self.timeout,
@@ -326,24 +350,31 @@ class GeminiClient:
 
         return response
 
-    async def generate_content(self, prompt: str, wait_time: int = 40) -> dict:
-        request_batch_execute = await self.post_prompt(prompt)
-        await asyncio.sleep(10)
-        print(f"Initial request status: {request_batch_execute.status_code}")
+    async def _post_initial_prompt(self, prompt: str) -> dict:
+        """Sends the initial prompt request and returns the response."""
+        response = await self.post_prompt(prompt)
+        await asyncio.sleep(self.latency)
+        print(f"Initial request status: {response.status_code}")
+        return response
 
-        async def attempt_fetch():
-            nonlocal request_batch_execute
-            while True:
-                response = await self.post_prompt(prompt)
-                print(f"Current batch execution status: {response.status_code}")
-                if response.status_code == 200:
-                    print("Received status code 200. Processing response.")
-                    return response
-                else:
-                    request_batch_execute = response
-                    await asyncio.sleep(10)
-
+    async def attempt_fetch_with_retries(self, prompt: str, wait_time: int = 40) -> dict:
+        """Attempts to fetch the content with retries until a status code 200 is received or a timeout occurs."""
         try:
+            request_batch_execute = await self._post_initial_prompt(prompt)
+            await asyncio.sleep(self.latency)
+            await self.update_target_cookies(self.target_cookies)
+            async def attempt_fetch():
+                nonlocal request_batch_execute
+                while True:
+                    response = await self.post_prompt(prompt)
+                    print(f"Current batch execution status: {response.status_code}")
+                    if response.status_code == 200:
+                        print("Received status code 200. Processing response.")
+                        return response
+                    else:
+                        request_batch_execute = response
+                        await asyncio.sleep(self.latency)
+
             return await asyncio.wait_for(attempt_fetch(), timeout=wait_time)
         except asyncio.TimeoutError:
             print(f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response.")
@@ -354,17 +385,7 @@ class GeminiClient:
         except Exception as e:
             raise Exception(f"Failed to process request: {e}")
 
-        # try:
-        #     response_batch_execute = await self.post_prompt(prompt)
-        #     print(f"Batch execution status: {response_batch_execute.status_code}")
-        #     await asyncio.sleep(self.latency)
-        #     task = asyncio.create_task(self.post_prompt(prompt))
-        #     stream_generate_response = await task
-        #     if stream_generate_response is None:
-        #         raise Exception("Stream generation failed: No response received")
-        #     return stream_generate_response
-        # except Exception as e:
-        #     raise Exception(f"Failed to process request: {e}")
+
 
     async def request_share(
         self,
