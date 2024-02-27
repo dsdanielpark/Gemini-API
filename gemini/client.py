@@ -17,7 +17,6 @@ from .constants import (
     TEXT_GENERATION_WEB_SERVER_PARAM,
     POST_ENDPOINT,
     HOST,
-    Tool,
 )
 from .models.base import (
     GeminiOutput,
@@ -58,6 +57,7 @@ class GeminiClient:
         "_reqid",
         "latency",
         "running",
+        "update_cookie_list",
     ]
 
     def __init__(
@@ -89,8 +89,8 @@ class GeminiClient:
             google_translator_api_key (Optional[str]): Google Cloud Translation API key.
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
-        self.auto_cookies = auto_cookies
         self.update_cookie_list = update_cookie_list
+        self.auto_cookies = auto_cookies
         self.latency = latency
         self.running = False
         self._reqid = int("".join(random.choices(string.digits, k=4)))
@@ -125,14 +125,6 @@ class GeminiClient:
 
     def check_session_cookies(self):
         if self.session:
-            cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join(
-                [f"{key}: {value}" for key, value in cookies.items()]
-            )
-            print("Session Cookies:\n" + cookies_str)
-
-    def check_session_cookies(self):
-        if self.session:
             cookies_str = "\n".join(
                 [f"{key}: {value}" for key, value in self.session.cookies.items()]
             )
@@ -140,7 +132,7 @@ class GeminiClient:
         else:
             print("Session not initialized.")
 
-    def check_client_headers(self):
+    def check_session_headers(self):
         """Prints the current session's headers"""
         if self.session:
             headers = self.session.headers
@@ -302,6 +294,7 @@ class GeminiClient:
             for cookie_name, cookie_value in cookies_to_update.items():
                 if cookie_value:
                     self.session.cookies.set(cookie_name, cookie_value)
+                    print(f"Succefully update cookies: {cookies_to_update}")
                 else:
                     print(
                         f"Warning: Cookie value for {cookie_name} is missing; skipping update."
@@ -366,7 +359,7 @@ class GeminiClient:
         """Sends the initial prompt request and returns the response."""
         response = await self.post_prompt(prompt)
         await asyncio.sleep(self.latency)
-        print(f"Initial request status: {response.status_code}")
+        print(f"Batch execute status: {response.status_code}")
         return response
 
     async def attempt_fetch_with_retries(
@@ -375,8 +368,8 @@ class GeminiClient:
         """Attempts to fetch the content with retries until a status code 200 is received or a timeout occurs."""
         try:
             request_batch_execute = await self._post_initial_prompt(prompt)
-            await asyncio.sleep(self.latency)
-            await self._update_cookies(self.target_cookies)
+            await asyncio.sleep(5)
+            self._update_cookies(self.update_cookie_list)
 
             async def attempt_fetch():
                 nonlocal request_batch_execute
