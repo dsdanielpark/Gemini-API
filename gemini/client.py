@@ -50,7 +50,6 @@ class GeminiClient:
         "timeout",
         "proxies",
         "language",
-        "conversation_id",
         "auto_cookies",
         "google_translator_api_key",
         "run_code",
@@ -70,12 +69,11 @@ class GeminiClient:
         timeout: int = 30,
         proxies: Optional[dict] = {},
         language: Optional[str] = None,
-        conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
         run_code: bool = False,
         verify: bool = True,
         latency: int = 10,
-        target_cookies: Optional[List] = {},
+        target_cookies: Optional[List] = [],
     ):
         """
         Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
@@ -103,7 +101,6 @@ class GeminiClient:
         self.session = session
         self.token = token
         self.token = self.get_nonce_value()
-        self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
