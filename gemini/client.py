@@ -2,6 +2,7 @@
 import os
 import re
 import json
+import time
 import httpx
 import random
 import string
@@ -54,6 +55,7 @@ class GeminiClient:
         "share_session",
         "verify",
         "_reqid",
+        "latency",
     ]
 
     def __init__(
@@ -69,6 +71,7 @@ class GeminiClient:
         google_translator_api_key: Optional[str] = None,
         run_code: bool = False,
         verify: bool = True,
+        latency: int = 10,
     ):
         """
         Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
@@ -85,6 +88,7 @@ class GeminiClient:
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
+        self.latency = latency
         self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.cookies = cookies or {}
         self._get_cookies(auto_cookies)
@@ -98,9 +102,15 @@ class GeminiClient:
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
         self.verify = verify
+        
 
     async def async_init(self):
         self.session = await self._create_async_session()
+
+    async def close_session(self):
+        if self.session:
+            await self.session.aclose()
+            self.session = None
 
     def check_session_cookies(self):
         if self.session:
@@ -209,11 +219,6 @@ class GeminiClient:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
-    async def close_session(self):
-        if self.session:
-            await self.session.aclose()
-            self.session = None
-
     async def _create_async_session(self) -> httpx.AsyncClient:
         """
         Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
@@ -252,10 +257,10 @@ class GeminiClient:
 
     def get_nonce_value(self) -> str:
         """
-        Get the SNlM0e Token value from the Gemini API response.
+        Get the Nonce Token value from the Gemini API response.
 
         Returns:
-            str: SNlM0e token value.
+            str: Nonce token value.
         Raises:
             Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
@@ -270,35 +275,33 @@ class GeminiClient:
         nonce = re.findall(r'nonce="([^"]+)"', response.text)
         if nonce == None:
             raise Exception(
-                "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
+                "Nonce token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
         return nonce
-
-    async def generate_content(
-        self,
-        prompt: str,
-        session: Optional["GeminiSession"] = None,
-    ) -> dict:
+    
+    def _prepare_data(self, prompt: str) -> dict:
+        session_metadata = self.session.metadata if self.session and self.session.metadata else None
+        request_body = [None, [[prompt], None, session_metadata]]
+        
         data = {
             "at": self.token,
-            "f.req": json.dumps(
-                [
-                    None,
-                    json.dumps(
-                        [
-                            [prompt],
-                            None,
-                            session and session.metadata if session else None,
-                        ]
-                    ),
-                ]
-            ),
+            "f.req": json.dumps([None, json.dumps(request_body)]),
         }
-        params = {
+        return data
+    
+    def _prepare_params(self) -> dict:
+        return {
             "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
             "_reqid": str(self._reqid),
             "rt": "c",
         }
+
+    async def generate_content(
+        self,
+        prompt: str,
+    ) -> dict:
+        data = data = self._prepare_data(prompt)
+        params = self._prepare_params()
 
         try:
             request_batch_execute = await self.session.post(
@@ -309,7 +312,8 @@ class GeminiClient:
             )
             self._reqid += 100000
             try:
-                if request_batch_execute == 200:
+                if request_batch_execute.status_code == 200:
+                    time.sleep(self.latency)
                     try:
                         stream_generate_response = await self.session.post(
                             "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
@@ -318,9 +322,13 @@ class GeminiClient:
                             timeout=self.timeout,
                         )
                         self._reqid += 100000
+                        if stream_generate_response == None:
+                            raise(f"Faile to generate content: {stream_generate_response}")
                         return stream_generate_response
                     except Exception as e:
-                        raise ("Fail to get content.")
+                        raise (f"Fail to send request content. \nStream generate status: {stream_generate_response.status_code}\n{e}")
+                else:
+                    print(f"Batch execution failed: response status not 200. \nBatch execution status: {request_batch_execute.status_code}")
             except Exception as e:
                 raise ("Fail to execute batch. {e}")
 
@@ -395,8 +403,6 @@ class GeminiSession:
             self.rid = rid
         if rcid:
             self.rcid = rcid
-        if _reqid:
-            self._reqid = _reqid
 
     def __str__(self):
         return f"GeminiSession(reqid ='{self._reqid}'cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
