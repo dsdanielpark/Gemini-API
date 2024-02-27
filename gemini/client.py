@@ -2,15 +2,18 @@
 import os
 import re
 import json
-import requests
 import httpx
+import random
+import string
 import asyncio
+import requests
 from typing import Optional, Any, List
 
 from .constants import (
     REQUIRED_COOKIE_LIST,
     HEADERS,
     SUPPORTED_BROWSERS,
+    TEXT_GENERATION_WEB_SERVER_PARAM,
     Tool,
 )
 from .models.base import (
@@ -50,6 +53,7 @@ class GeminiClient:
         "run_code",
         "share_session",
         "verify",
+        "_reqid",
     ]
 
     def __init__(
@@ -59,7 +63,7 @@ class GeminiClient:
         session: Optional[httpx.AsyncClient] = None,
         cookies: Optional[dict] = None,
         timeout: int = 30,
-        proxies: Optional[dict] = None,
+        proxies: Optional[dict] = {},
         language: Optional[str] = None,
         conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
@@ -81,13 +85,14 @@ class GeminiClient:
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
+        self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.cookies = cookies or {}
         self._get_cookies(auto_cookies)
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.session = None
+        self.session = session
         self.token = token
-        self.token = self._get_nonce_value()
+        self.token = self.get_nonce_value()
         self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
@@ -100,12 +105,16 @@ class GeminiClient:
     def check_session_cookies(self):
         if self.session:
             cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join([f"{key}: {value}" for key, value in cookies.items()])
+            cookies_str = "\n".join(
+                [f"{key}: {value}" for key, value in cookies.items()]
+            )
             print("Session Cookies:\n" + cookies_str)
 
     def check_session_cookies(self):
         if self.session:
-            cookies_str = "\n".join([f"{key}: {value}" for key, value in self.session.cookies.items()])
+            cookies_str = "\n".join(
+                [f"{key}: {value}" for key, value in self.session.cookies.items()]
+            )
             print("Session Cookies:\n" + cookies_str)
         else:
             print("Session not initialized.")
@@ -114,7 +123,9 @@ class GeminiClient:
         """Prints the current session's headers with each key-value pair on a new line."""
         if self.session:
             headers = self.session.headers
-            headers_str = "\n".join([f"{key}: {value}" for key, value in headers.items()])
+            headers_str = "\n".join(
+                [f"{key}: {value}" for key, value in headers.items()]
+            )
             print("Session Headers:\n" + headers_str)
         else:
             print("Session not initialized.")
@@ -138,9 +149,11 @@ class GeminiClient:
                 )
                 cj = browser_fn(domain_name=".google.com")
                 found_cookies = {cookie.name: cookie.value for cookie in cj}
-                print(f"Automatically configure cookies with detected ones.\n{found_cookies}")
+                print(
+                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
+                )
                 self.cookies = found_cookies
-                
+
             except Exception as e:
                 continue  # Ignore exceptions and try the next browser function
 
@@ -160,7 +173,7 @@ class GeminiClient:
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
         """
         # Initialize cookies dictionary if not already initialized
-        if not hasattr(self, 'cookies'):
+        if not hasattr(self, "cookies"):
             self.cookies = {}
 
         # Load cookies from environment variables
@@ -196,9 +209,6 @@ class GeminiClient:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
-
-
-
     async def close_session(self):
         if self.session:
             await self.session.aclose()
@@ -220,17 +230,27 @@ class GeminiClient:
         if not self.cookies:
             raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
-        self.session = httpx.AsyncClient(headers=HEADERS, cookies=self.cookies, proxies=self.proxies, timeout=self.timeout)
+        self.session = httpx.AsyncClient(
+            headers=HEADERS,
+            cookies=self.cookies,
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
 
         # Ensure session is initialized
-        if not hasattr(self, 'session') or self.session is None:
-            self.session = httpx.AsyncClient()
-
+        if not hasattr(self, "session") or self.session is None:
+            for i in range(2):
+                print(f"Re-try to create async client. ({i})")
+                self.session = httpx.AsyncClient(
+                    headers=HEADERS,
+                    cookies=self.cookies,
+                    proxies=self.proxies,
+                    timeout=self.timeout,
+                )
 
         return self.session
 
-
-    def _get_nonce_value(self) -> str:
+    def get_nonce_value(self) -> str:
         """
         Get the SNlM0e Token value from the Gemini API response.
 
@@ -253,7 +273,7 @@ class GeminiClient:
                 "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
             )
         return nonce
-    
+
     async def generate_content(
         self,
         prompt: str,
@@ -262,49 +282,76 @@ class GeminiClient:
         data = {
             "at": self.token,
             "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata if session else None])]
+                [
+                    None,
+                    json.dumps(
+                        [
+                            [prompt],
+                            None,
+                            session and session.metadata if session else None,
+                        ]
+                    ),
+                ]
             ),
+        }
+        params = {
+            "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
+            "_reqid": str(self._reqid),
+            "rt": "c",
         }
 
         try:
-            execute_response = await self.session.post(
+            request_batch_execute = await self.session.post(
                 "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
                 data=data,
+                params=params,
                 timeout=self.timeout,
-                proxies=self.proxies,
-                verify=self.verify,
             )
-            return execute_response.json()
-        except:
-            raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-            )
-        
+            self._reqid += 100000
+            try:
+                if request_batch_execute == 200:
+                    try:
+                        stream_generate_response = await self.session.post(
+                            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                            data=data,
+                            params=params,
+                            timeout=self.timeout,
+                        )
+                        self._reqid += 100000
+                        return stream_generate_response
+                    except Exception as e:
+                        raise ("Fail to get content.")
+            except Exception as e:
+                raise ("Fail to execute batch. {e}")
+
+        except Exception as e:
+            raise ("")
+
     async def request_share(
-            self,
-            session: Optional["GeminiSession"] = None,
-        ) -> dict:
-            """
-            Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+        self,
+        session: Optional["GeminiSession"] = None,
+    ) -> dict:
+        """
+        Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
 
-            Args:
-                session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+        Args:
+            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
 
-            Returns:
-                dict: A dictionary containing the response from the Gemini API.
-            """
-            url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
-            
-            # Use httpx.ClientSession for asynchronous HTTP requests
-            async with httpx.ClientSession() as session:
-                try:
-                    async with session.post(url, timeout=self.timeout) as response:
-                        return await response.json()
-                except asyncio.TimeoutError:
-                    raise TimeoutError(
-                        "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-                    )
-        
+        Returns:
+            dict: A dictionary containing the response from the Gemini API.
+        """
+        url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
+
+        # Use httpx.ClientSession for asynchronous HTTP requests
+        async with httpx.AsyncClient() as session:
+            try:
+                async with session.post(url, timeout=self.timeout) as response:
+                    return await response.json()
+            except asyncio.TimeoutError:
+                raise TimeoutError(
+                    "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+                )
+
 
 class GeminiSession:
     """
@@ -334,6 +381,7 @@ class GeminiSession:
         cid: Optional[str] = None,  # chat id
         rid: Optional[str] = None,  # reply id
         rcid: Optional[str] = None,  # reply candidate id
+        _reqid: Optional[str] = None,
     ):
         self.__metadata: list[Optional[str]] = [None, None, None]
         self.gemini: GeminiClient = gemini
@@ -347,9 +395,11 @@ class GeminiSession:
             self.rid = rid
         if rcid:
             self.rcid = rcid
+        if _reqid:
+            self._reqid = _reqid
 
     def __str__(self):
-        return f"GeminiSession(cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
+        return f"GeminiSession(reqid ='{self._reqid}'cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
 
     __repr__ = __str__
 
