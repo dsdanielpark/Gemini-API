@@ -1,4 +1,4 @@
-# Copyright 2024 Minwoo(Daniel) Park, MIT License, Revert checkpoint #2
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import os
 import re
 import json

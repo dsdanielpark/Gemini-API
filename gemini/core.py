@@ -1,4 +1,4 @@
-# Copyright 2024 Minwoo(Daniel) Park, MIT License, Revert checkpoint #1
+# Copyright 2024 Minwoo(Daniel) Park, MIT License
 import os
 import re
 import json
@@ -345,7 +345,6 @@ class Gemini:
             "f.req": json.dumps(
                 [None, json.dumps([[prompt], None, session and session.metadata])]
             ),
-            "rpcids": "ESY5D",
         }
         try:
             execute_response = self._execute_prompt(prompt)
@@ -382,9 +381,8 @@ class Gemini:
         Returns:
             dict: A dictionary containing the response from the Gemini API.
         """
-        url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
+        url = "https://clients6.google.com/upload/drive/v3/files/"
 
-        # Use aiohttp.ClientSession for asynchronous HTTP requests
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.post(url, timeout=self.timeout) as response:
@@ -490,145 +488,6 @@ class Gemini:
             raise TimeoutError(
                 "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
             )
-
-        # if response.status_code != 200:
-        #     raise APIError(f"Request failed with status code {response.status_code}")
-        # else:
-        #     try:
-        #         body = json.loads(
-        #             json.loads(response.text.split("\n")[2])[0][2]
-        #         )  # Generated texts
-        #         if not body[4]:
-        #             body = json.loads(
-        #                 json.loads(response.text.split("\n")[2])[4][2]
-        #             )  # Non-textual data formats.
-        #         if not body[4]:
-        #             raise APIError(
-        #                 "Failed to parse body. The response body is unstructured. Please try again."
-        #             )  # Fail to parse
-        #     except Exception:
-        #         raise APIError(
-        #             "Failed to parse candidates. Unexpected structured response returned. Please try again."
-        #         )  # Unexpected structured response
-
-        #     try:
-        #         candidates = []
-        #         for candidate in body[4]:
-        #             web_images = (
-        #                 candidate[4]
-        #                 and [
-        #                     WebImage(
-        #                         url=image[0][0][0], title=image[2], alt=image[0][4]
-        #                     )
-        #                     for image in candidate[4]
-        #                 ]
-        #                 or []
-        #             )
-        #             generated_images = (
-        #                 candidate[12]
-        #                 and candidate[12][7]
-        #                 and candidate[12][7][0]
-        #                 and [
-        #                     GeneratedImage(
-        #                         url=image[0][3][3],
-        #                         title=f"[Generated image {image[3][6]}]",
-        #                         alt=image[3][5][i],
-        #                         cookies=self.cookies,
-        #                     )
-        #                     for i, image in enumerate(candidate[12][7][0])
-        #                 ]
-        #                 or []
-        #             )
-        #             candidates.append(
-        #                 Candidate(
-        #                     rcid=candidate[0],
-        #                     text=candidate[1][0],
-        #                     web_images=web_images,
-        #                     generated_images=generated_images,
-        #                 )
-        #             )
-        #         if not candidates:
-        #             raise GeminiError(
-        #                 "Failed to generate candidates. No data of any kind returned. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-        #             )
-        #         generated_content = GeminiOutput(
-        #             metadata=body[1], candidates=candidates
-        #         )
-        #     except IndexError:
-        #         raise APIError(
-        #             "Failed to parse response body. Data structure is invalid. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-        #         )
-        # # Retry to generate content by updating cookies and session
-        # if not generated_content:
-        #     print(
-        #         "Using 'browser_cookie3' package, automatically refresh cookies, re-establish the session, and attempt to generate content again."
-        #     )
-        #     for _ in range(2):
-        #         self.cookies = self._set_cookies(True)
-        #         self.session = self._set_session(None)
-        #         try:
-        #             generated_content = self.generate_content(
-        #                 prompt, session, image, tool
-        #             )
-        #             break
-        #         except:
-        #             print(
-        #                 "Failed to establish session connection after retrying. If this issue persists, please submit an issue at https://github.com/dsdanielpark/Gemini-API/issues."
-        #             )
-        #     else:
-        #         raise APIError("Failed to generate content.")
-
-        # return generated_content
-
-    def speech(self, prompt: str, lang: str = "en-US") -> dict:
-        """
-        Get speech audio from Gemini API for the given input text.
-
-        Args:
-            prompt (str): Input text for the query.
-            lang (str, optional, default = "en-US"): Input language for the query.
-
-        Returns:
-            dict: Answer from the Gemini API in the following format:
-            {
-                "audio": bytes,
-                "status_code": int
-            }
-        """
-        params = {
-            "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
-            "_reqid": str(self._reqid),
-            "rt": "c",
-        }
-
-        prompt_struct = [[["XqA3Ic", json.dumps([None, prompt, lang, None, 2])]]]
-
-        data = {
-            "f.req": json.dumps(prompt_struct),
-            "at": self.token,
-        }
-
-        # Get response
-        response = self.session.post(
-            "https://gemini.google.com/_/BardChatUi/data/batchexecute",
-            params=params,
-            data=data,
-            timeout=self.timeout,
-            proxies=self.proxies,
-        )
-
-        # Post-processing of response
-        response_dict = json.loads(response.content.splitlines()[3])[0][2]
-        if not response_dict:
-            return {
-                "content": f"Response Error: {response.content}. "
-                f"\nUnable to get response."
-                f"\nPlease double-check the cookie values and verify your network environment or google account."
-            }
-        resp_json = json.loads(response_dict)
-        audio_b64 = resp_json[0]
-        audio_bytes = base64.b64decode(audio_b64)
-        return {"audio": audio_bytes, "status_code": response.status_code}
 
 
 class GeminiSession:
