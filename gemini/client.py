@@ -73,7 +73,7 @@ class GeminiClient:
         run_code: bool = False,
         verify: bool = True,
         latency: int = 10,
-        target_cookies: Optional[List] = [],
+        update_cookie_list: Optional[List] = [],
     ):
         """
         Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
@@ -90,7 +90,7 @@ class GeminiClient:
             run_code (bool): Flag indicating whether to execute code in IPython environments.
         """
         self.auto_cookies = auto_cookies
-        self.target_cookies = target_cookies
+        self.update_cookie_list = update_cookie_list
         self.latency = latency
         self.running = False
         self._reqid = int("".join(random.choices(string.digits, k=4)))
@@ -277,21 +277,19 @@ class GeminiClient:
             self.running = False
 
         return self.session
-    
 
-
-    async def update_target_cookies(self, target_cookies: dict = None):
+    def _update_cookies(self, update_cookie_list: List[str] = None):
         """
-        Updates specified cookies in the httpx client. If target_cookies is not provided,
+        Updates specified cookies in the httpx client. If update_cookie_list is not provided,
         updates all cookies stored in self.cookies.
 
         Parameters:
-        - target_cookies (dict, optional): A dictionary of cookie names and values to update.
-                                           If None, updates all cookies from self.cookies.
+        - update_cookie_list (List[str], optional): A list of cookie names to update.
+                                                If None, updates all cookies from self.cookies.
         """
-        cookies_to_update = target_cookies if target_cookies is not None else self.cookies
-
         self._get_cookies(True)
+
+        cookies_to_update = {k: self.cookies[k] for k in update_cookie_list} if update_cookie_list is not None else self.cookies
 
         try:
             for cookie_name, cookie_value in cookies_to_update.items():
@@ -301,6 +299,7 @@ class GeminiClient:
                     print(f"Warning: Cookie value for {cookie_name} is missing; skipping update.")
         except Exception as e:
             print(f"An error occurred while updating cookies: {e}")
+
 
     def get_nonce_value(self) -> str:
         """
@@ -359,7 +358,7 @@ class GeminiClient:
         try:
             request_batch_execute = await self._post_initial_prompt(prompt)
             await asyncio.sleep(self.latency)
-            await self.update_target_cookies(self.target_cookies)
+            await self._update_cookies(self.target_cookies)
             async def attempt_fetch():
                 nonlocal request_batch_execute
                 while True:
