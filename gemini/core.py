@@ -70,7 +70,6 @@ class Gemini:
         timeout: int = 30,
         proxies: Optional[dict] = None,
         language: Optional[str] = None,
-        conversation_id: Optional[str] = None,
         google_translator_api_key: Optional[str] = None,
         run_code: bool = False,
         verify: bool = True,
@@ -98,7 +97,6 @@ class Gemini:
         self.share_session = self._set_share_session(share_session)
         self.token = token
         self.token = self._get_token()
-        self.conversation_id = conversation_id or ""
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
@@ -284,7 +282,7 @@ class Gemini:
             )
         return nonce
 
-    def __execute_prompt(
+    def _execute_prompt(
         self,
         prompt: str,
         session: Optional["GeminiSession"] = None,
@@ -312,7 +310,7 @@ class Gemini:
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
             execute_response = self.session.post(
-                "https://gemini.google.com//_/BardChatUi/data/batchexecute",
+                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
@@ -350,7 +348,7 @@ class Gemini:
             "rpcids": "ESY5D",
         }
         try:
-            execute_response = self.__execute_prompt(prompt)
+            execute_response = self._execute_prompt(prompt)
         except:
             pass
 

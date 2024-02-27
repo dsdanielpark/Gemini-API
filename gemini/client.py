@@ -293,7 +293,6 @@ class GeminiClient:
                 match = re.search(r'nonce="([^"]+)"', response.text)
                 if match:
                     return match.group(1)
-            # If the status code is not 200 or nonce value not found, raise an exception.
             raise Exception(error_message)
     
     def _prepare_data(self, prompt: str, gemini_session: Optional["GeminiSession"] = None) -> dict:
@@ -327,18 +326,45 @@ class GeminiClient:
 
         return response
 
-    async def generate_content(self, prompt: str) -> dict:
+    async def generate_content(self, prompt: str, wait_time: int = 40) -> dict:
+        request_batch_execute = await self.post_prompt(prompt)
+        await asyncio.sleep(10)
+        print(f"Initial request status: {request_batch_execute.status_code}")
+
+        async def attempt_fetch():
+            nonlocal request_batch_execute
+            while True:
+                response = await self.post_prompt(prompt)
+                print(f"Current batch execution status: {response.status_code}")
+                if response.status_code == 200:
+                    print("Received status code 200. Processing response.")
+                    return response
+                else:
+                    request_batch_execute = response
+                    await asyncio.sleep(10)
+
         try:
-            response_batch_execute = await self.post_prompt(prompt)
-            print(f"Batch execution status: {response_batch_execute.status_code}")
-            await asyncio.sleep(self.latency)
-            task = asyncio.create_task(self.post_prompt(prompt))
-            stream_generate_response = await task
-            if stream_generate_response is None:
-                raise Exception("Stream generation failed: No response received")
-            return stream_generate_response
+            return await asyncio.wait_for(attempt_fetch(), timeout=wait_time)
+        except asyncio.TimeoutError:
+            print(f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response.")
+            return request_batch_execute
+        except asyncio.CancelledError as e:
+            print(f"Operation was cancelled due to: {e}. Handling cleanup here if necessary.")
+            return request_batch_execute
         except Exception as e:
             raise Exception(f"Failed to process request: {e}")
+
+        # try:
+        #     response_batch_execute = await self.post_prompt(prompt)
+        #     print(f"Batch execution status: {response_batch_execute.status_code}")
+        #     await asyncio.sleep(self.latency)
+        #     task = asyncio.create_task(self.post_prompt(prompt))
+        #     stream_generate_response = await task
+        #     if stream_generate_response is None:
+        #         raise Exception("Stream generation failed: No response received")
+        #     return stream_generate_response
+        # except Exception as e:
+        #     raise Exception(f"Failed to process request: {e}")
 
     async def request_share(
         self,
@@ -409,7 +435,7 @@ class GeminiSession:
             self.rcid = rcid
 
     def __str__(self):
-        return f"GeminiSession(reqid ='{self._reqid}'cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
+        return f"GeminiSession(cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
 
     __repr__ = __str__
 
