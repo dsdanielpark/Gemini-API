@@ -97,12 +97,12 @@ class BardFlightContent(UserContent):
 
     @property
     def from_date(self) -> str:
-        # Jan 22
+        # Jan 22, 2023
         return self._input_list[6]
 
     @property
     def to_date(self) -> str:
-        # Jan 28
+        # Jan 28, 2023
         return self._input_list[7]
 
     @property

@@ -41,7 +41,6 @@ class Gemini:
         timeout (int): Request timeout in seconds. Defaults to 30.
         proxies (dict): Proxy configuration for requests. Useful for routing requests through specific network interfaces.
         language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja"). Used for specifying the desired language for translation services.
-        conversation_id (str, optional): An identifier for fetching conversational context. Useful in applications requiring context-aware interactions.
         auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies. Defaults to False.
         google_translator_api_key (str, optional): Specifies the Google Cloud Translation API key for translation services.
         run_code (bool): Indicates whether to execute code included in the response. This is applicable only in IPython environments.
@@ -54,7 +53,6 @@ class Gemini:
         "timeout",
         "proxies",
         "language",
-        "conversation_id",
         "auto_cookies",
         "google_translator_api_key",
         "run_code",
@@ -107,7 +105,7 @@ class Gemini:
         self.verify = verify
 
     def check_session_cookies(self):
-        """Prints the current session's cookies with each key-value pair on a new line."""
+        """Prints the current session's cookies"""
         if self.session:
             cookies = self.session.cookies.get_dict()
             cookies_str = "\n".join([f"{key}: {value}" for key, value in cookies.items()])
@@ -116,7 +114,7 @@ class Gemini:
             print("Session not initialized.")
 
     def check_session_headers(self):
-        """Prints the current session's headers with each key-value pair on a new line."""
+        """Prints the current session's headers"""
         if self.session:
             headers = self.session.headers
             headers_str = "\n".join([f"{key}: {value}" for key, value in headers.items()])
@@ -157,7 +155,7 @@ class Gemini:
         current_cookie_keys = set(self.cookies.keys())
         if not required_cookie_set.issubset(current_cookie_keys):
             print(
-                "Some recommended cookies not found: '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
+                "Some recommended cookies not found: 'SIDCC', or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
             )
 
     def _set_cookies(self, auto_cookies: bool) -> None:
