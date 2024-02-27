@@ -1,6 +1,7 @@
 import re
 from setuptools import find_packages, setup
 
+
 def read(file_path, version=False):
     with open(file_path, encoding="UTF-8") as f:
         content = f.read()
@@ -10,6 +11,7 @@ def read(file_path, version=False):
             raise RuntimeError(f"{file_path} doesn't contain __version__")
         return match.group(1)
     return content
+
 
 setup(
     name="python-gemini-api",

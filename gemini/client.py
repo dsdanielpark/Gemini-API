@@ -57,7 +57,7 @@ class GeminiClient:
         "verify",
         "_reqid",
         "latency",
-        "running"
+        "running",
     ]
 
     def __init__(
@@ -105,10 +105,11 @@ class GeminiClient:
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
         self.verify = verify
-        
 
     async def async_init(self, auto_close: bool = False, close_delay: int = 300):
-        self.session = await self._create_async_session(auto_close = auto_close, close_delay = close_delay)
+        self.session = await self._create_async_session(
+            auto_close=auto_close, close_delay=close_delay
+        )
 
     async def close_session(self):
         if self.session:
@@ -229,7 +230,9 @@ class GeminiClient:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
-    async def _create_async_session(self, auto_close: bool, close_delay: int) -> httpx.AsyncClient:
+    async def _create_async_session(
+        self, auto_close: bool, close_delay: int
+    ) -> httpx.AsyncClient:
         """
         Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
 
@@ -289,17 +292,22 @@ class GeminiClient:
         """
         self._get_cookies(True)
 
-        cookies_to_update = {k: self.cookies[k] for k in update_cookie_list} if update_cookie_list is not None else self.cookies
+        cookies_to_update = (
+            {k: self.cookies[k] for k in update_cookie_list}
+            if update_cookie_list is not None
+            else self.cookies
+        )
 
         try:
             for cookie_name, cookie_value in cookies_to_update.items():
                 if cookie_value:
                     self.session.cookies.set(cookie_name, cookie_value)
                 else:
-                    print(f"Warning: Cookie value for {cookie_name} is missing; skipping update.")
+                    print(
+                        f"Warning: Cookie value for {cookie_name} is missing; skipping update."
+                    )
         except Exception as e:
             print(f"An error occurred while updating cookies: {e}")
-
 
     def get_nonce_value(self) -> str:
         """
@@ -314,17 +322,23 @@ class GeminiClient:
                 if match:
                     return match.group(1)
             raise Exception(error_message)
-    
-    def _prepare_data(self, prompt: str, gemini_session: Optional["GeminiSession"] = None) -> dict:
-        session_metadata = gemini_session.metadata if gemini_session and gemini_session.metadata else None
+
+    def _prepare_data(
+        self, prompt: str, gemini_session: Optional["GeminiSession"] = None
+    ) -> dict:
+        session_metadata = (
+            gemini_session.metadata
+            if gemini_session and gemini_session.metadata
+            else None
+        )
         request_body = [None, [[prompt], None, session_metadata]]
-        
+
         data = {
             "at": self.token,
             "f.req": json.dumps([None, json.dumps(request_body)]),
         }
         return data
-    
+
     def _prepare_params(self) -> dict:
         return {
             "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
@@ -332,7 +346,9 @@ class GeminiClient:
             "rt": "c",
         }
 
-    async def post_prompt(self, prompt: str, gemini_session: Optional["GeminiSession"] = None) -> dict:
+    async def post_prompt(
+        self, prompt: str, gemini_session: Optional["GeminiSession"] = None
+    ) -> dict:
         data = self._prepare_data(prompt, gemini_session)
         params = self._prepare_params()
 
@@ -353,12 +369,15 @@ class GeminiClient:
         print(f"Initial request status: {response.status_code}")
         return response
 
-    async def attempt_fetch_with_retries(self, prompt: str, wait_time: int = 40) -> dict:
+    async def attempt_fetch_with_retries(
+        self, prompt: str, wait_time: int = 40
+    ) -> dict:
         """Attempts to fetch the content with retries until a status code 200 is received or a timeout occurs."""
         try:
             request_batch_execute = await self._post_initial_prompt(prompt)
             await asyncio.sleep(self.latency)
             await self._update_cookies(self.target_cookies)
+
             async def attempt_fetch():
                 nonlocal request_batch_execute
                 while True:
@@ -373,15 +392,17 @@ class GeminiClient:
 
             return await asyncio.wait_for(attempt_fetch(), timeout=wait_time)
         except asyncio.TimeoutError:
-            print(f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response.")
+            print(
+                f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response."
+            )
             return request_batch_execute
         except asyncio.CancelledError as e:
-            print(f"Operation was cancelled due to: {e}. Handling cleanup here if necessary.")
+            print(
+                f"Operation was cancelled due to: {e}. Handling cleanup here if necessary."
+            )
             return request_batch_execute
         except Exception as e:
             raise Exception(f"Failed to process request: {e}")
-
-
 
     async def request_share(
         self,
