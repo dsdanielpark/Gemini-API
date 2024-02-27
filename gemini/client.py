@@ -283,29 +283,21 @@ class GeminiClient:
     def get_nonce_value(self) -> str:
         """
         Get the Nonce Token value from the Gemini API response.
-
-        Returns:
-            str: Nonce token value.
-        Raises:
-            Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
-        sync_session = requests.Session()
-        response = sync_session.get(
-            "https://gemini.google.com/", timeout=self.timeout, proxies=self.proxies
-        )
-        if response.status_code != 200:
-            raise Exception(
-                f"Response status code is not 200. Response Status is {response.status_code}"
-            )
-        nonce = re.findall(r'nonce="([^"]+)"', response.text)
-        if nonce == None:
-            raise Exception(
-                "Nonce token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
-            )
-        return nonce
+        url = "https://gemini.google.com/"
+        error_message = "Nonce token value not found or response status is not 200."
+
+        with requests.Session() as session:
+            response = session.get(url, timeout=self.timeout, proxies=self.proxies)
+            if response.status_code == 200:
+                match = re.search(r'nonce="([^"]+)"', response.text)
+                if match:
+                    return match.group(1)
+            # If the status code is not 200 or nonce value not found, raise an exception.
+            raise Exception(error_message)
     
-    def _prepare_data(self, prompt: str) -> dict:
-        session_metadata = self.session.metadata if self.session and self.session.metadata else None
+    def _prepare_data(self, prompt: str, gemini_session: Optional["GeminiSession"] = None) -> dict:
+        session_metadata = gemini_session.metadata if gemini_session and gemini_session.metadata else None
         request_body = [None, [[prompt], None, session_metadata]]
         
         data = {
@@ -320,10 +312,9 @@ class GeminiClient:
             "_reqid": str(self._reqid),
             "rt": "c",
         }
-    
 
-    async def post_prompt(self, prompt: str) -> dict:
-        data = self._prepare_data(prompt)
+    async def post_prompt(self, prompt: str, gemini_session: Optional["GeminiSession"] = None) -> dict:
+        data = self._prepare_data(prompt, gemini_session)
         params = self._prepare_params()
 
         response = await self.session.post(
@@ -338,16 +329,14 @@ class GeminiClient:
 
     async def generate_content(self, prompt: str) -> dict:
         try:
-            request_batch_execute = await self.post_prompt(prompt)
-            if request_batch_execute.status == 200:
-                await asyncio.sleep(self.latency)
-                task = asyncio.create_task(self.post_prompt(prompt))
-                stream_generate_response = await task
-                if stream_generate_response is None:
-                    raise Exception("Stream generation failed: No response received")
-                return stream_generate_response
-            else:
-                print(f"Batch execution failed: Response status not 200.\nBatch execution status: {request_batch_execute.status}")
+            response_batch_execute = await self.post_prompt(prompt)
+            print(f"Batch execution status: {response_batch_execute.status_code}")
+            await asyncio.sleep(self.latency)
+            task = asyncio.create_task(self.post_prompt(prompt))
+            stream_generate_response = await task
+            if stream_generate_response is None:
+                raise Exception("Stream generation failed: No response received")
+            return stream_generate_response
         except Exception as e:
             raise Exception(f"Failed to process request: {e}")
 
