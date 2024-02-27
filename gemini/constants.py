@@ -13,6 +13,7 @@ class Tool(Enum):
     GOOGLE_MAPS = ["google_map_tool"]
     YOUTUBE = ["youtube_tool"]
 
+
 DEFAULT_LANGUAGE = "en"
 SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
@@ -207,5 +208,3 @@ ALLOWED_LANGUAGES = {
     "ur",
     "vi",
 }
-
-
