@@ -26,7 +26,7 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 Cookie requirements may vary based on country/regions and the status of your Google account.
 1. Visit https://gemini.google.com/
 2. F12 for console
-3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie.
+3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie or `SIDCC` cookie.
 Depending on the region and Google account status, *multiple cookies may be required*.
 
 <br>
@@ -34,9 +34,11 @@ Depending on the region and Google account status, *multiple cookies may be requ
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Initialization
-You must appropriately set the `cookies_dict` parameter to `Gemini` class.
+You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* <br>
+
+*Async client*
 ```python
-from gemini import Gemini
+from gemini import GeminiClient
 
 cookies = {
     "__Secure-1PSID": "value",
@@ -45,16 +47,23 @@ cookies = {
     "NID": "value",
 }
 
-GeminiClient = Gemini(cookies=cookies)
+client = GeminiClient(cookies=cookies)
+# client = GeminiClient(auto_cookies=True) # Or use auto_cookies paprameter
+
+await client.async_init()
 ```
-Or update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. (under investigation for better methods.)
+*Sync session*
 ```python
 from gemini import Gemini
 
-GeminiClient = Gemini(auto_cookies=True)
-```
-However, `auto_cookies` feature is incomplete, and you may need to periodically update cookie values in a .env file or json file. You will need to develop a logic that suits you for automatically updating cookies.
+cookies = {
+    "SIDCC": "value"
+}
 
+client = Gemini(cookies=cookies)
+# client = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
+```
+Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. 
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
@@ -184,8 +193,6 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
-## Sponsor
-![(https://crawlbase.com/)](assets/crawlbase_logo.png)
 
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
