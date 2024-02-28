@@ -61,6 +61,8 @@ class GeminiClient:
         "latency",
         "running",
         "update_cookie_list",
+        "auto_close",
+        "close_delay",
     ]
 
     def __init__(
@@ -68,7 +70,7 @@ class GeminiClient:
         auto_cookies: bool = False,
         token: str = None,
         session: Optional[httpx.AsyncClient] = None,
-        cookies: Optional[dict] = None,
+        cookies: Optional[dict] = {},
         timeout: int = 30,
         proxies: Optional[dict] = {},
         language: Optional[str] = None,
@@ -77,43 +79,49 @@ class GeminiClient:
         verify: bool = True,
         latency: int = 10,
         update_cookie_list: Optional[List] = [],
+        auto_close=True,
+        close_delay: int = 60,
     ):
         """
-        Initializes a new GeminiClient instance with configurations for service interaction.
+        Initializes a new GeminiClient instance with various configurations for HTTP requests and service interactions.
 
-        Parameters:
-            auto_cookies (bool): Enables automatic cookie management.
-            token (Optional[str]): Authentication token for session management.
-            session (Optional[httpx.AsyncClient]): Custom asynchronous HTTP client session.
-            cookies (Optional[Dict[str, str]]): Initial cookies for session management.
-            timeout (int): Request timeout in seconds.
-            proxies (Optional[Dict[str, str]]): Proxy configurations for requests.
-            language (Optional[str]): Default language code for translation services.
-            google_translator_api_key (Optional[str]): API key for Google Cloud Translation.
-            run_code (bool): Enables code execution in IPython environments.
-            verify (bool): Enables SSL certificate verification.
-            latency (int): Latency consideration for operations.
-            update_cookie_list (Optional[List[str]]): List of cookies to update.
+        Args:
+            auto_cookies (bool): If True, enables automatic management of cookies.
+            token (str, optional): Authentication token used for session management. Defaults to None.
+            session (httpx.AsyncClient, optional): An instance of httpx.AsyncClient for making asynchronous HTTP requests. If None, a new session will be created. Defaults to None.
+            cookies (dict, optional): Initial cookies to be used with the session. Defaults to an empty dictionary.
+            timeout (int): The timeout for requests in seconds. Defaults to 30.
+            proxies (dict, optional): A dictionary of proxy configurations to be used with the session. Defaults to an empty dictionary.
+            language (str, optional): The default language code to be used for translation services. Defaults to None.
+            google_translator_api_key (str, optional): The API key for Google Cloud Translation services. Defaults to None.
+            run_code (bool): If True, enables the execution of code in IPython environments. Defaults to False.
+            verify (bool): If True, enables SSL certificate verification for HTTP requests. Defaults to True.
+            latency (int): The latency in seconds to consider for operations, affecting retry and backoff strategies. Defaults to 10.
+            update_cookie_list (List[str], optional): A list of cookies that should be updated during session management. Defaults to an empty list.
+            auto_close (bool): If True, the session will automatically close after a specified delay. Defaults to True.
+            close_delay (int): The delay in seconds before the session is automatically closed, applicable if auto_close is True. Defaults to 60.
         """
         self.update_cookie_list = update_cookie_list
         self.auto_cookies = auto_cookies
         self.latency = latency
         self.running = False
         self._reqid = int("".join(random.choices(string.digits, k=4)))
-        self.cookies = cookies or {}
+        self.cookies = cookies
         self._get_cookies(auto_cookies)
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.session = session or httpx.AsyncClient()
+        self.session = session
         self.token = token
         self.token = self.get_nonce_value()
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
         self.verify = verify
+        self.auto_close = auto_close
+        self.close_delay = close_delay
 
     async def async_init(
-        self, auto_close: bool = False, close_delay: int = 300
+        self,
     ) -> None:
         """
         Initializes the asynchronous session with optional auto-close functionality.
@@ -123,17 +131,46 @@ class GeminiClient:
             close_delay (int): Delay in seconds before automatically closing the session.
         """
         self.session = await self._create_async_session(
-            auto_close=auto_close, close_delay=close_delay
+            auto_close=self.auto_close, close_delay=self.close_delay
         )
 
-    async def close_session(self) -> None:
+    async def _create_async_session(
+        self, auto_close: bool, close_delay: int
+    ) -> httpx.AsyncClient:
         """
-        Closes the current session and resets the running state.
+        Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
+
+        Returns:
+            httpx.AsyncClient: The session object, configured with headers, proxies, and cookies.
+
+        Raises:
+            ValueError: If the 'cookies' dictionary is empty, indicating that there's insufficient information to properly set up a new session.
         """
+        if self.session is not None:
+            return self.session
+
+        print(self.cookies)
+        if not self.cookies:
+            raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
+
+        self.session = httpx.AsyncClient(
+            headers=HEADERS,
+            cookies=self.cookies,
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if hasattr(self, "session"):
+            self.running = True
+        else:
+            self.running = False
+
+        return self.session
+
+    async def close(self):
         if self.session:
             await self.session.aclose()
             self.session = None
-            self.running = False
 
     async def reset_close_task(self) -> None:
         """
@@ -181,44 +218,6 @@ class GeminiClient:
                     return match.group(1)
             raise Exception(error_message)
 
-    def _get_cookies_from_browser(self) -> dict:
-        """
-        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
-
-        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
-
-        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
-
-        Raises:
-            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
-        """
-
-        for browser_fn in SUPPORTED_BROWSERS:
-            try:
-                print(
-                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
-                )
-                cj = browser_fn(domain_name=".google.com")
-                found_cookies = {cookie.name: cookie.value for cookie in cj}
-                print(
-                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
-                )
-                self.cookies = found_cookies
-
-            except Exception as e:
-                continue  # Ignore exceptions and try the next browser function
-
-        if not self.cookies:
-            raise ValueError(
-                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
-            )
-        required_cookie_set = set(REQUIRED_COOKIE_LIST)
-        current_cookie_keys = set(self.cookies.keys())
-        if not required_cookie_set.issubset(current_cookie_keys):
-            print(
-                "Some recommended cookies not found: 'SIDCC' or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'.\nIt depends on your Contries/Legions."
-            )
-
     def _get_cookies(self, auto_cookies: bool) -> None:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
@@ -260,42 +259,43 @@ class GeminiClient:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
-    async def _create_async_session(
-        self, auto_close: bool, close_delay: int
-    ) -> httpx.AsyncClient:
+    def _get_cookies_from_browser(self) -> dict:
         """
-        Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
+        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
 
-        Returns:
-            httpx.AsyncClient: The session object, configured with headers, proxies, and cookies.
+        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
+
+        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
 
         Raises:
-            ValueError: If the 'cookies' dictionary is empty, indicating that there's insufficient information to properly set up a new session.
+            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
         """
-        if self.session is not None:
-            return self.session
+
+        for browser_fn in SUPPORTED_BROWSERS:
+            try:
+                print(
+                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
+                )
+                cj = browser_fn(domain_name=".google.com")
+                found_cookies = {cookie.name: cookie.value for cookie in cj}
+                print(
+                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
+                )
+                self.cookies = found_cookies
+
+            except Exception as e:
+                continue  # Ignore exceptions and try the next browser function
 
         if not self.cookies:
-            raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
-
-        try:
-            self.session = httpx.AsyncClient(
-                headers=HEADERS,
-                cookies=self.cookies,
-                proxies=self.proxies,
-                timeout=self.timeout,
+            raise ValueError(
+                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
-            self.auto_close = auto_close
-            self.close_delay = close_delay
-            if self.auto_close:
-                await self.reset_close_task()
-            self.running = True
-        except Exception as e:
-            await self.close(0)
-            print(e)
-            raise
-
-        return self.session
+        required_cookie_set = set(REQUIRED_COOKIE_LIST)
+        current_cookie_keys = set(self.cookies.keys())
+        if not required_cookie_set.issubset(current_cookie_keys):
+            print(
+                "Some recommended cookies not found: 'SIDCC' or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'.\nIt depends on your Contries/Legions."
+            )
 
     def _update_cookies(self, update_cookie_list: List[str] = None):
         """
