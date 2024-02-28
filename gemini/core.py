@@ -20,6 +20,7 @@ from .constants import (
     HEADERS,
     SHARE_HEADERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
+    POST_ENDPOINT,
     SUPPORTED_BROWSERS,
     Tool,
 )
@@ -96,7 +97,7 @@ class Gemini:
         self.session = self._set_session(session)
         self.share_session = self._set_share_session(share_session)
         self.token = token
-        self.token = self._get_token()
+        self.token = self.get_nonce_value()
         self.language = language or os.getenv("GEMINI_LANGUAGE")
         self.google_translator_api_key = google_translator_api_key
         self.run_code = run_code
@@ -259,12 +260,12 @@ class Gemini:
 
         return session
 
-    def _get_token(self) -> str:
+    def get_nonce_value(self) -> str:
         """
-        Get the SNlM0e Token value from the Gemini API response.
+        Get the Nonce Token value from the Gemini API response.
 
         Returns:
-            str: SNlM0e token value.
+            str: Nonce value.
         Raises:
             Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
@@ -278,7 +279,7 @@ class Gemini:
         nonce = re.findall(r'nonce="([^"]+)"', response.text)
         if nonce == None:
             raise Exception(
-                "SNlM0e token value not found. Double-check cookies dict value or set 'auto_cookies' parametes as True.\nOccurs due to cookie changes. Re-enter new cookie, restart browser, re-login, or manually refresh cookie."
+                "Nonce not found. Check cookies or set 'auto_cookies' to True. \nCookie needs vary by location/account. Often due to cookie updates. \nIf set correctly need cookies, restart browser, re-login, or refresh cookie manually."
             )
         return nonce
 
@@ -302,7 +303,7 @@ class Gemini:
         data = {
             "at": self.token,
             "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata])]
+                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
             ),
             "rpcids": "ESY5D",
         }
@@ -310,7 +311,7 @@ class Gemini:
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
             execute_response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                POST_ENDPOINT,
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
@@ -326,7 +327,7 @@ class Gemini:
     def _post_prompt(
         self,
         prompt: str,
-        session: Optional["GeminiSession"] = None,
+        gemini_session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -343,7 +344,7 @@ class Gemini:
         data = {
             "at": self.token,
             "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata])]
+                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
             ),
         }
         try:
@@ -355,7 +356,7 @@ class Gemini:
             # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
             try:
                 post_prompt_response = self.session.post(
-                    "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                    POST_ENDPOINT,
                     data=data,
                     timeout=self.timeout,
                     proxies=self.proxies,
@@ -370,7 +371,7 @@ class Gemini:
 
     async def request_share(
         self,
-        session: Optional["GeminiSession"] = None,
+        gemini_session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -383,9 +384,9 @@ class Gemini:
         """
         url = "https://clients6.google.com/upload/drive/v3/files/"
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession() as client:
             try:
-                async with session.post(url, timeout=self.timeout) as response:
+                async with client.post(url, timeout=self.timeout) as response:
                     return await response.json()
             except asyncio.TimeoutError:
                 raise TimeoutError(
@@ -395,7 +396,7 @@ class Gemini:
     def _post_conversation(
         self,
         prompt: str,
-        session: Optional["GeminiSession"] = None,
+        gemini_session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -412,14 +413,14 @@ class Gemini:
         data = {
             "at": self.token,
             "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata])]
+                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
             ),
         }
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
             post_conversation_response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                POST_ENDPOINT,
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
@@ -434,7 +435,7 @@ class Gemini:
     def generate_content(
         self,
         prompt: str,
-        session: Optional["GeminiSession"] = None,
+        gemini_session: Optional["GeminiSession"] = None,
         image: Optional[bytes] = None,
         tool: Optional[Tool] = None,
     ) -> dict:
@@ -472,14 +473,14 @@ class Gemini:
         data = {
             "at": self.token,
             "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, session and session.metadata])]
+                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
             ),
         }
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
             response = self.session.post(
-                "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+                POST_ENDPOINT,
                 data=data,
                 timeout=self.timeout,
                 proxies=self.proxies,
