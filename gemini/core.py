@@ -2,7 +2,7 @@
 import os
 import re
 import json
-import base64
+import time
 import requests
 import aiohttp
 import asyncio
@@ -15,11 +15,11 @@ except ImportError:
     pass
 
 from .constants import (
-    ALLOWED_LANGUAGES,
     REQUIRED_COOKIE_LIST,
     HEADERS,
+    HOST,
     SHARE_HEADERS,
-    TEXT_GENERATION_WEB_SERVER_PARAM,
+    SHARE_ENDPOINT,
     POST_ENDPOINT,
     SUPPORTED_BROWSERS,
     Tool,
@@ -34,17 +34,18 @@ from .models.exceptions import (
 
 class Gemini:
     """
-    Represents a Gemini instance for interacting with services, supporting features like automatic cookie handling, proxy configuration, Google Cloud Translation integration, and optional code execution within IPython environments.
+    Represents a Gemini instance for interacting with various services. It supports features like automatic cookie handling, proxy configuration, Google Cloud Translation integration, and optional code execution within IPython environments.
 
     Attributes:
-        session (requests.Session): A requests session object for making HTTP requests.
-        cookies (dict): A dictionary containing cookies with their respective values. Important for maintaining session state.
-        timeout (int): Request timeout in seconds. Defaults to 30.
-        proxies (dict): Proxy configuration for requests. Useful for routing requests through specific network interfaces.
-        language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja"). Used for specifying the desired language for translation services.
-        auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies. Defaults to False.
-        google_translator_api_key (str, optional): Specifies the Google Cloud Translation API key for translation services.
-        run_code (bool): Indicates whether to execute code included in the response. This is applicable only in IPython environments.
+        session (requests.Session): A session object for making HTTP requests.
+        cookies (dict): A dictionary containing cookies with their respective values, important for maintaining session state.
+        timeout (int): Request timeout in seconds, defaults to 30.
+        proxies (Optional[dict]): Proxy configuration for requests, useful for routing requests through specific network interfaces.
+        language (Optional[str]): Code for the natural language for translation services (e.g., "en", "ko", "ja").
+        auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies, defaults to False.
+        google_translator_api_key (Optional[str]): The Google Cloud Translation API key for translation services.
+        run_code (bool): Indicates whether to execute code included in the response, applicable only in IPython environments.
+        verify (bool): Whether to verify SSL certificates for HTTPS requests.
     """
 
     __slots__ = [
@@ -80,14 +81,16 @@ class Gemini:
 
         Parameters:
             auto_cookies (bool): Whether to automatically manage cookies.
+            token (Optional[str]): Authentication token for the session.
             session (Optional[requests.Session]): A custom session object. If not provided, a new session will be created.
+            share_session (Optional[requests.Session]): A session object to be shared among instances, if applicable.
             cookies (Optional[dict]): Initial cookie values. If auto_cookies is True, cookies are managed automatically.
-            timeout (int): Request timeout in seconds. Defaults to 30.
+            timeout (int): Request timeout in seconds, defaults to 30.
             proxies (Optional[dict]): Proxy configurations for the requests.
             language (Optional[str]): Default language for translation services.
-            conversation_id (Optional[str]): ID for fetching conversational context.
             google_translator_api_key (Optional[str]): Google Cloud Translation API key.
             run_code (bool): Flag indicating whether to execute code in IPython environments.
+            verify (bool): Whether to verify SSL certificates for HTTPS requests.
         """
         self.auto_cookies = auto_cookies
         self.cookies = cookies or {}
@@ -103,65 +106,55 @@ class Gemini:
         self.run_code = run_code
         self.verify = verify
 
-    def check_session_cookies(self):
-        """Prints the current session's cookies"""
+    def check_session_cookies(self) -> None:
+        """
+        Prints the session's cookies. Indicates if the session is uninitialized.
+        """
         if self.session:
             cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join(
-                [f"{key}: {value}" for key, value in cookies.items()]
-            )
-            print("Session Cookies:\n" + cookies_str)
+            cookies_str = "\n".join(f"{key}: {value}" for key, value in cookies.items())
+            print(f"Session Cookies:\n{cookies_str}")
         else:
             print("Session not initialized.")
 
-    def check_session_headers(self):
-        """Prints the current session's headers"""
+    def check_session_headers(self) -> None:
+        """
+        Prints the session's headers. Indicates if the session is uninitialized.
+        """
         if self.session:
             headers = self.session.headers
-            headers_str = "\n".join(
-                [f"{key}: {value}" for key, value in headers.items()]
-            )
-            print("Session Headers:\n" + headers_str)
+            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
+            print(f"Session Headers:\n{headers_str}")
         else:
             print("Session not initialized.")
 
     def _set_cookies_from_browser(self) -> None:
         """
-        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
+        Extracts Gemini cookies from web browsers' cookies on the system for a specific domain (".google.com").
 
-        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
+        Iterates over supported browsers to add found cookies to the instance's cookie store. Supports multiple browsers and OS.
 
-        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
+        Updates `cookies` attribute with found cookies.
 
         Raises:
-            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
+            ValueError: If essential cookies are missing after checking all supported browsers.
         """
-
         for browser_fn in SUPPORTED_BROWSERS:
             try:
-                print(
-                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
-                )
+                print(f"Retrieving cookies from {browser_fn} via browser_cookie3.")
                 cj = browser_fn(domain_name=".google.com")
-                found_cookies = {cookie.name: cookie.value for cookie in cj}
-
-                self.cookies.update(found_cookies)
-                print(
-                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
-                )
-            except Exception as e:
-                continue  # Ignore exceptions and try the next browser function
+                self.cookies.update({cookie.name: cookie.value for cookie in cj})
+            except Exception:
+                continue  # Try the next browser if an exception occurs
 
         if not self.cookies:
             raise ValueError(
-                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
+                "Failed to get cookies. Ensure 'auto_cookies' is True or manually set 'cookies'."
             )
-        required_cookie_set = set(REQUIRED_COOKIE_LIST)
-        current_cookie_keys = set(self.cookies.keys())
-        if not required_cookie_set.issubset(current_cookie_keys):
-            print(
-                "Some recommended cookies not found: 'SIDCC', or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'."
-            )
+
+        missing_cookies = set(REQUIRED_COOKIE_LIST) - self.cookies.keys()
+        if missing_cookies:
+            print(f"Missing recommended cookies: {', '.join(missing_cookies)}.")
 
     def _set_cookies(self, auto_cookies: bool) -> None:
         """
@@ -185,9 +178,7 @@ class Gemini:
         if auto_cookies and not self.cookies:
             try:
                 self._set_cookies_from_browser()  # Assuming this updates self.cookies directly
-            except (
-                Exception
-            ) as e:  # Consider specifying more precise exceptions if possible
+            except Exception as e:
                 raise Exception("Failed to extract cookies from browser.") from e
         if not auto_cookies and not self.cookies:
             print(
@@ -269,9 +260,7 @@ class Gemini:
         Raises:
             Exception: If the __Secure-1PSID value is invalid or token value is not found in the response.
         """
-        response = self.session.get(
-            "https://gemini.google.com/", timeout=self.timeout, proxies=self.proxies
-        )
+        response = self.session.get(HOST, timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
             raise Exception(
                 f"Response status code is not 200. Response Status is {response.status_code}"
@@ -283,10 +272,25 @@ class Gemini:
             )
         return nonce
 
+    def _prepare_data(self, prompt, gemini_session=None):
+        data = {
+            "at": self.token,
+            "f.req": json.dumps(
+                [
+                    None,
+                    json.dumps(
+                        [[prompt], None, gemini_session and gemini_session.metadata]
+                    ),
+                ]
+            ),
+            "rpcids": "ESY5D",
+        }
+        return data
+
     def _execute_prompt(
         self,
         prompt: str,
-        session: Optional["GeminiSession"] = None,
+        gemini_session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -300,13 +304,8 @@ class Gemini:
         Returns:
             dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
         """
-        data = {
-            "at": self.token,
-            "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
-            ),
-            "rpcids": "ESY5D",
-        }
+        data = self._prepare_data(prompt, gemini_session)
+        data["rpcids"] = "ESY5D"
 
         # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
         try:
@@ -317,61 +316,67 @@ class Gemini:
                 proxies=self.proxies,
                 verify=self.verify,
             )
-        except:
+            execute_response.raise_for_status()  # Raises a HTTPError for bad responses
+        except requests.exceptions.Timeout as e:
             raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
+                f"Request timed out: {e}. Increase the timeout parameter if this error persists."
+            )
+        except requests.exceptions.HTTPError as e:
+            raise Exception(
+                f"HTTP error occurred: {e}. Check the POST_ENDPOINT and network connectivity."
+            )
+        except requests.exceptions.RequestException as e:
+            raise Exception(
+                f"Error during request: {e}. Check your network connectivity and proxy settings."
             )
 
         return execute_response
 
-    def _post_prompt(
+    def generate_content(
         self,
         prompt: str,
         gemini_session: Optional["GeminiSession"] = None,
+        wait_time: int = 40,
+        retry_interval: int = 5,
     ) -> dict:
         """
-        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
+        Generates content by querying the Gemini API, supporting text and optional session input. Attempts are made at fixed intervals within a total wait time of 40 seconds.
 
         Args:
             prompt (str): The input text for the content generation query.
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
-            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
+            gemini_session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            wait_time (int): Maximum time to wait for a successful response before timing out, default is 40 seconds.
+            retry_interval (int): Time in seconds between each retry attempt, default is 5 seconds.
 
         Returns:
             dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
         """
-        data = {
-            "at": self.token,
-            "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
-            ),
-        }
-        try:
-            execute_response = self._execute_prompt(prompt)
-        except:
-            pass
-
-        if execute_response == 200:
-            # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
+        attempts = wait_time // retry_interval
+        for attempt in range(attempts):
             try:
-                post_prompt_response = self.session.post(
-                    POST_ENDPOINT,
-                    data=data,
-                    timeout=self.timeout,
-                    proxies=self.proxies,
-                    verify=self.verify,
-                )
-            except:
-                raise TimeoutError(
-                    "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-                )
+                execute_response = self._execute_prompt(prompt, gemini_session)
+                if execute_response.get("status_code") == 200:
+                    print("Received status code 200. Processing response.")
+                    return execute_response
+                else:
+                    print(
+                        f"Attempt {attempt + 1}: Current execution status: {execute_response.get('status_code')}"
+                    )
+            except Exception as e:
+                print(f"Attempt {attempt + 1}: Failed to process request: {e}")
 
-        return post_prompt_response
+            if attempt < attempts - 1:
+                time.sleep(
+                    retry_interval
+                )  # Wait before retrying unless it's the last attempt
+
+        print(
+            f"Reached maximum attempts without success. Last status code: {execute_response.get('status_code', 'N/A')}"
+        )
+        return execute_response
 
     async def request_share(
         self,
-        gemini_session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -382,7 +387,7 @@ class Gemini:
         Returns:
             dict: A dictionary containing the response from the Gemini API.
         """
-        url = "https://clients6.google.com/upload/drive/v3/files/"
+        url = SHARE_ENDPOINT
 
         async with aiohttp.ClientSession() as client:
             try:
@@ -392,103 +397,6 @@ class Gemini:
                 raise TimeoutError(
                     "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
                 )
-
-    def _post_conversation(
-        self,
-        prompt: str,
-        gemini_session: Optional["GeminiSession"] = None,
-    ) -> dict:
-        """
-        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
-
-        Args:
-            prompt (str): The input text for the content generation query.
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
-            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
-
-        Returns:
-            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
-        """
-        data = {
-            "at": self.token,
-            "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
-            ),
-        }
-
-        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
-        try:
-            post_conversation_response = self.session.post(
-                POST_ENDPOINT,
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-            )
-        except:
-            raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-            )
-
-        return post_conversation_response
-
-    def generate_content(
-        self,
-        prompt: str,
-        gemini_session: Optional["GeminiSession"] = None,
-        image: Optional[bytes] = None,
-        tool: Optional[Tool] = None,
-    ) -> dict:
-        """
-        Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
-
-        Args:
-            prompt (str): The input text for the content generation query.
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
-            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
-
-        Returns:
-            dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
-        """
-        if self.google_translator_api_key is not None:
-            google_official_translator = translate.Client(
-                api_key=self.google_translator_api_key
-            )
-
-        # [Optional] Language translation
-        if (
-            self.language is not None
-            and self.language not in ALLOWED_LANGUAGES
-            and self.google_translator_api_key is None
-        ):
-            translator_to_eng = GoogleTranslator(source="auto", target="en")
-            prompt = translator_to_eng.translate(prompt)
-        elif (
-            self.language is not None
-            and self.language not in ALLOWED_LANGUAGES
-            and self.google_translator_api_key is not None
-        ):
-            prompt = google_official_translator.translate(prompt, target_language="en")
-        data = {
-            "at": self.token,
-            "f.req": json.dumps(
-                [None, json.dumps([[prompt], None, gemini_session and gemini_session.metadata])]
-            ),
-        }
-
-        # Post request that cannot receive any response due to Google changing the logic for the Gemini API Post to the Web UI.
-        try:
-            response = self.session.post(
-                POST_ENDPOINT,
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-            )
-        except:
-            raise TimeoutError(
-                "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
-            )
 
 
 class GeminiSession:

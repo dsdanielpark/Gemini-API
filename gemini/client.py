@@ -15,6 +15,7 @@ from .constants import (
     HEADERS,
     SUPPORTED_BROWSERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
+    SHARE_ENDPOINT,
     POST_ENDPOINT,
     HOST,
 )
@@ -28,18 +29,20 @@ from .models.exceptions import (
 
 class GeminiClient:
     """
-    Represents a Gemini instance for interacting with services, supporting features like automatic cookie handling, proxy configuration, Google Cloud Translation integration, and optional code execution within IPython environments.
+    A client for interacting with various services, featuring automatic cookie management, proxy configuration, Google Cloud Translation integration, and optional code execution in IPython environments.
 
     Attributes:
-        session (requests.Session): A requests session object for making HTTP requests.
-        cookies (dict): A dictionary containing cookies with their respective values. Important for maintaining session state.
-        timeout (int): Request timeout in seconds. Defaults to 30.
-        proxies (dict): Proxy configuration for requests. Useful for routing requests through specific network interfaces.
-        language (str, optional): Natural language code for translation (e.g., "en", "ko", "ja"). Used for specifying the desired language for translation services.
-        conversation_id (str, optional): An identifier for fetching conversational context. Useful in applications requiring context-aware interactions.
-        auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies. Defaults to False.
-        google_translator_api_key (str, optional): Specifies the Google Cloud Translation API key for translation services.
-        run_code (bool): Indicates whether to execute code included in the response. This is applicable only in IPython environments.
+        session (httpx.AsyncClient): An asynchronous HTTP client for making requests.
+        cookies (Dict[str, str]): A dictionary of cookies for session management.
+        timeout (int): Timeout for requests in seconds, defaulting to 30.
+        proxies (Dict[str, str]): Configuration for request proxies.
+        language (Optional[str]): Language code for translation services (e.g., "en", "ko", "ja").
+        auto_cookies (bool): Flag for automatic cookie retrieval and management, defaulting to False.
+        google_translator_api_key (Optional[str]): API key for Google Cloud Translation services.
+        run_code (bool): Flag for executing code in IPython environments.
+        verify (bool): Flag for SSL certificate verification in HTTP requests.
+        latency (int): Latency consideration in operations, defaulting to 10.
+        update_cookie_list (List[str]): List of cookies to be updated, if any.
     """
 
     __slots__ = [
@@ -76,18 +79,21 @@ class GeminiClient:
         update_cookie_list: Optional[List] = [],
     ):
         """
-        Initializes a new instance of the Gemini class, setting up the necessary configurations for interacting with the services.
+        Initializes a new GeminiClient instance with configurations for service interaction.
 
         Parameters:
-            auto_cookies (bool): Whether to automatically manage cookies.
-            session (Optional[httpx.AsyncClient]): A custom session object. If not provided, a new session will be created.
-            cookies (Optional[dict]): Initial cookie values. If auto_cookies is True, cookies are managed automatically.
-            timeout (int): Request timeout in seconds. Defaults to 30.
-            proxies (Optional[dict]): Proxy configurations for the requests.
-            language (Optional[str]): Default language for translation services.
-            conversation_id (Optional[str]): ID for fetching conversational context.
-            google_translator_api_key (Optional[str]): Google Cloud Translation API key.
-            run_code (bool): Flag indicating whether to execute code in IPython environments.
+            auto_cookies (bool): Enables automatic cookie management.
+            token (Optional[str]): Authentication token for session management.
+            session (Optional[httpx.AsyncClient]): Custom asynchronous HTTP client session.
+            cookies (Optional[Dict[str, str]]): Initial cookies for session management.
+            timeout (int): Request timeout in seconds.
+            proxies (Optional[Dict[str, str]]): Proxy configurations for requests.
+            language (Optional[str]): Default language code for translation services.
+            google_translator_api_key (Optional[str]): API key for Google Cloud Translation.
+            run_code (bool): Enables code execution in IPython environments.
+            verify (bool): Enables SSL certificate verification.
+            latency (int): Latency consideration for operations.
+            update_cookie_list (Optional[List[str]]): List of cookies to update.
         """
         self.update_cookie_list = update_cookie_list
         self.auto_cookies = auto_cookies
@@ -98,7 +104,7 @@ class GeminiClient:
         self._get_cookies(auto_cookies)
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.session = session
+        self.session = session or httpx.AsyncClient()
         self.token = token
         self.token = self.get_nonce_value()
         self.language = language or os.getenv("GEMINI_LANGUAGE")
@@ -106,42 +112,74 @@ class GeminiClient:
         self.run_code = run_code
         self.verify = verify
 
-    async def async_init(self, auto_close: bool = False, close_delay: int = 300):
+    async def async_init(
+        self, auto_close: bool = False, close_delay: int = 300
+    ) -> None:
+        """
+        Initializes the asynchronous session with optional auto-close functionality.
+
+        Args:
+            auto_close (bool): Flag to enable automatic session closure.
+            close_delay (int): Delay in seconds before automatically closing the session.
+        """
         self.session = await self._create_async_session(
             auto_close=auto_close, close_delay=close_delay
         )
 
-    async def close_session(self):
+    async def close_session(self) -> None:
+        """
+        Closes the current session and resets the running state.
+        """
         if self.session:
             await self.session.aclose()
             self.session = None
             self.running = False
 
     async def reset_close_task(self) -> None:
+        """
+        Resets the close task, cancelling any existing task and creating a new one.
+        """
         if self.close_task:
             self.close_task.cancel()
             self.close_task = None
-        self.close_task = asyncio.create_task(self.close())
+        self.close_task = asyncio.create_task(self.close_session())
 
-    def check_session_cookies(self):
+    def check_session_cookies(self) -> None:
+        """
+        Prints the current session's cookies. Indicates if the session is uninitialized.
+        """
         if self.session:
             cookies_str = "\n".join(
-                [f"{key}: {value}" for key, value in self.session.cookies.items()]
+                f"{key}: {value}" for key, value in self.session.cookies.items()
             )
             print("Session Cookies:\n" + cookies_str)
         else:
             print("Session not initialized.")
 
-    def check_session_headers(self):
-        """Prints the current session's headers"""
+    def check_session_headers(self) -> None:
+        """
+        Prints the current session's headers. Indicates if the session is uninitialized.
+        """
         if self.session:
             headers = self.session.headers
-            headers_str = "\n".join(
-                [f"{key}: {value}" for key, value in headers.items()]
-            )
+            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
             print("Session Headers:\n" + headers_str)
         else:
             print("Session not initialized.")
+
+    def get_nonce_value(self) -> str:
+        """
+        Get the Nonce Token value from the Gemini API response.
+        """
+        error_message = "Nonce token value not found or response status is not 200."
+
+        with requests.Session() as session:
+            response = session.get(HOST, timeout=self.timeout, proxies=self.proxies)
+            if response.status_code == 200:
+                match = re.search(r'nonce="([^"]+)"', response.text)
+                if match:
+                    return match.group(1)
+            raise Exception(error_message)
 
     def _get_cookies_from_browser(self) -> dict:
         """
@@ -185,7 +223,7 @@ class GeminiClient:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
         """
-        # Initialize cookies dictionary if not already initialized
+        # Initialize cookies dictionary if not already ini/tialized
         if not hasattr(self, "cookies"):
             self.cookies = {}
 
@@ -240,36 +278,22 @@ class GeminiClient:
         if not self.cookies:
             raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
-        self.session = httpx.AsyncClient(
-            headers=HEADERS,
-            cookies=self.cookies,
-            proxies=self.proxies,
-            timeout=self.timeout,
-        )
-
-        # Ensure session is initialized
-        if not hasattr(self, "session") or self.session is None:
-            for i in range(2):
-                print(f"Re-try to create async client. ({i})")
-                try:
-                    self.session = httpx.AsyncClient(
-                        headers=HEADERS,
-                        cookies=self.cookies,
-                        proxies=self.proxies,
-                        timeout=self.timeout,
-                    )
-                    self.auto_close = auto_close
-                    self.close_delay = close_delay
-                    if self.auto_close:
-                        await self.reset_close_task()
-                except Exception as e:
-                    await self.close(0)
-                    print(e)
-                    raise
-        if hasattr(self, "session"):
+        try:
+            self.session = httpx.AsyncClient(
+                headers=HEADERS,
+                cookies=self.cookies,
+                proxies=self.proxies,
+                timeout=self.timeout,
+            )
+            self.auto_close = auto_close
+            self.close_delay = close_delay
+            if self.auto_close:
+                await self.reset_close_task()
             self.running = True
-        else:
-            self.running = False
+        except Exception as e:
+            await self.close(0)
+            print(e)
+            raise
 
         return self.session
 
@@ -301,20 +325,6 @@ class GeminiClient:
                     )
         except Exception as e:
             print(f"An error occurred while updating cookies: {e}")
-
-    def get_nonce_value(self) -> str:
-        """
-        Get the Nonce Token value from the Gemini API response.
-        """
-        error_message = "Nonce token value not found or response status is not 200."
-
-        with requests.Session() as session:
-            response = session.get(HOST, timeout=self.timeout, proxies=self.proxies)
-            if response.status_code == 200:
-                match = re.search(r'nonce="([^"]+)"', response.text)
-                if match:
-                    return match.group(1)
-            raise Exception(error_message)
 
     def _prepare_data(
         self, prompt: str, gemini_session: Optional["GeminiSession"] = None
@@ -371,31 +381,31 @@ class GeminiClient:
             await asyncio.sleep(5)
             self._update_cookies(self.update_cookie_list)
 
-            async def attempt_fetch():
-                nonlocal request_batch_execute
-                while True:
-                    response = await self.post_prompt(prompt)
-                    print(f"Current batch execution status: {response.status_code}")
-                    if response.status_code == 200:
-                        print("Received status code 200. Processing response.")
-                        return response
-                    else:
-                        request_batch_execute = response
-                        await asyncio.sleep(self.latency)
+            start_time = time.time()
+            while True:
+                response = await self.post_prompt(prompt)
+                print(f"Current batch execution status: {response.status_code}")
+                if response.status_code == 200:
+                    print("Received status code 200. Processing response.")
+                    return response
+                else:
+                    request_batch_execute = response
+                    elapsed_time = time.time() - start_time
+                    if elapsed_time >= wait_time:
+                        print(
+                            f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response."
+                        )
+                        return request_batch_execute
+                    await asyncio.sleep(self.latency)
 
-            return await asyncio.wait_for(attempt_fetch(), timeout=wait_time)
         except asyncio.TimeoutError:
             print(
                 f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response."
             )
             return request_batch_execute
-        except asyncio.CancelledError as e:
-            print(
-                f"Operation was cancelled due to: {e}. Handling cleanup here if necessary."
-            )
-            return request_batch_execute
         except Exception as e:
-            raise Exception(f"Failed to process request: {e}")
+            print(f"Failed to process request: {e}")
+            raise
 
     async def request_share(
         self,
@@ -410,9 +420,8 @@ class GeminiClient:
         Returns:
             dict: A dictionary containing the response from the Gemini API.
         """
-        url = "https://clients6.google.com/upload/drive/v3/files?uploadType=multipart&fields=id&key=AIzaSyAHCfkEDYwQD6HuUx2DyX3VylTrKZG7doM"
+        url = SHARE_ENDPOINT
 
-        # Use httpx.ClientSession for asynchronous HTTP requests
         async with httpx.AsyncClient() as session:
             try:
                 async with session.post(url, timeout=self.timeout) as response:
