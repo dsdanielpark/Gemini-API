@@ -34,7 +34,7 @@ Depending on the region and Google account status, *multiple cookies may be requ
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Initialization
-You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* <br>
+You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* When using the auto_cookies argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
 
 *Async client*
 ```python
