@@ -86,25 +86,26 @@ class Gemini:
             }
         )
 
-    def send_request(self, prompt: str) -> Tuple[str, Optional[int]]:
+    def send_request(self, prompt: str) -> Tuple[str, int]:
+        """Sends a request and returns the response text and status code."""
         try:
             sid, nonce = self._get_sid_and_nonce()
-        except ConnectionError as e:
-            return str(e), None
-
-        params: str = self._construct_params(sid)
-        data: str = self._construct_payload(
-            f"Provide a written response. {prompt}", nonce
-        )
-
-        try:
-            response: requests.Response = self.session.post(
-                POST_ENDPOINT,
-                params=params,
-                data=data,
+            params = self._construct_params(sid)
+            data = self._construct_payload(
+                f"Provide a written response. {prompt}", nonce
             )
+            response = self.session.post(POST_ENDPOINT, params=params, data=data)
             response.raise_for_status()
+            return response.text, response.status_code
+        except ConnectionError as e:
+            raise ConnectionError(f"Connection failed: {e}")
         except RequestException as e:
-            return f"Request failed: {str(e)}", None
+            raise RequestException(f"Request failed: {e}")
 
-        return response.text, response.status_code
+    def generate_content(self, prompt: str) -> str:
+        """Generates content based on the prompt, raising an exception for non-200 responses."""
+        response_text, response_status_code = self.send_request(prompt)
+        if response_status_code == 200:
+            return response_text
+        else:
+            raise ValueError(f"Response status: {response_status_code}")
