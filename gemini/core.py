@@ -37,15 +37,15 @@ class Gemini:
     Represents a Gemini instance for interacting with various services. It supports features like automatic cookie handling, proxy configuration, Google Cloud Translation integration, and optional code execution within IPython environments.
 
     Attributes:
-        session (requests.Session): A session object for making HTTP requests.
-        cookies (dict): A dictionary containing cookies with their respective values, important for maintaining session state.
-        timeout (int): Request timeout in seconds, defaults to 30.
-        proxies (Optional[dict]): Proxy configuration for requests, useful for routing requests through specific network interfaces.
-        language (Optional[str]): Code for the natural language for translation services (e.g., "en", "ko", "ja").
-        auto_cookies (bool): Indicates whether to automatically retrieve and manage cookies, defaults to False.
-        google_translator_api_key (Optional[str]): The Google Cloud Translation API key for translation services.
-        run_code (bool): Indicates whether to execute code included in the response, applicable only in IPython environments.
-        verify (bool): Whether to verify SSL certificates for HTTPS requests.
+        `session` (requests.Session): A session object for making HTTP requests.
+        `cookies` (dict): A dictionary containing cookies with their respective values, important for maintaining session state.
+        `timeout` (int): Request timeout in seconds, defaults to 30.
+        `proxies` (Optional[dict]): Proxy configuration for requests, useful for routing requests through specific network interfaces.
+        `language` (Optional[str]): Code for the natural language for translation services (e.g., "en", "ko", "ja").
+        `auto_cookies` (bool): Indicates whether to automatically retrieve and manage cookies, defaults to False.
+        `google_translator_api_key` (Optional[str]): The Google Cloud Translation API key for translation services.
+        `run_code` (bool): Indicates whether to execute code included in the response, applicable only in IPython environments.
+        `verify` (bool): Whether to verify SSL certificates for HTTPS requests.
     """
 
     __slots__ = [
@@ -197,7 +197,7 @@ class Gemini:
         The new or provided session is configured with predefined session headers, proxies, and cookies from the instance.
 
         Args:
-            session (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
+            `session` (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
 
         Returns:
             requests.Session: The session object, either the one provided or a newly created and configured session.
@@ -228,7 +228,7 @@ class Gemini:
         The new or provided session is configured with predefined session headers, proxies, and cookies from the instance.
 
         Args:
-            session (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
+            `session` (Optional[requests.Session]): An optional requests.Session object. If provided, it will be used as is; otherwise, a new session is created.
 
         Returns:
             requests.Session: The session object, either the one provided or a newly created and configured session.
@@ -296,10 +296,8 @@ class Gemini:
         Generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
 
         Args:
-            prompt (str): The input text for the content generation query.
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            image (Optional[bytes]): Input image bytes for the query; supported image types include JPEG, PNG, and WEBP. This parameter is optional and used for queries that benefit from image context.
-            tool (Optional[Tool]): The tool to use for content generation, specifying the context or platform for which the content is relevant. Options include Gmail, Google Docs, Google Drive, Google Flights, Google Hotels, Google Maps, and YouTube. This parameter is optional.
+            `prompt` (str): The input text for the content generation query.
+            `session` (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
 
         Returns:
             dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
@@ -343,10 +341,10 @@ class Gemini:
         Generates content by querying the Gemini API, supporting text and optional session input. Attempts are made at fixed intervals within a total wait time of 40 seconds.
 
         Args:
-            prompt (str): The input text for the content generation query.
-            gemini_session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
-            wait_time (int): Maximum time to wait for a successful response before timing out, default is 40 seconds.
-            retry_interval (int): Time in seconds between each retry attempt, default is 5 seconds.
+            `prompt` (str): The input text for the content generation query.
+            `gemini_session` (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            `wait_time` (int): Maximum time to wait for a successful response before timing out, default is 40 seconds.
+            `retry_interval` (int): Time in seconds between each retry attempt, default is 5 seconds.
 
         Returns:
             dict: A dictionary containing the response from the Gemini API, which may include content, conversation ID, response ID, factuality queries, text query, choices, links, images, programming language, code, and status code.
@@ -382,7 +380,7 @@ class Gemini:
         Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
 
         Args:
-            session (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
+            `session` (Optional[GeminiSession]): A session object for the Gemini API, if None, a new session is created or a default session is used.
 
         Returns:
             dict: A dictionary containing the response from the Gemini API.
@@ -409,11 +407,11 @@ class GeminiSession:
         gemini_output: Stores the output from the Gemini API calls. This attribute is managed internally and populated based on interactions facilitated by the session.
 
     Parameters:
-        gemini (Gemini): The Gemini client interface, providing the necessary functionality to interact with the Gemini API.
-        metadata (list[str], optional): A list containing identifiers for chat metadata, such as `[cid, rid, rcid]`. The list can be shorter, with one or two elements like `[cid]` or `[cid, rid]`, depending on the available information.
-        cid (str, optional): A specific chat ID. If provided along with `metadata`, it will replace the first element in the metadata list, signifying the chat ID.
-        rid (str, optional): A specific reply ID. If provided along with `metadata`, it will replace the second element in the metadata list, indicating the reply ID.
-        rcid (str, optional): A specific reply candidate ID. If provided along with `metadata`, it will replace the third element in the metadata list, denoting the reply candidate ID.
+        `gemini` (Gemini): The Gemini client interface, providing the necessary functionality to interact with the Gemini API.
+        `metadata` (list[str], optional): A list containing identifiers for chat metadata, such as `[cid, rid, rcid]`. The list can be shorter, with one or two elements like `[cid]` or `[cid, rid]`, depending on the available information.
+        `cid` (str, optional): A specific chat ID. If provided along with `metadata`, it will replace the first element in the metadata list, signifying the chat ID.
+        `rid` (str, optional): A specific reply ID. If provided along with `metadata`, it will replace the second element in the metadata list, indicating the reply ID.
+        `rcid` (str, optional): A specific reply candidate ID. If provided along with `metadata`, it will replace the third element in the metadata list, denoting the reply candidate ID.
 
     The class requires a Gemini instance to function correctly. It uses the provided metadata, along with optional specific identifiers (`cid`, `rid`, `rcid`), to manage and retrieve conversation history. Only when all three identifiers are provided will the complete conversation history be retrieved.
     """
@@ -478,7 +476,7 @@ class GeminiSession:
         This method allows the user to influence the direction of the conversation by choosing one of the answer candidates provided by the last Gemini API call. By specifying the index of the desired candidate, the conversation can be steered towards a particular topic or response style.
 
         Parameters:
-            index (int): The zero-based index of the candidate to be selected. This index corresponds to the position of the candidate within the list of answer candidates provided in the last `GeminiOutput`.
+            `index` (int): The zero-based index of the candidate to be selected. This index corresponds to the position of the candidate within the list of answer candidates provided in the last `GeminiOutput`.
 
         The chosen candidate will affect subsequent interactions with the Gemini API, guiding the content and responses generated based on the selected conversational path.
         """
