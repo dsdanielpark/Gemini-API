@@ -1,3 +1,4 @@
+# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import requests
 import re
 import random

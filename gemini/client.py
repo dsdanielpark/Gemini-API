@@ -1,4 +1,4 @@
-# Copyright 2024 Minwoo(Daniel) Park, MIT License
+# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import os
 import re
 import json
@@ -11,7 +11,6 @@ import requests
 from typing import Optional, Any, List
 
 from .constants import (
-    REQUIRED_COOKIE_LIST,
     HEADERS,
     SUPPORTED_BROWSERS,
     TEXT_GENERATION_WEB_SERVER_PARAM,
