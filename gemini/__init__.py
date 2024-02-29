@@ -1,6 +1,6 @@
 # Copyright 2024 Minwoo(Daniel) Park, MIT License
 from os import environ
-from gemini.core import Gemini, GeminiSession
+from gemini.core import Gemini
 from gemini.constants import (
     HEADERS,
     ALLOWED_LANGUAGES,
@@ -22,7 +22,6 @@ gemini_api_key = environ.get("GEMINI_COOKIES")
 __all__ = [
     "GeminiClient",
     "Gemini",
-    "GeminiSession",
     "extract_links",
     "upload_image",
     "max_token",

@@ -22,31 +22,22 @@ POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.Bar
 HOST = "https://gemini.google.com/"
 SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
 
-IMG_UPLOAD_HEADERS = {
-    "authority": "content-push.googleapis.com",
-    "accept": "*/*",
-    "accept-language": "en-US,en;q=0.7",
-    "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",  # Constant Authorization Key
-    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "origin": "https://gemini.google.com",
-    "push-id": "feeds/mcudyrk2a4khkz",  # Constant
-    "referer": "https://gemini.google.com/",
-    "x-goog-upload-command": "start",
-    "x-goog-upload-header-content-length": "",
-    "x-goog-upload-protocol": "resumable",
-    "x-tenant-id": "bard-storage",
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:123.0) Gecko/20100101 Firefox/123.0",
+    "Accept": "*/*",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+    "Origin": "https://gemini.google.com",
+    "DNT": "1",
+    "Connection": "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
 }
 
 
 EXECUTE_HEADERS = {
-    "Host": "gemini.google.com",
-    "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-    "Origin": "https://gemini.google.com",
-    "Referer": "https://gemini.google.com/",
-}
-HEADERS = {
     "Host": "gemini.google.com",
     "X-Same-Domain": "1",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
@@ -63,6 +54,23 @@ SHARE_HEADERS = {
     "Referer": "https://gemini.google.com/",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
 }
+
+
+IMG_UPLOAD_HEADERS = {
+    "authority": "content-push.googleapis.com",
+    "accept": "*/*",
+    "accept-language": "en-US,en;q=0.7",
+    "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",  # Constant Authorization Key
+    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "origin": "https://gemini.google.com",
+    "push-id": "feeds/mcudyrk2a4khkz",  # Constant
+    "referer": "https://gemini.google.com/",
+    "x-goog-upload-command": "start",
+    "x-goog-upload-header-content-length": "",
+    "x-goog-upload-protocol": "resumable",
+    "x-tenant-id": "bard-storage",
+}
+
 
 REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
     "python": "main.py",
