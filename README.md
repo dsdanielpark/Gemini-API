@@ -209,9 +209,10 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 We would like to express my sincere gratitude to all the contributors.
 
 ## Contacts
-- Core maintainer: 
-  - [Daniel Park, parkminwoo1991@gmail.com](https://github.com/DSDanielPark) <br>
-  - [Antonio Cheong, teapotv8@proton.me](https://github.com/acheong08)
+- Core maintainer:
+  - [Antonio Cheong, teapotv8@proton.me](https://github.com/acheong08) <br>
+  - [Daniel Park, parkminwoo1991@gmail.com](https://github.com/DSDanielPark) 
+ 
 
 
 ## License
