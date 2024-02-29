@@ -12,7 +12,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
 ## Installation
 ```
@@ -26,14 +26,14 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 > **Warning** Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster.
 
 1. Go to https://gemini.google.com/ and wait for it to load.
-2. *(Recommended)* Use a Chrome Extension to export cookies. While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. It already be in dictionary formated cookies.
+2. *(Recommended)* While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. 
 3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually. Refer to this [image](assets/netrwork.pdf).
 <br>
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Initialization
-You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* When using the auto_cookies argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
+You must appropriately set the `cookies_dict` parameter to `Gemini` class. When using the `auto_cookies` argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
 
 ```python
 from gemini import Gemini
@@ -46,8 +46,7 @@ GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
-Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. 
-For the first attempt, manually download the cookies to test the functionality.
+Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality.
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
@@ -73,7 +72,7 @@ for i, image in enumerate(response.images): # Save images
 ```
 
 ### Generate content with image
-*It may not work as it is only available for certain accounts, regions, and other restrictions.*
+
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
 
 ```
@@ -160,7 +159,7 @@ response = GeminiClient.generate_content("What was my last prompt?")
 
 
 ## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
-Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
+[Gemma](https://huggingface.co/google/gemma-7b) models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -175,8 +174,11 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
-
+## Sponsor
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
+
+<img src="assets/crawlbase_logo.png" width="200">
+
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
@@ -204,8 +206,8 @@ Core maintainers:
 
 ## References
 [1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
-[2] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[3] Github [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[2] Github [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
+[3] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 > **Warning** 
