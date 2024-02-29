@@ -209,8 +209,10 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 We would like to express my sincere gratitude to all the contributors.
 
 ## Contacts
-- **Core Maintainer:** Minwoo(Daniel) Park, [@dsdanielpark](https://github.com/dsdanielpark)
-- **E-mail:** parkminwoo1991@gmail.com
+- Core maintainer: 
+  - [Daniel Park, parkminwoo1991@gmail.com](https://github.com/DSDanielPark) <br>
+  - [Antonio Cheong, teapotv8@proton.me](https://github.com/acheong08)
+
 
 ## License
 [MIT](https://opensource.org/license/mit/) license, 2024, Minwoo(Daniel) Park. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
