@@ -11,12 +11,36 @@ from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT
 
 
 class Gemini:
-    def __init__(self, cookies: Optional[Dict[str, str]] = None) -> None:
+    def __init__(
+        self, cookies: Optional[Dict[str, str]] = None, cookie_fp: str = None
+    ) -> None:
         self.session: requests.Session = requests.Session()
         self.base_url: str = HOST
         self.session.headers.update(HEADERS)
         if cookies:
             self.session.cookies.update(cookies)
+
+        if cookie_fp:
+            self._load_cookies_from_file(cookie_fp)
+
+    def _load_cookies_from_file(self, file_path: str) -> None:
+        """Loads cookies from a file and updates the session."""
+        try:
+            if file_path.endswith(".json"):
+                with open(file_path, "r") as file:
+                    cookies = json.load(file)
+            else:  # Assuming txt or other formats
+                with open(file_path, "r") as file:
+                    content = file.read()
+                    # Evaluating the dictionary-like string
+                    try:
+                        cookies = eval(content)
+                    except NameError:
+                        # Fallback if eval fails due to undefined names
+                        cookies = json.loads(content.replace("'", '"'))
+            self.session.cookies.update(cookies)
+        except Exception as e:
+            print(f"Error loading cookie file: {e}")
 
     def _get_sid_and_nonce(self) -> Tuple[str, str]:
         try:
@@ -69,7 +93,9 @@ class Gemini:
             return str(e), None
 
         params: str = self._construct_params(sid)
-        data: str = self._construct_payload(prompt, nonce)
+        data: str = self._construct_payload(
+            f"Provide a written response. {prompt}", nonce
+        )
 
         try:
             response: requests.Response = self.session.post(
