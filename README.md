@@ -210,8 +210,8 @@ We would like to express my sincere gratitude to all the contributors.
 
 ## Contacts
 - Core maintainer:
-  - [Antonio Cheong, teapotv8@proton.me](https://github.com/acheong08) <br>
-  - [Daniel Park, parkminwoo1991@gmail.com](https://github.com/DSDanielPark) 
+  - [Antonio Cheong](https://github.com/acheong08) / teapotv8@proton.me <br>
+  - [Daniel Park](https://github.com/DSDanielPark) / parkminwoo1991@gmail.com
  
 
 
