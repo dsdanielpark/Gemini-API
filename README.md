@@ -5,12 +5,12 @@ Development Status :: 1 - Planning
 <br>
 
 # <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API
-A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering.
+A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering. Reconstructing with REST syntax for users facing frequent authentication errors or unable to authenticate properly in [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=ko).
 
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Web](https://deepmind.google/technologies/gemini/#introduction)
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Gemini** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
 ## Installation
 ```
@@ -34,7 +34,7 @@ Depending on the region and Google account status, *multiple cookies may be requ
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
 ### Initialization
-You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* <br>
+You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* When using the auto_cookies argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
 
 *Async client*
 ```python
