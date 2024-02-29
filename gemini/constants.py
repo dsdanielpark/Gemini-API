@@ -90,7 +90,7 @@ SUPPORTED_BROWSERS = [
     browser_cookie3.safari,
 ]
 
-
+# https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes
 LANGUAGE = {
     "ad": "Andorra",
     "ae": "United Arab Emirates",
