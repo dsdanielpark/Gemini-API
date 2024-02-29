@@ -1,6 +1,6 @@
 Development Status :: 2 - Pre-Alpha
 
-Not fully prepared yet.
+*Not fully prepared yet.*
 
 <br>
 
