@@ -43,7 +43,6 @@ cookies = {
 }
 
 GeminiClient = Gemini(cookies=cookies)
-
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
@@ -62,7 +61,7 @@ print(response)
 
 ### Image generation
 
-```python
+```
 prompt = "Hello, Gemini. Give me a beautiful photo of Seoul's scenery."
 response = GeminiClient.generate_content(prompt)
 
@@ -77,7 +76,7 @@ for i, image in enumerate(response.images): # Save images
 *It may not work as it is only available for certain accounts, regions, and other restrictions.*
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
 
-```python
+```
 prompt = "What is in the image?"
 image = open("folder_path/image.jpg", "rb").read() # (jpeg, png, webp) are supported.
 
@@ -86,7 +85,7 @@ response = GeminiClient.generate_content(prompt, image)
 
 ### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
 Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
-```python
+```
 text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
 response = GeminiClient.generate_content(prompt)
 audio = GeminiClient.speech(text)
