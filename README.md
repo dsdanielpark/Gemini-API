@@ -23,9 +23,8 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
 ## Authentication
-> **Warning** *DO NOT* expose your cookies.
+> **Warning** Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster.
 
-Cookie requirements may vary based on country/regions and the status of your Google account.
 1. Go to https://gemini.google.com/ and wait for it to load.
 2. *(Recommended)* Use a Chrome Extension to export cookies. While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. It already be in dictionary formated cookies.
 3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually.
