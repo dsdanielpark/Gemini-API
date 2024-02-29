@@ -19,8 +19,9 @@ SEPARATOR_LINE = "=" * 36
 USER_PROMPT = Fore.BLUE + "You: " + Fore.RESET
 TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240222.09_p2"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
-HOST = "https://gemini.google.com/"
+HOST = "https://gemini.google.com"
 SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
+BOT_SERVER = "boq_assistant-bard-web-server_20240227.13_p0"
 
 
 HEADERS = {
@@ -36,26 +37,6 @@ HEADERS = {
     "Sec-Fetch-Site": "same-origin",
 }
 
-
-EXECUTE_HEADERS = {
-    "Host": "gemini.google.com",
-    "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-    "Origin": "https://gemini.google.com",
-    "Referer": "https://gemini.google.com/",
-}
-
-SHARE_HEADERS = {
-    "Alt-Used": "clients6.google.com",
-    "Content-Type": 'multipart/mixed; boundary="-------314159265358979323846"',
-    "Host": "clients6.google.com",
-    "Origin": "https://gemini.google.com",
-    "Referer": "https://gemini.google.com/",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-}
-
-
 IMG_UPLOAD_HEADERS = {
     "authority": "content-push.googleapis.com",
     "accept": "*/*",
@@ -70,7 +51,6 @@ IMG_UPLOAD_HEADERS = {
     "x-goog-upload-protocol": "resumable",
     "x-tenant-id": "bard-storage",
 }
-
 
 REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
     "python": "main.py",
@@ -96,13 +76,6 @@ REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
     "perl": "main.pl",
 }
 
-REQUIRED_COOKIE_LIST = [
-    "SIDCC",
-    "__Secure-1PSID",
-    "__Secure-1PSIDTS",
-    "__Secure-1PSIDCC",
-    "NID",
-]
 
 SUPPORTED_BROWSERS = [
     browser_cookie3.chrome,
@@ -116,105 +89,3 @@ SUPPORTED_BROWSERS = [
     browser_cookie3.librewolf,
     browser_cookie3.safari,
 ]
-
-# https://support.google.com/bard/answer/13575153?hl=en
-ALLOWED_LANGUAGES = {
-    "korean",
-    "english",
-    "japanese",
-    "arabic",
-    "bengali",
-    "bulgarian",
-    "chinese (simplified)",
-    "chinese (traditional)",
-    "croatian",
-    "czech",
-    "danish",
-    "dutch",
-    "english",
-    "estonian",
-    "farsi",
-    "finnish",
-    "french",
-    "german",
-    "greek",
-    "gujarati",
-    "hebrew",
-    "hindi",
-    "hungarian",
-    "indonesian",
-    "italian",
-    "japanese",
-    "kannada",
-    "korean",
-    "latvian",
-    "lithuanian",
-    "malayalam",
-    "marathi",
-    "norwegian",
-    "polish",
-    "portuguese",
-    "romanian",
-    "russian",
-    "serbian",
-    "slovak",
-    "slovenian",
-    "spanish",
-    "swahili",
-    "swedish",
-    "tamil",
-    "telugu",
-    "thai",
-    "turkish",
-    "ukrainian",
-    "urdu",
-    "vietnamese",
-    "ko",
-    "en",
-    "ja",
-    "ar",
-    "bn",
-    "bg",
-    "zh-cn",
-    "zh-tw",
-    "hr",
-    "cs",
-    "da",
-    "nl",
-    "en",
-    "et",
-    "fa",
-    "fi",
-    "fr",
-    "de",
-    "el",
-    "gu",
-    "he",
-    "hi",
-    "hu",
-    "id",
-    "it",
-    "kn",
-    "lv",
-    "lt",
-    "ml",
-    "mr",
-    "no",
-    "pl",
-    "pt",
-    "ro",
-    "ru",
-    "sr",
-    "sk",
-    "sl",
-    "es",
-    "sw",
-    "sv",
-    "ta",
-    "te",
-    "th",
-    "tr",
-    "uk",
-    "ur",
-    "vi",
-}
