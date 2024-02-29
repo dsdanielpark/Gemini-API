@@ -24,4 +24,6 @@ __all__ = [
     "Tool",
 ]
 __version__ = "0.1.4"
-__author__ = "daniel park <parkminwoo1991@gmail.com>"
+__author__ = (
+    "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>"
+)
