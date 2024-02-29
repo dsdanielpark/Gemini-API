@@ -27,8 +27,8 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 
 Cookie requirements may vary based on country/regions and the status of your Google account.
 1. Go to https://gemini.google.com/ and wait for it to load.
-2. *(Recommended)* Use a Chrome Extension like [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) to export cookies. If using ExportThisCookies extension, open the downloaded txt file and copy its contents exactly as they are. It already be in dictionary formated cookies.
-3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary.
+2. *(Recommended)* Use a Chrome Extension to export cookies. While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. It already be in dictionary formated cookies.
+3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually.
 <br>
 
 ## Usage
@@ -44,10 +44,12 @@ cookies = {
 }
 
 GeminiClient = Gemini(cookies=cookies)
+
+# GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. 
-For the first attempt, manually download the cookies to test the functionality
+For the first attempt, manually download the cookies to test the functionality.
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
