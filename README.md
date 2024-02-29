@@ -208,7 +208,7 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 
 
 ## Contributors
-We would like to express my sincere gratitude to all the contributors.
+We would like to express our sincere gratitude to all the contributors.
 
 ## Contacts
 - Core maintainer:
