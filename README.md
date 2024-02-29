@@ -23,14 +23,11 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
 ## Authentication
-> **Warning** *DO NOT* expose your cookies.
+> **Warning** Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster.
 
-Cookie requirements may vary based on country/regions and the status of your Google account.
-1. Visit https://gemini.google.com/
-2. F12 for console
-3. Session: Application → Cookies → Copy the value of `__Secure-1PSIDTS`, `__Secure-1PSIDCC`, `__Secure-1PSID`, `NID` cookie or `SIDCC` cookie.
-Depending on the region and Google account status, *multiple cookies may be required*.
-
+1. Go to https://gemini.google.com/ and wait for it to load.
+2. *(Recommended)* Use a Chrome Extension to export cookies. While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. It already be in dictionary formated cookies.
+3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually.
 <br>
 
 ## Usage
@@ -38,34 +35,20 @@ After changed Bard to Gemini, multiple cookies, *often updated*, are needed base
 ### Initialization
 You must appropriately set the `cookies_dict` parameter to `Gemini` class. *Needed cookie values may vary by country/region/account.* When using the auto_cookies argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
 
-*Async client*
-```python
-from gemini import GeminiClient
-
-cookies = {
-    "__Secure-1PSID": "value",
-    "__Secure-1PSIDTS": "value",
-    "__Secure-1PSIDCC": "value",
-    "NID": "value",
-}
-
-client = GeminiClient(cookies=cookies)
-# client = GeminiClient(auto_cookies=True) # Or use auto_cookies paprameter
-
-await client.async_init()
-```
-*Sync session*
 ```python
 from gemini import Gemini
 
 cookies = {
-    "SIDCC": "value"
+    "key": "value"
 }
 
-client = Gemini(cookies=cookies)
-# client = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
+GeminiClient = Gemini(cookies=cookies)
+
+# GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
+# GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). Cookie values can be changed frequently, thus it is recommended to automatically update. 
+For the first attempt, manually download the cookies to test the functionality.
 
 *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
@@ -78,6 +61,7 @@ print(response)
 ```
 
 ### Image generation
+
 ```python
 prompt = "Hello, Gemini. Give me a beautiful photo of Seoul's scenery."
 response = GeminiClient.generate_content(prompt)
