@@ -130,10 +130,7 @@ from gemini import Gemini, SESSION_HEADERS
 import requests
 
 cookies = {
-    "__Secure-1PSID": "value",
-    "__Secure-1PSIDTS": "value",
-    "__Secure-1PSIDCC": "value",
-    "NID": "value",
+    "key": "value"
 }
 
 session = requests.Session()
@@ -195,9 +192,9 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 We would like to express our sincere gratitude to all the contributors.
 
 ## Contacts
-- Core maintainer:
-  - [Antonio Cheong](https://github.com/acheong08) / teapotv8@proton.me <br>
-  - [Daniel Park](https://github.com/DSDanielPark) / parkminwoo1991@gmail.com
+Core maintainers:
+- [Antonio Cheong](https://github.com/acheong08) / teapotv8@proton.me <br>
+- [Daniel Park](https://github.com/DSDanielPark) / parkminwoo1991@gmail.com
  
 
 
