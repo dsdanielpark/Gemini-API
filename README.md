@@ -11,29 +11,15 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 <br>
 
-- [ Google - Gemini API](#-google---gemini-api)
+- [Google - Gemini API](#-google---gemini-api)
   - [What is Gemini?](#what-is-gemini)
   - [Installation](#installation)
   - [Authentication](#authentication)
   - [Usage](#usage)
-    - [Initialization](#initialization)
-    - [Text generation](#text-generation)
-    - [Image generation](#image-generation)
-    - [Generate content with image](#generate-content-with-image)
-    - [Text To Speech(TTS) from Gemini](#text-to-speechtts-from-gemini)
   - [Further](#further)
-    - [Behind a proxy](#behind-a-proxy)
-    - [Use rotating proxies](#use-rotating-proxies)
-    - [Reusable session object](#reusable-session-object)
   - [More features](#more-features)
   - [How to use open-source Gemma](#how-to-use-open-source-gemma)
-  - [Sponsor](#sponsor)
   - [FAQ](#faq)
-  - [Issues](#issues)
-  - [Contributors](#contributors)
-  - [Contacts](#contacts)
-  - [License](#license)
-  - [References](#references)
 
 
 <br>
