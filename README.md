@@ -2,8 +2,6 @@ Development Status :: 2 - Pre-Alpha
 
 *Not fully prepared yet.*
 
-<br>
-
 # <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API
 A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering. Reconstructing with REST syntax for users facing frequent authentication errors or unable to authenticate properly in [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=ko).
 
