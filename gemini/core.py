@@ -1,5 +1,4 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
-
 import os
 import re
 import json
@@ -7,7 +6,7 @@ import random
 import string
 import requests
 import urllib.parse
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Tuple, Dict
 from requests.exceptions import RequestException
 
 from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWSERS

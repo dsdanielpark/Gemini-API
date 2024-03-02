@@ -1,7 +1,6 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import json
 import requests
-from typing import Optional
 from gemini.constants import IMG_UPLOAD_HEADERS
 
 
