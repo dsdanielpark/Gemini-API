@@ -225,14 +225,6 @@ class GeminiClient:
         if not hasattr(self, "cookies"):
             self.cookies = {}
 
-        # Load cookies from environment variables
-        env_cookies = {
-            cookie: os.getenv(cookie)
-            for cookie in REQUIRED_COOKIE_LIST
-            if os.getenv(cookie)
-        }
-        self.cookies.update(env_cookies)
-
         # Attempt to load cookies automatically from the browser if necessary
         if auto_cookies and not self.cookies:
             try:
@@ -283,17 +275,11 @@ class GeminiClient:
                 self.cookies = found_cookies
 
             except Exception as e:
-                continue  # Ignore exceptions and try the next browser function
+                continue 
 
         if not self.cookies:
             raise ValueError(
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
-            )
-        required_cookie_set = set(REQUIRED_COOKIE_LIST)
-        current_cookie_keys = set(self.cookies.keys())
-        if not required_cookie_set.issubset(current_cookie_keys):
-            print(
-                "Some recommended cookies not found: 'SIDCC' or '__Secure-1PSIDTS', '__Secure-1PSIDCC', '__Secure-1PSID', and 'NID'.\nIt depends on your Contries/Legions."
             )
 
     def _update_cookies(self, update_cookie_list: List[str] = None):
