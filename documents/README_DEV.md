@@ -100,15 +100,23 @@ Please check the translation results in [this folder](https://github.com/dsdanie
 ### Post-processing: max_token, max_sentence
 Gemini does not support temperature or hyperparameter adjustments, but it is possible to achieve the appearance of limiting the number of output tokens or the number of output sentences using simple algorithms, as follows:
 ```python
-from bardapi import Gemini, max_token, max_sentence
+from gemini import Gemini
 
-token = 'xxxxxxx'
-bard = Gemini(token=token)
+cookies = {
+    "key": "value"
+}
+
+GeminiClient = Gemini(cookies=cookies)
+# GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
+# GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
+
+prompt = "Hello, Gemini. What's the weather like in Seoul today?"
+response = GeminiClient.generate_content(prompt)
 
 # max_token==30
-max_token(bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")['content'], 30) 
+max_token(response, 30) 
 # max_sentence==2
-max_sentence(bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")['content'], 2)
+max_sentence(response, 2)
 ```
 
 <br>
