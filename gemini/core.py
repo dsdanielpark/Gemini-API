@@ -28,16 +28,18 @@ class Gemini:
         self._set_cookies(auto_cookies)
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.session = self._set_session(session)
-        self.session: requests.Session = requests.Session()
+        self.session = session or self._initialize_session(cookies, cookie_fp)
         self.base_url: str = HOST
 
-        self.session.headers.update(HEADERS)
+    def _initialize_session(self, cookies, cookie_fp):
+        session = requests.Session()
+        session.headers.update(HEADERS)
         if cookies:
-            self.session.cookies.update(cookies)
-
+            session.cookies.update(cookies)
         if cookie_fp:
-            self._load_cookies_from_file(cookie_fp)
+            self._load_cookies_from_file(cookie_fp, session)
+
+        return session
 
     def _set_cookies(self, auto_cookies: bool) -> None:
         """
