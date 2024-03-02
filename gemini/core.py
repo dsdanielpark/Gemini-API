@@ -103,14 +103,12 @@ class Gemini:
             if file_path.endswith(".json"):
                 with open(file_path, "r") as file:
                     cookies = json.load(file)
-            else:  # Assuming txt or other formats
+            else:
                 with open(file_path, "r") as file:
                     content = file.read()
-                    # Evaluating the dictionary-like string
                     try:
                         cookies = eval(content)
                     except NameError:
-                        # Fallback if eval fails due to undefined names
                         cookies = json.loads(content.replace("'", '"'))
             self.session.cookies.update(cookies)
         except Exception as e:
@@ -128,7 +126,7 @@ class Gemini:
         """
         if auto_cookies and not self.cookies:
             try:
-                self._set_cookies_from_browser()  # Assuming this updates self.cookies directly
+                self._set_cookies_from_browser()
             except Exception as e:
                 raise Exception("Failed to extract cookies from browser.") from e
         if not auto_cookies and not self.cookies:
@@ -157,7 +155,7 @@ class Gemini:
                 cj = browser_fn(domain_name=".google.com")
                 self.cookies.update({cookie.name: cookie.value for cookie in cj})
             except Exception:
-                continue  # Try the next browser if an exception occurs
+                continue
 
         if not self.cookies:
             raise ValueError(
@@ -264,9 +262,7 @@ class Gemini:
         try:
             sid, nonce = self._get_sid_and_nonce()
             params = self._construct_params(sid)
-            data = self._construct_payload(
-                f"Provide a written response. {prompt}", nonce
-            )
+            data = self._construct_payload(prompt, nonce)
             response = self.session.post(
                 POST_ENDPOINT,
                 params=params,
