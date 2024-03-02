@@ -1,5 +1,6 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 from enum import Enum
+from colorama import Fore
 import browser_cookie3
 
 
