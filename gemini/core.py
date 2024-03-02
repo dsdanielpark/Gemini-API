@@ -14,6 +14,26 @@ from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWS
 
 
 class Gemini:
+    """
+    A class to manage interactions with a web service, handling sessions, cookies, and proxies.
+
+    Attributes:
+        auto_cookies (bool): Whether to automatically manage cookies.
+        cookies (Dict[str, str]): A dictionary of cookies.
+        proxies (dict): A dictionary of proxy settings.
+        timeout (int): The timeout for requests.
+        session (requests.Session): The session for making requests.
+        base_url (str): The base URL for the web service.
+
+    Parameters:
+        session (Optional[requests.Session]): An existing requests session, if any.
+        cookies (Optional[Dict[str, str]]): Initial cookies to use, if any.
+        cookie_fp (str): File path to load cookies from, if `auto_cookies` is True.
+        auto_cookies (bool): Automatically manage cookies if True.
+        timeout (int): Timeout for requests, defaults to 30 seconds.
+        proxies (Optional[dict]): Proxy configuration for requests, if any.
+    """
+
     def __init__(
         self,
         session: Optional[requests.Session] = None,
@@ -23,6 +43,9 @@ class Gemini:
         timeout: int = 30,
         proxies: Optional[dict] = None,
     ) -> None:
+        """
+        Initializes the Gemini object with session, cookies, and other configurations.
+        """
         self.auto_cookies = auto_cookies
         self.cookies = cookies or {}
         self._set_cookies(auto_cookies)
@@ -31,7 +54,19 @@ class Gemini:
         self.session = session or self._initialize_session(cookies, cookie_fp)
         self.base_url: str = HOST
 
-    def _initialize_session(self, cookies, cookie_fp):
+    def _initialize_session(
+        self, cookies: Optional[Dict[str, str]], cookie_fp: Optional[str]
+    ) -> requests.Session:
+        """
+        Initializes a new session with headers, cookies, and optionally loads cookies from a file.
+
+        Parameters:
+            cookies (Optional[Dict[str, str]]): Cookies to add to the session.
+            cookie_fp (Optional[str]): Path to a file from which to load cookies.
+
+        Returns:
+            requests.Session: The initialized session.
+        """
         session = requests.Session()
         session.headers.update(HEADERS)
         if cookies:
@@ -40,6 +75,47 @@ class Gemini:
             self._load_cookies_from_file(cookie_fp, session)
 
         return session
+
+    def check_session_cookies(self) -> None:
+        """
+        Prints the session's cookies. Indicates if the session is uninitialized.
+        """
+        if self.session:
+            cookies = self.session.cookies.get_dict()
+            cookies_str = "\n".join(f"{key}: {value}" for key, value in cookies.items())
+            print(f"Session Cookies:\n{cookies_str}")
+        else:
+            print("Session not initialized.")
+
+    def check_session_headers(self) -> None:
+        """
+        Prints the session's headers. Indicates if the session is uninitialized.
+        """
+        if self.session:
+            headers = self.session.headers
+            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
+            print(f"Session Headers:\n{headers_str}")
+        else:
+            print("Session not initialized.")
+
+    def _load_cookies_from_file(self, file_path: str) -> None:
+        """Loads cookies from a file and updates the session."""
+        try:
+            if file_path.endswith(".json"):
+                with open(file_path, "r") as file:
+                    cookies = json.load(file)
+            else:  # Assuming txt or other formats
+                with open(file_path, "r") as file:
+                    content = file.read()
+                    # Evaluating the dictionary-like string
+                    try:
+                        cookies = eval(content)
+                    except NameError:
+                        # Fallback if eval fails due to undefined names
+                        cookies = json.loads(content.replace("'", '"'))
+            self.session.cookies.update(cookies)
+        except Exception as e:
+            print(f"Error loading cookie file: {e}")
 
     def _set_cookies(self, auto_cookies: bool) -> None:
         """
@@ -89,48 +165,19 @@ class Gemini:
                 "Failed to get cookies. Ensure 'auto_cookies' is True or manually set 'cookies'."
             )
 
-    def check_session_cookies(self) -> None:
-        """
-        Prints the session's cookies. Indicates if the session is uninitialized.
-        """
-        if self.session:
-            cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join(f"{key}: {value}" for key, value in cookies.items())
-            print(f"Session Cookies:\n{cookies_str}")
-        else:
-            print("Session not initialized.")
-
-    def check_session_headers(self) -> None:
-        """
-        Prints the session's headers. Indicates if the session is uninitialized.
-        """
-        if self.session:
-            headers = self.session.headers
-            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
-            print(f"Session Headers:\n{headers_str}")
-        else:
-            print("Session not initialized.")
-
-    def _load_cookies_from_file(self, file_path: str) -> None:
-        """Loads cookies from a file and updates the session."""
-        try:
-            if file_path.endswith(".json"):
-                with open(file_path, "r") as file:
-                    cookies = json.load(file)
-            else:  # Assuming txt or other formats
-                with open(file_path, "r") as file:
-                    content = file.read()
-                    # Evaluating the dictionary-like string
-                    try:
-                        cookies = eval(content)
-                    except NameError:
-                        # Fallback if eval fails due to undefined names
-                        cookies = json.loads(content.replace("'", '"'))
-            self.session.cookies.update(cookies)
-        except Exception as e:
-            print(f"Error loading cookie file: {e}")
-
     def _get_sid_and_nonce(self) -> Tuple[str, str]:
+        """
+        Retrieves the session ID (SID) and a nonce from the application page.
+
+        This method sends a GET request to the application page, then parses the response
+        to extract the SID and nonce values using regular expressions.
+
+        Returns:
+            Tuple[str, str]: A tuple containing the SID and nonce as strings.
+
+        Raises:
+            ConnectionError: If the request to the application page fails.
+        """
         try:
             response: requests.Response = self.session.get(f"{self.base_url}/app")
             response.raise_for_status()
@@ -146,6 +193,20 @@ class Gemini:
 
     @staticmethod
     def _search_regex(text: str, pattern: str, term: str) -> str:
+        """
+        Searches for a pattern in the given text and returns the first matching group.
+
+        Parameters:
+            text (str): The text to search through.
+            pattern (str): The regex pattern to search for.
+            term (str): A descriptive term for the item being searched (used in error message).
+
+        Returns:
+            str: The first group matched by the regex pattern.
+
+        Raises:
+            ValueError: If no match is found for the given pattern.
+        """
         match: Optional[re.Match] = re.search(pattern, text)
         if not match:
             raise ValueError(f"Failed to extract {term}.")
@@ -153,9 +214,24 @@ class Gemini:
 
     @staticmethod
     def _get_reqid() -> int:
+        """
+        Generates a random 7-digit request ID.
+
+        Returns:
+            int: A random 7-digit integer used as a request ID.
+        """
         return int("".join(random.choices(string.digits, k=7)))
 
     def _construct_params(self, sid: str) -> str:
+        """
+        Constructs URL-encoded parameters for a request.
+
+        Parameters:
+            sid (str): The session ID.
+
+        Returns:
+            str: URL-encoded string of parameters.
+        """
         return urllib.parse.urlencode(
             {
                 "bl": BOT_SERVER,
@@ -167,6 +243,16 @@ class Gemini:
         )
 
     def _construct_payload(self, prompt: str, nonce: str) -> str:
+        """
+        Constructs URL-encoded payload for a request.
+
+        Parameters:
+            prompt (str): The user prompt to send.
+            nonce (str): A one-time token used for request verification.
+
+        Returns:
+            str: URL-encoded string of the payload.
+        """
         return urllib.parse.urlencode(
             {
                 "at": nonce,
