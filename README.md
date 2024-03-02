@@ -11,6 +11,33 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 <br>
 
+- [ Google - Gemini API](#-google---gemini-api)
+  - [What is Gemini?](#what-is-gemini)
+  - [Installation](#installation)
+  - [Authentication](#authentication)
+  - [Usage](#usage)
+    - [Initialization](#initialization)
+    - [Text generation](#text-generation)
+    - [Image generation](#image-generation)
+    - [Generate content with image](#generate-content-with-image)
+    - [Text To Speech(TTS) from Gemini](#text-to-speechtts-from-gemini)
+  - [Further](#further)
+    - [Behind a proxy](#behind-a-proxy)
+    - [Use rotating proxies](#use-rotating-proxies)
+    - [Reusable session object](#reusable-session-object)
+  - [More features](#more-features)
+  - [How to use open-source Gemma](#how-to-use-open-source-gemma)
+  - [Sponsor](#sponsor)
+  - [FAQ](#faq)
+  - [Issues](#issues)
+  - [Contributors](#contributors)
+  - [Contacts](#contacts)
+  - [License](#license)
+  - [References](#references)
+
+
+<br>
+
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
