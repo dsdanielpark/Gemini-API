@@ -124,7 +124,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ### Reusable session object
 You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
 ```python
-from gemini import Gemini, SESSION_HEADERS
+from gemini import Gemini, HEADERS
 import requests
 
 cookies = {
@@ -132,7 +132,7 @@ cookies = {
 }
 
 session = requests.Session()
-session.headers = SESSION_HEADERS
+session.headers = HEADERS
 session.cookies.update(cookies)
 
 GeminiClient = Gemini(session=session, timeout=30)
