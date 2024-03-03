@@ -275,7 +275,7 @@ class GeminiClient:
                 self.cookies = found_cookies
 
             except Exception as e:
-                continue 
+                continue
 
         if not self.cookies:
             raise ValueError(
