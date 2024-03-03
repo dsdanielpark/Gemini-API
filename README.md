@@ -11,15 +11,29 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
-- [Google - Gemini API](#-google---gemini-api)
+- [ Google - Gemini API](#-google---gemini-api)
   - [What is Gemini?](#what-is-gemini)
   - [Installation](#installation)
   - [Authentication](#authentication)
   - [Usage](#usage)
+    - [Initialization](#initialization)
+    - [Text generation](#text-generation)
+    - [Image generation](#image-generation)
+    - [Generate content with image](#generate-content-with-image)
+    - [Text To Speech(TTS) from Gemini](#text-to-speechtts-from-gemini)
   - [Further](#further)
+    - [Behind a proxy](#behind-a-proxy)
+    - [Use rotating proxies](#use-rotating-proxies)
+    - [Reusable session object](#reusable-session-object)
   - [More features](#more-features)
   - [How to use open-source Gemma](#how-to-use-open-source-gemma)
+  - [Sponsor](#sponsor)
   - [FAQ](#faq)
+  - [Issues](#issues)
+  - [Contributions](#contributions)
+  - [Contacts](#contacts)
+  - [License](#license)
+  - [References](#references)
 
 
 <br>
@@ -256,8 +270,8 @@ Core maintainers:
 [3] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
-> [!WARNING]
-> Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
+> *Warning**
+Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
 
 <br>
 
