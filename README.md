@@ -7,7 +7,9 @@ A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
-<br>
+
+## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
 - [Google - Gemini API](#-google---gemini-api)
   - [What is Gemini?](#what-is-gemini)
@@ -22,8 +24,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 <br>
 
-## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
+
 
 ## Installation
 ```
@@ -39,8 +40,6 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 1. Go to https://gemini.google.com/ and wait for it to load.
 2. *(Recommended)* While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. 
 3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually. Refer to this [image](assets/netrwork.pdf).
-
-<br>
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
