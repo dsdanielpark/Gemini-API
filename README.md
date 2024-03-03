@@ -186,6 +186,10 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
+
+
+
+
 ## Sponsor
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
@@ -201,8 +205,38 @@ You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/b
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 
-## Contributors
+## Contributions
 We would like to express our sincere gratitude to all the contributors.
+
+
+<details><summary>Further development potential</summary>
+  
+- [ ] `refactoring`
+- [x] `gemini/core`: httpx.session
+  - [x] `messages`
+      - [x] `content`
+        - [x] `text`  
+          - [ ] `parsing`
+        - [ ] `image`
+          - [ ] `parsing`
+      - [ ] `response format structure class`
+      - [ ] `tool_calls`
+  - [ ] `third party`
+    - [ ] `replit`
+    - [ ] `google tools`
+- [ ] `gemini/client`: httpx.AsyncClient
+  - [ ] `messages`
+      - [ ] `content`
+        - [ ] `text`  
+          - [ ] `parsing`
+        - [ ] `image`
+          - [ ] `parsing`
+      - [ ] `response format structure class`
+      - [ ] `tool_calls`
+  - [ ] `third party`
+    - [ ] `replit`
+    - [ ] `google tools`   
+</details>
 
 ## Contacts
 Core maintainers:
