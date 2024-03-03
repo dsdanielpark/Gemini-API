@@ -34,11 +34,12 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
 ## Authentication
-> **Warning** Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster.
-
+> [!NOTE]
+> Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
 1. Go to https://gemini.google.com/ and wait for it to load.
 2. *(Recommended)* While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. 
 3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually. Refer to this [image](assets/netrwork.pdf).
+
 <br>
 
 ## Usage
@@ -59,7 +60,8 @@ GeminiClient = Gemini(cookies=cookies)
 ```
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality.
 
-*Before proceeding, ensure that the GeminiClient object is defined without any errors.*
+> [!IMPORTANT]
+> *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
 
 ### Text generation
