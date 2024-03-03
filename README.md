@@ -7,7 +7,9 @@ A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
-<br>
+
+## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
 - [Google - Gemini API](#-google---gemini-api)
   - [What is Gemini?](#what-is-gemini)
@@ -22,8 +24,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 <br>
 
-## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
+
 
 ## Installation
 ```
@@ -34,12 +35,11 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
 ## Authentication
-> **Warning** Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster.
-
+> [!NOTE]
+> Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
 1. Go to https://gemini.google.com/ and wait for it to load.
 2. *(Recommended)* While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. 
 3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually. Refer to this [image](assets/netrwork.pdf).
-<br>
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
@@ -59,7 +59,8 @@ GeminiClient = Gemini(cookies=cookies)
 ```
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality.
 
-*Before proceeding, ensure that the GeminiClient object is defined without any errors.*
+> [!IMPORTANT]
+> *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
 <br>
 
 ### Text generation
@@ -185,6 +186,10 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
+
+
+
+
 ## Sponsor
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
@@ -200,8 +205,38 @@ You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/b
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 
-## Contributors
+## Contributions
 We would like to express our sincere gratitude to all the contributors.
+
+
+<details><summary>Further development potential</summary>
+  
+- [ ] `refactoring`
+- [x] `gemini/core`: httpx.session
+  - [x] `messages`
+      - [x] `content`
+        - [x] `text`  
+          - [ ] `parsing`
+        - [ ] `image`
+          - [ ] `parsing`
+      - [ ] `response format structure class`
+      - [ ] `tool_calls`
+  - [ ] `third party`
+    - [ ] `replit`
+    - [ ] `google tools`
+- [ ] `gemini/client`: httpx.AsyncClient
+  - [ ] `messages`
+      - [ ] `content`
+        - [ ] `text`  
+          - [ ] `parsing`
+        - [ ] `image`
+          - [ ] `parsing`
+      - [ ] `response format structure class`
+      - [ ] `tool_calls`
+  - [ ] `third party`
+    - [ ] `replit`
+    - [ ] `google tools`   
+</details>
 
 ## Contacts
 Core maintainers:
@@ -221,8 +256,8 @@ Core maintainers:
 [3] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
-> **Warning** 
-Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
+> [!WARNING]
+> Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
 
 <br>
 
