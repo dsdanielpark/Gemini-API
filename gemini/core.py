@@ -53,7 +53,7 @@ class Gemini:
         self.timeout = timeout
         self.session = session or self._initialize_session(cookies, cookie_fp)
         self.base_url: str = HOST
-        self.nonce = None
+        self.nonce = nonce
 
     def _initialize_session(
         self, cookies: Optional[Dict[str, str]], cookie_fp: Optional[str]
@@ -177,43 +177,17 @@ class Gemini:
         Raises:
             ConnectionError: If the request to the application page fails.
         """
+        
         try:
-            response: requests.Response = self.session.get(f"{self.base_url}/app")
-            response.raise_for_status()
-        except RequestException as e:
-            raise ConnectionError(
-                f"Failed to connect to {self.base_url}: {str(e)}"
-            ) from e
-
-        sid: str = self._search_regex(response.text, r'"FdrFJe":"([\d-]+)"', "SID")
-        try:
-            nonce = self._search_regex(response.text, r'"SNlM0e":"(.*?)"', "nonce")
-        except:
+            response = requests.get("https://gemini.google.com/app", cookies=self.cookies)
+        except Exception as e:
+            raise(f"Request error https://gemini.google.com/app\n{e}")
+        sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
+        nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
+        if nonce == None:
             nonce = self.nonce
-
         return sid, nonce
-
-    @staticmethod
-    def _search_regex(text: str, pattern: str, term: str) -> str:
-        """
-        Searches for a pattern in the given text and returns the first matching group.
-
-        Parameters:
-            text (str): The text to search through.
-            pattern (str): The regex pattern to search for.
-            term (str): A descriptive term for the item being searched (used in error message).
-
-        Returns:
-            str: The first group matched by the regex pattern.
-
-        Raises:
-            ValueError: If no match is found for the given pattern.
-        """
-        match: Optional[re.Match] = re.search(pattern, text)
-        if not match:
-            raise ValueError(f"Failed to extract {term}.")
-        return match.group(1)
-
+    
     @staticmethod
     def _get_reqid() -> int:
         """
@@ -266,16 +240,6 @@ class Gemini:
         """Sends a request and returns the response text and status code."""
         try:
             sid, nonce = self._get_sid_and_nonce()
-            if nonce is None and self.nonce is None:
-                raise ValueError(
-                    "Error: Cannot find nonce value.\n"
-                    "Please refresh the Gemini web page, send any prompt, re-export the cookie, "
-                    "and manually collect the nonce value.\n"
-                    "Refer to the following page: https://github.com/dsdanielpark/Gemini-API?tab=readme-ov-file#authentication"
-                )
-            else:
-                nonce = self.nonce
-
             params = self._construct_params(sid)
             data = self._construct_payload(prompt, nonce)
             response = self.session.post(
