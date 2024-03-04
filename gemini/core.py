@@ -177,17 +177,19 @@ class Gemini:
         Raises:
             ConnectionError: If the request to the application page fails.
         """
-        
+
         try:
-            response = requests.get("https://gemini.google.com/app", cookies=self.cookies)
+            response = requests.get(
+                "https://gemini.google.com/app", cookies=self.cookies
+            )
         except Exception as e:
-            raise(f"Request error https://gemini.google.com/app\n{e}")
+            raise (f"Request error https://gemini.google.com/app\n{e}")
         sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
         nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
         if nonce == None:
             nonce = self.nonce
         return sid, nonce
-    
+
     @staticmethod
     def _get_reqid() -> int:
         """
