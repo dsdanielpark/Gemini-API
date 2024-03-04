@@ -269,12 +269,18 @@ class GeminiClient:
                 )
                 cj = browser_fn(domain_name=".google.com")
                 found_cookies = {cookie.name: cookie.value for cookie in cj}
-                print(
-                    f"Automatically configure cookies with detected ones.\n{found_cookies}"
-                )
-                self.cookies = found_cookies
-
+                if len(found_cookies) >= 5:
+                    print(
+                        f"Successfully retrieved cookies from {browser_fn}.\n{found_cookies}"
+                    )
+                    self.cookies = found_cookies
+                    break
+                else:
+                    print(
+                        f"Automatically configure cookies with detected ones but found only {len(found_cookies)} cookies.\n{found_cookies}"
+                    )
             except Exception as e:
+                print(e)
                 continue
 
         if not self.cookies:
