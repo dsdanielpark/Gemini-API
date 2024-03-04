@@ -44,9 +44,9 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ## Authentication
 > [!NOTE]
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
-1. Go to https://gemini.google.com/ and wait for it to load.
-2. *(Recommended)* While on the gemini website, export cookies using a Chrome extension. If using [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk) extension, open the downloaded txt file and copy its contents exactly as they are. 
-3. Or, press F12 → Network → Send prompt to webui gemini → Click post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Copy cookies → Format as a dictionary manually. Refer to this [image](assets/netrwork.pdf).
+1. Visit https://gemini.google.com/ and wait for it to fully load.
+2. *(Recommended)* Export cookies on the gemini site using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), then open and copy the txt file contents. For manual collection, see [this image](assets/cookies.pdf).
+3. *(Additional requirement)* To manually collect the nonce value: Press F12 → Network → Send any prompt to webui gemini → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. Reference [this image](assets/nonce.pdf).
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
