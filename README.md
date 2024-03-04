@@ -34,10 +34,10 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
 
 
 ## Installation
-```
+```bash
 pip install python-gemini-api
 ```
-```
+```bash
 pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
