@@ -63,6 +63,7 @@ cookies = {
 GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
+# GeminiClient = Gemini(cookies=cookies, nonce="value") # If you encounter nonce error, pass nonce value. See `Authentication` section above.
 ```
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality.
 
