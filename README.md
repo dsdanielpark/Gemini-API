@@ -1,4 +1,4 @@
-Development Status :: 2 - Pre-Alpha
+Development Status :: 1 - Planning
 
 *Not fully prepared yet.*
 
