@@ -266,13 +266,15 @@ class Gemini:
         """Sends a request and returns the response text and status code."""
         try:
             sid, nonce = self._get_sid_and_nonce()
-            if nonce is None:
+            if nonce is None and self.nonce is None:
                 raise ValueError(
                     "Error: Cannot find nonce value.\n"
                     "Please refresh the Gemini web page, send any prompt, re-export the cookie, "
                     "and manually collect the nonce value.\n"
                     "Refer to the following page: https://github.com/dsdanielpark/Gemini-API?tab=readme-ov-file#authentication"
                 )
+            else:
+                nonce = self.nonce
 
             params = self._construct_params(sid)
             data = self._construct_payload(prompt, nonce)
