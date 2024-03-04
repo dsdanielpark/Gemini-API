@@ -23,7 +23,7 @@ __all__ = [
     "REPLIT_SUPPORT_PROGRAM_LANGUAGES",
     "Tool",
 ]
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = (
     "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>"
 )
