@@ -36,6 +36,7 @@ class Gemini:
     def __init__(
         self,
         session: Optional[requests.Session] = None,
+        nonce: str = None,
         cookies: Optional[Dict[str, str]] = None,
         cookie_fp: str = None,
         auto_cookies: bool = False,
@@ -52,6 +53,7 @@ class Gemini:
         self.timeout = timeout
         self.session = session or self._initialize_session(cookies, cookie_fp)
         self.base_url: str = HOST
+        self.nonce = None
 
     def _initialize_session(
         self, cookies: Optional[Dict[str, str]], cookie_fp: Optional[str]
@@ -184,7 +186,10 @@ class Gemini:
             ) from e
 
         sid: str = self._search_regex(response.text, r'"FdrFJe":"([\d-]+)"', "SID")
-        nonce: str = self._search_regex(response.text, r'"SNlM0e":"(.*?)"', "nonce")
+        try:
+            nonce = self._search_regex(response.text, r'"SNlM0e":"(.*?)"', "nonce")
+        except:
+            nonce = self.nonce
 
         return sid, nonce
 
