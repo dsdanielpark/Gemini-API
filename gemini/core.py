@@ -255,6 +255,7 @@ class Gemini:
             )
             response.raise_for_status()
         except (ConnectionError, RequestException) as e:
+            print(f"Retry to generate content: {e}")
             self._set_sid_and_nonce()
             params = self._construct_params(self._sid)
             data = self._construct_payload(prompt, self._nonce)
