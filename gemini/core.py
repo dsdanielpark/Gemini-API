@@ -7,7 +7,7 @@ import string
 import requests
 import urllib.parse
 from typing import Optional, Tuple, Dict
-from requests.exceptions import RequestException
+from requests.exceptions import ConnectionError, RequestException
 
 from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWSERS
 
@@ -36,8 +36,8 @@ class Gemini:
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        nonce: str = None,
         cookies: Optional[Dict[str, str]] = None,
+        nonce: Optional[str] = None,
         cookie_fp: str = None,
         auto_cookies: bool = False,
         timeout: int = 30,
@@ -46,6 +46,8 @@ class Gemini:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
         """
+        self._nonce = None
+        self._sid = None
         self.auto_cookies = auto_cookies
         self.cookies = cookies or {}
         self._set_cookies(auto_cookies)
@@ -74,6 +76,8 @@ class Gemini:
             session.cookies.update(cookies)
         if cookie_fp:
             self._load_cookies_from_file(cookie_fp, session)
+
+        self._set_sid_and_nonce()
 
         return session
 
@@ -164,7 +168,7 @@ class Gemini:
                 "Failed to get cookies. Ensure 'auto_cookies' is True or manually set 'cookies'."
             )
 
-    def _get_sid_and_nonce(self) -> Tuple[str, str]:
+    def _set_sid_and_nonce(self) -> Tuple[str, str]:
         """
         Retrieves the session ID (SID) and a nonce from the application page.
 
@@ -183,12 +187,11 @@ class Gemini:
                 "https://gemini.google.com/app", cookies=self.cookies
             )
         except Exception as e:
-            raise (f"Request error https://gemini.google.com/app\n{e}")
-        sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
-        nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
+            raise (f"Request error https://gemini.google.com/app {e}")
+        self._sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
+        self._nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
         if nonce == None:
             nonce = self.nonce
-        return sid, nonce
 
     @staticmethod
     def _get_reqid() -> int:
@@ -241,9 +244,8 @@ class Gemini:
     def send_request(self, prompt: str) -> Tuple[str, int]:
         """Sends a request and returns the response text and status code."""
         try:
-            sid, nonce = self._get_sid_and_nonce()
-            params = self._construct_params(sid)
-            data = self._construct_payload(prompt, nonce)
+            params = self._construct_params(self._sid)
+            data = self._construct_payload(prompt, self._nonce)
             response = self.session.post(
                 POST_ENDPOINT,
                 params=params,
@@ -252,11 +254,19 @@ class Gemini:
                 proxies=self.proxies,
             )
             response.raise_for_status()
-            return response.text, response.status_code
-        except ConnectionError as e:
-            raise ConnectionError(f"Connection failed: {e}") from e
-        except RequestException as e:
-            raise RequestException(f"Request failed: {e}") from e
+        except (ConnectionError, RequestException) as e:
+            self._set_sid_and_nonce()
+            params = self._construct_params(self._sid)
+            data = self._construct_payload(prompt, self._nonce)
+            response = self.session.post(
+                POST_ENDPOINT,
+                params=params,
+                data=data,
+                timeout=self.timeout,
+                proxies=self.proxies,
+            )
+            response.raise_for_status()
+        return response.text, response.status_code
 
     def generate_content(self, prompt: str) -> str:
         """Generates content based on the prompt, raising an exception for non-200 responses."""
