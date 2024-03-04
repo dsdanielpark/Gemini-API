@@ -13,7 +13,7 @@ from typing import Optional, Any, List
 from .constants import (
     HEADERS,
     SUPPORTED_BROWSERS,
-    TEXT_GENERATION_WEB_SERVER_PARAM,
+    BOT_SERVER,
     SHARE_ENDPOINT,
     POST_ENDPOINT,
     HOST,
@@ -329,7 +329,7 @@ class GeminiClient:
 
     def _prepare_params(self) -> dict:
         return {
-            "bl": TEXT_GENERATION_WEB_SERVER_PARAM,
+            "bl": BOT_SERVER,
             "_reqid": str(self._reqid),
             "rt": "c",
         }
