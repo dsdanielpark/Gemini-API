@@ -2,8 +2,9 @@ Development Status :: 1 - Planning
 
 *Not fully prepared yet.*
 
-# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API
-A Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), interacts with [Google Gemini](https://gemini.google.com) via reverse engineering. Reconstructing with REST syntax for users facing frequent authentication errors or unable to authenticate properly in [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=ko).
+# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API <a href="https://pypi.org/project/bardapi/"><img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api"></a>
+
+A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
@@ -46,7 +47,7 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
 1. Visit https://gemini.google.com/ and wait for it to fully load.
 2. *(Recommended)* Export cookies on the gemini site using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), then open and copy the txt file contents. For manual collection, see [this image](assets/cookies.pdf).
-3. *(Additional requirement)* To manually collect the nonce value: Press F12 → Network → Send any prompt to webui gemini → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. Reference [this image](assets/nonce_value.pdf).
+3. *(Additional requirement)* Some users need to set nonce value manually. To collect the nonce value: Press F12 → Network → Send any prompt to webui gemini → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. Reference [this image](assets/nonce_value.pdf).
 
 ## Usage
 After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
