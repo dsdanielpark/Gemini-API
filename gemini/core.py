@@ -9,6 +9,7 @@ import urllib.parse
 from typing import Optional, Tuple, Dict
 from requests.exceptions import ConnectionError, RequestException
 
+from .models.parser.methods import ParseMethod1, ParseMethod2
 from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWSERS
 
 
@@ -317,10 +318,16 @@ class Gemini:
             response.raise_for_status()
         return response.text, response.status_code
 
-    def generate_content(self, prompt: str) -> str:
-        """Generates content based on the prompt, raising an exception for non-200 responses."""
+    def generate_content(self, prompt: str, *custom_parsers) -> str:
+        """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""
         response_text, response_status_code = self.send_request(prompt)
-        if response_status_code == 200:
-            return response_text
-        else:
+        if response_status_code != 200:
             raise ValueError(f"Response status: {response_status_code}")
+
+        parsers = [ParseMethod1.parse, ParseMethod2.parse] + list(custom_parsers)
+        for parse in parsers:
+            try:
+                return parse(response_text)
+            except Exception as e:
+                continue  
+        return f"All parsing methods failed. Returning original response text. Consider implementing a new parser.\n\n{response_text}"
