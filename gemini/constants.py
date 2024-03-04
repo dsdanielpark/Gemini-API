@@ -14,18 +14,18 @@ class Tool(Enum):
 
 
 DEFAULT_LANGUAGE = "en"
-SEPARATOR_LINE = "=" * 36
-TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240228.09_p0"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
 HOST = "https://gemini.google.com"
-SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
 BOT_SERVER = "boq_assistant-bard-web-server_20240227.13_p0"
 
+SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:123.0) Gecko/20100101 Firefox/123.0",
     "Accept": "*/*",
     "Accept-Language": "en-US,en;q=0.5",
+    "Referer": "https://gemini.google.com/",
+    "X-Same-Domain": "1",
     "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
     "Origin": "https://gemini.google.com",
     "DNT": "1",
