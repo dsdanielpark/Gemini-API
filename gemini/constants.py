@@ -15,7 +15,7 @@ class Tool(Enum):
 
 DEFAULT_LANGUAGE = "en"
 SEPARATOR_LINE = "=" * 36
-TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240222.09_p2"
+TEXT_GENERATION_WEB_SERVER_PARAM = "boq_assistant-bard-web-server_20240228.09_p0"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
 HOST = "https://gemini.google.com"
 SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
