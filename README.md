@@ -202,6 +202,13 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 ## Contributions
 We would like to express our sincere gratitude to all the contributors.
 
+Contributors to the Bard API and Gemini API.
+
+<a href="https://github.com/dsdanielpark/Bard_API/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dsdanielpark/Bard_API" />
+</a>
+
+<br>
 
 <details><summary>Further development potential</summary>
   
