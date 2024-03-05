@@ -26,7 +26,6 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
     - [Image generation](#image-generation)
     - [Generate content with image](#generate-content-with-image)
   - [Further](#further)
-    - [Behind a proxy](#behind-a-proxy)
     - [Use rotating proxies](#use-rotating-proxies)
   - [More features](#more-features)
 
@@ -97,17 +96,6 @@ print(response)
 <br>
 
 ## Further
-### Behind a proxy
-If you are working behind a proxy, use the following.
-```python
-proxies = {
-    "http": "http://proxy.example.com:8080",
-    "https": "https://proxy.example.com:8080"
-}
-
-GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
-GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
-```
 
 ### Use rotating proxies
 
@@ -129,14 +117,17 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 <br>
 
 ## [More features](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md)
-- [Max_token, Max_sentences](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
+Explore additional features in [this document](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md).
 
 <br>
 
 
-## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
+## Open-source LLM, [Gemma](https://huggingface.co/google/gemma-7b)
+If you have sufficient GPU resources, you can download weights directly instead of using the Gemini API to generate content. Consider Gemma, an open-source model available for on-premises use.
+
 [Gemma](https://huggingface.co/google/gemma-7b) models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
+### How to use Gemma
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -150,14 +141,15 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
-
-## Sponsor
-Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
-
+<br>
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
 You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
+
+
+## Sponsor
+Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
@@ -213,7 +205,6 @@ Core maintainers:
 
 ## License
 [MIT](https://opensource.org/license/mit/) license, 2024, Minwoo(Daniel) Park. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
-
 
 
 ## References
