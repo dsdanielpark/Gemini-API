@@ -337,16 +337,6 @@ class Gemini:
             response.raise_for_status()
         return response.text, response.status_code
 
-    def generate_content(self, prompt) -> dict:
-        response_text, response_status_code = self.send_request(prompt)
-        if response_status_code != 200:
-            raise ValueError(f"Response status: {response_status_code}")
-        else:
-            parsed_json = ResponseParser(cookies=self.cookies).parse_response_text(
-                response_text
-            )
-        return parsed_json
-
     def generate_content(self, prompt: str) -> GeminiModelOutput:
         """Generates content based on the prompt and returns a GeminiModelOutput object."""
         response_text, response_status_code = self.send_request(prompt)
@@ -359,16 +349,31 @@ class Gemini:
         return parsed_data
         # return self._create_model_output(parsed_data, parsed_json=parsed_data)
 
-    def _create_model_output(
-        self, parsed_data: dict, parsed_json: dict
-    ) -> GeminiModelOutput:
-        candidates = [
-            GeminiCandidate(**details) for details in parsed_data["candidates"].values()
-        ]
+    @staticmethod
+    def collect_candidates(data):
+        collected = []
+        stack = [data] 
+
+        while stack:
+            current = stack.pop() 
+
+            if isinstance(current, dict):
+                if "rcid" in current and "text" in current:  
+                    collected.append(GeminiCandidate(**current))
+                else:
+                    stack.extend(current.values()) 
+
+            elif isinstance(current, list):
+                stack.extend(current)
+
+        return collected
+
+    def _create_model_output(self, parsed_data: dict) -> GeminiModelOutput:
+        processed_parsed_data = self.collect_candidates(parsed_data)
         return GeminiModelOutput(
-            metadata=parsed_data.get("metadata", []),
-            candidates=candidates,
-            response_dict=parsed_json,
+            metadata=processed_parsed_data.get("metadata", []),
+            candidates=processed_parsed_data,
+            response_dict=parsed_data,
         )
 
     def generate_custom_content(self, prompt: str, *custom_parsers) -> str:
