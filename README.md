@@ -17,7 +17,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 
-[[Paper](https://arxiv.org/abs/2312.11805)] [[Official Website](https://deepmind.google/technologies/gemini/#introduction)] [[Official API](https://aistudio.google.com/)] [[API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)]
+| [Paper](https://arxiv.org/abs/2312.11805) | [Official Website](https://deepmind.google/technologies/gemini/#introduction) | [Official API](https://aistudio.google.com/) | [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) |
 
 Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**.
 
@@ -100,7 +100,7 @@ response = GeminiClient.generate_content(prompt)
 print(response)
 ```
 > [!NOTE]
-> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. However, do not retry multiple times after one success to set session.
+> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. *Once connected and generating valid content, avoid closing the browser or revisiting Gemini web for cookie stability.*
 
 <br>
 
@@ -135,7 +135,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 
 
 ### Reusable session object
-You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
+You can continue using a reusable session, but it may not perfectly maintain context due to limitations. Consider storing summaries of past conversations in the database for better consistency.
 ```python
 from gemini import Gemini, HEADERS
 import requests
@@ -159,11 +159,6 @@ response = GeminiClient.generate_content("What was my last prompt?")
 <br>
 
 ## [More features](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md)
-- [Chat Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#chatbard)
-- [Multi-language Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#multi-language-bard-api)
-- [Export Conversation](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#export-conversation)
-- [Export Code to Repl.it](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#export-code-to-replit)
-- [Executing Python code received as a response from Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#chatbard)
 - [Max_token, Max_sentences](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
 
 <br>
@@ -202,6 +197,13 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 ## Contributions
 We would like to express our sincere gratitude to all the contributors.
 
+Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [Gemini API](https://github.com/dsdanielpark/Gemini-API/).
+
+<a href="https://github.com/dsdanielpark/Bard_API/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dsdanielpark/Bard_API" />
+</a>
+
+<br>
 
 <details><summary>Further development potential</summary>
   
