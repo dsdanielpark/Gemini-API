@@ -4,6 +4,7 @@ import re
 import json
 import random
 import string
+import inspect
 import requests
 import urllib.parse
 from typing import Optional, Tuple, Dict
@@ -324,13 +325,30 @@ class Gemini:
             response.raise_for_status()
         return response.text, response.status_code
 
+    # def generate_content(self, prompt) -> dict:
+    #     response_text, response_status_code = self.send_request(prompt)
+    #     if response_status_code != 200:
+    #         raise ValueError(f"Response status: {response_status_code}")
+
+    #     return response_text
+
     def generate_content(self, prompt: str, *custom_parsers) -> str:
         """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""
         response_text, response_status_code = self.send_request(prompt)
         if response_status_code != 200:
             raise ValueError(f"Response status: {response_status_code}")
 
-        parsers = [ParseMethod1.parse, ParseMethod2.parse] + list(custom_parsers)
+        parser1 = ParseMethod1()
+        parser2 = ParseMethod2()
+        parsers = [parser1.parse, parser2.parse]
+
+        for custom_parser in custom_parsers:
+            if inspect.isclass(custom_parser):
+                instance = custom_parser()
+                parsers.append(instance.parse)
+            elif callable(custom_parser):
+                parsers.append(custom_parser)
+
         for parse in parsers:
             try:
                 return parse(response_text)
