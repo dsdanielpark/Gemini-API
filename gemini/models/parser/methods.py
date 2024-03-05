@@ -1,8 +1,8 @@
-from gemini.models.parser.base import ResponseParser
+from gemini.models.parser.base import BaesParser
 from typing import Dict, Any
 
 
-class ParseMethod1(ResponseParser):
+class ParseMethod1(BaesParser):
     def parse(self, response_text: str) -> Dict[str, Any]:
         """
         Parses the given response text into a structured format.
@@ -74,7 +74,7 @@ class ParseMethod1(ResponseParser):
         return parsed_response_text
 
 
-class ParseMethod2(ResponseParser):
+class ParseMethod2(BaesParser):
     def parse(self, response_text: str) -> Dict[str, Any]:
         """
         Parses the given response text into a structured JSON-like format.
