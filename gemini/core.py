@@ -50,20 +50,16 @@ class Gemini:
         self._nonce = None
         self._sid = None
         self.auto_cookies = auto_cookies
+        self.cookie_fp = cookie_fp
         self.cookies = cookies
         self.proxies = proxies or {}
         self.timeout = timeout
-        self.session = session or self._initialize_session(
-            cookies, cookie_fp, auto_cookies
-        )
+        self.session = session or self._initialize_session()
         self.base_url: str = HOST
         self.nonce = nonce
 
     def _initialize_session(
         self,
-        cookies: Optional[Dict[str, str]],
-        cookie_fp: Optional[str],
-        auto_cookies: Optional[bool],
     ) -> requests.Session:
         """
         Initializes a new session with headers, cookies, and optionally loads cookies from a file.
@@ -77,12 +73,12 @@ class Gemini:
         """
         session = requests.Session()
         session.headers.update(HEADERS)
-        if cookies:
-            session.cookies.update(cookies)
-        if cookie_fp:
-            self._load_cookies_from_file(cookie_fp)
-        if auto_cookies:
-            self._set_cookies_automatically(auto_cookies)
+        if self.cookies:
+            session.cookies.update(self.cookies)
+        elif self.cookie_fp:
+            self._load_cookies_from_file(self.cookie_fp)
+        elif self.auto_cookies == True:
+            self._set_cookies_automatically()
 
         self._set_sid_and_nonce()
 
@@ -127,14 +123,14 @@ class Gemini:
         except Exception as e:
             print(f"Error loading cookie file: {e}")
 
-    def _set_cookies_automatically(self, auto_cookies: bool) -> None:
+    def _set_cookies_automatically(self) -> None:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
         """
         if len(getattr(self, "cookies", {})) > 5:
             return
 
-        if auto_cookies:
+        if self.auto_cookies:
             try:
                 self._update_cookies_from_browser()
                 if not self.cookies:
@@ -196,39 +192,45 @@ class Gemini:
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
 
-    def _set_sid_and_nonce(self) -> Tuple[str, str]:
-        """
-        Retrieves the session ID (SID) and a nonce from the application page.
-        """
-        try:
-            response = requests.get(
-                "https://gemini.google.com/app", cookies=self.cookies
-            )
-            sid_match, nonce_match = self.extract_sid_nonce(response.text)
+    def _set_sid_and_nonce(self):
+        url = "https://gemini.google.com/app"
+        response = requests.get(url, cookies=self.cookies)
+        self._sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
+        self._nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
 
-            if not sid_match or not nonce_match:
-                print(
-                    "Failed to get SID or nonce. Trying to update cookies automatically..."
-                )
-                self._set_cookies_automatically()
-                response = requests.get(
-                    "https://gemini.google.com/app", cookies=self.cookies
-                )
-                sid_match, nonce_match = self.extract_sid_nonce(response.text)
+    # def _set_sid_and_nonce(self) -> Tuple[str, str]:
+    #     """
+    #     Retrieves the session ID (SID) and a nonce from the application page.
+    #     """
+    #     try:
+    #         response = requests.get(
+    #             "https://gemini.google.com/app", cookies=self.cookies
+    #         )
+    #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
 
-                if not nonce_match:
-                    if self.nonce:
-                        return (sid_match, self.nonce)
-                    else:
-                        raise Exception(
-                            "Failed to retrieve SID and nonce after automatic cookie update."
-                        )
-            return (sid_match.group(1), nonce_match.group(1))
+    #         if not sid_match or not nonce_match:
+    #             print(
+    #                 "Failed to get SID or nonce. Trying to update cookies automatically..."
+    #             )
+    #             self._set_cookies_automatically()
+    #             response = requests.get(
+    #                 "https://gemini.google.com/app", cookies=self.cookies
+    #             )
+    #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
 
-        except Exception as e:
-            raise ConnectionError(
-                f"Failed to connect to https://gemini.google.com/app: {e}"
-            )
+    #             if not nonce_match:
+    #                 if self.nonce:
+    #                     return (sid_match, self.nonce)
+    #                 else:
+    #                     raise Exception(
+    #                         "Can not retrieve SID and nonce even after automatic cookie update."
+    #                     )
+    #         return (sid_match.group(1), nonce_match.group(1))
+
+    #     except Exception as e:
+    #         raise ConnectionError(
+    #             f"Failed to connect to https://gemini.google.com/app: {e}"
+    #         )
 
     @staticmethod
     def extract_sid_nonce(response_text):
