@@ -34,4 +34,7 @@ class ResponseParser(ABC):
             method_name (str): The name of the method to be added.
             function (callable): The function to be set as a method of the class.
         """
+        # Recommend to start from this codes
+        # response_items = response_text.lstrip("')]}\'\n\n").split("\n")[1].split("\\")
+        # response_items = [item for item in response_items if item]
         setattr(cls, method_name, function)
