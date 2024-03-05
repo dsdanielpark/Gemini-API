@@ -193,18 +193,22 @@ class Gemini:
             )
 
     def _set_sid_and_nonce(self):
-        url = "https://gemini.google.com/app"
+        """
+        Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
+        """
+        url = f"{HOST}/app"
         response = requests.get(url, cookies=self.cookies)
         self._sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
         self._nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
 
     # def _set_sid_and_nonce(self) -> Tuple[str, str]:
     #     """
-    #     Retrieves the session ID (SID) and a nonce from the application page.
+    #     Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
     #     """
+    #     url = f"{HOST}/app"
     #     try:
     #         response = requests.get(
-    #             "https://gemini.google.com/app", cookies=self.cookies
+    #             url, cookies=self.cookies
     #         )
     #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
 
@@ -214,7 +218,7 @@ class Gemini:
     #             )
     #             self._set_cookies_automatically()
     #             response = requests.get(
-    #                 "https://gemini.google.com/app", cookies=self.cookies
+    #                 url, cookies=self.cookies
     #             )
     #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
 
@@ -229,7 +233,7 @@ class Gemini:
 
     #     except Exception as e:
     #         raise ConnectionError(
-    #             f"Failed to connect to https://gemini.google.com/app: {e}"
+    #             f"Failed to retrive SID or Nonce valuse:\n{e}"
     #         )
 
     @staticmethod
@@ -301,7 +305,7 @@ class Gemini:
             response.raise_for_status()
         except (ConnectionError, RequestException) as e:
             print(f"Retry to generate content: {e}")
-            self._update_cookies_from_browser()
+            # self._update_cookies_from_browser()
             self._set_sid_and_nonce()
             params = self._construct_params(self._sid)
             data = self._construct_payload(prompt, self._nonce)
