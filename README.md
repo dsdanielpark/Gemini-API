@@ -87,7 +87,7 @@ GeminiClient = Gemini(cookies=cookies)
 Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality. (Currently in progress)
 
 > [!IMPORTANT]
-> *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
+> *Before proceeding, ensure that the GeminiClient object is defined without any errors.* If the session connects successfully and 'generate_content' runs well, close Gemini web. If Gemini web stays open in the browser, cookies may expire faster.
 
 
 
