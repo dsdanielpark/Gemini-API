@@ -87,7 +87,7 @@ GeminiClient = Gemini(cookies=cookies)
 ```
 
 > [!IMPORTANT]
->  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini web.** If Gemini web stays open in the browser, cookies may expire faster.
+>  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster.
 
 
 
