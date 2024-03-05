@@ -47,7 +47,10 @@ pip install python-gemini-api
 ```bash
 pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
-
+For the updated version, use as follows:
+```
+pip install -q -U python-gemini-api
+```
 ## Authentication
 > [!NOTE]
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
