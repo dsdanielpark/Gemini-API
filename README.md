@@ -100,7 +100,7 @@ response = GeminiClient.generate_content(prompt)
 print(response)
 ```
 > [!NOTE]
-> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. However, do not retry multiple times after one success to set session.
+> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. *Once connected and generating valid content, avoid closing the browser or revisiting Gemini web for cookie stability.*
 
 <br>
 
