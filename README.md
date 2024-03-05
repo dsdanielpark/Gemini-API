@@ -1,12 +1,9 @@
-Development Status :: 2 - Pre-Alpha
 
 <div align="right">
-  <a href="https://pypi.org/project/python-gemini-api/">
-    <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api?color=black">
-  </a>
-</div>
+  </div>
 
-# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API 
+# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Gemini API  <a href="https://pypi.org/project/python-gemini-api/"> <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api?color=black"></a>
+
 
 
 A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
@@ -28,11 +25,8 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
     - [Text generation](#text-generation)
     - [Image generation](#image-generation)
     - [Generate content with image](#generate-content-with-image)
-    - [Text To Speech(TTS) from Gemini](#text-to-speechtts-from-gemini)
   - [Further](#further)
-    - [Behind a proxy](#behind-a-proxy)
     - [Use rotating proxies](#use-rotating-proxies)
-    - [Reusable session object](#reusable-session-object)
   - [More features](#more-features)
 
 
@@ -87,11 +81,8 @@ GeminiClient = Gemini(cookies=cookies)
 ```
 
 > [!IMPORTANT]
->  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini web.** If Gemini web stays open in the browser, cookies may expire faster.
+>  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster.
 
-
-
-<br>
 
 ### Generate Content
 ```python
@@ -104,21 +95,7 @@ print(response)
 
 <br>
 
-
-<br>
-
 ## Further
-### Behind a proxy
-If you are working behind a proxy, use the following.
-```python
-proxies = {
-    "http": "http://proxy.example.com:8080",
-    "https": "https://proxy.example.com:8080"
-}
-
-GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
-GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
-```
 
 ### Use rotating proxies
 
@@ -134,39 +111,23 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ```
 
 
-### Reusable session object
-You can continue using a reusable session, but it may not perfectly maintain context due to limitations. Consider storing summaries of past conversations in the database for better consistency.
-```python
-from gemini import Gemini, HEADERS
-import requests
 
-cookies = {
-    "key": "value"
-}
-
-session = requests.Session()
-session.headers = HEADERS
-session.cookies.update(cookies)
-
-GeminiClient = Gemini(session=session, timeout=30)
-response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
-
-# Continued conversation without set new session
-response = GeminiClient.generate_content("What was my last prompt?")
-```
 
 
 <br>
 
 ## [More features](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md)
-- [Max_token, Max_sentences](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
+Explore additional features in [this document](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md).
 
 <br>
 
 
-## How to use open-source [Gemma](https://huggingface.co/google/gemma-7b)
+## Open-source LLM, [Gemma](https://huggingface.co/google/gemma-7b)
+If you have sufficient GPU resources, you can download weights directly instead of using the Gemini API to generate content. Consider Gemma, an open-source model available for on-premises use.
+
 [Gemma](https://huggingface.co/google/gemma-7b) models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. Their small size enables deployment in resource-limited settings, broadening access to cutting-edge AI. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
+### How to use Gemma
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -180,21 +141,22 @@ outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
 
-
-## Sponsor
-Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
-
+<br>
 
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
 You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. Alternatively, utilize the official Gemini API at [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart).
+
+
+## Sponsor
+Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 
-## Contributions
+## Contributors
 We would like to express our sincere gratitude to all the contributors.
 
 Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [Gemini API](https://github.com/dsdanielpark/Gemini-API/).
@@ -243,7 +205,6 @@ Core maintainers:
 
 ## License
 [MIT](https://opensource.org/license/mit/) license, 2024, Minwoo(Daniel) Park. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
-
 
 
 ## References
