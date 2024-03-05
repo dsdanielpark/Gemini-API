@@ -6,6 +6,7 @@ import time
 import httpx
 import random
 import string
+import urllib
 import asyncio
 import requests
 from typing import Optional, Any, List
@@ -17,12 +18,6 @@ from .constants import (
     SHARE_ENDPOINT,
     POST_ENDPOINT,
     HOST,
-)
-from .models.base import (
-    GeminiOutput,
-)
-from .models.exceptions import (
-    TimeoutError,
 )
 
 
@@ -52,14 +47,11 @@ class GeminiClient:
         "proxies",
         "language",
         "auto_cookies",
-        "google_translator_api_key",
         "run_code",
-        "share_session",
         "verify",
         "_reqid",
         "latency",
         "running",
-        "update_cookie_list",
         "auto_close",
         "close_delay",
     ]
@@ -73,11 +65,8 @@ class GeminiClient:
         timeout: int = 30,
         proxies: Optional[dict] = {},
         language: Optional[str] = None,
-        google_translator_api_key: Optional[str] = None,
-        run_code: bool = False,
         verify: bool = True,
         latency: int = 10,
-        update_cookie_list: Optional[List] = [],
         auto_close=True,
         close_delay: int = 60,
     ):
@@ -100,7 +89,6 @@ class GeminiClient:
             auto_close (bool): If True, the session will automatically close after a specified delay. Defaults to True.
             close_delay (int): The delay in seconds before the session is automatically closed, applicable if auto_close is True. Defaults to 60.
         """
-        self.update_cookie_list = update_cookie_list
         self.auto_cookies = auto_cookies
         self.latency = latency
         self.running = False
@@ -113,8 +101,6 @@ class GeminiClient:
         self.token = token
         self.token = self.get_nonce_value()
         self.language = language or os.getenv("GEMINI_LANGUAGE")
-        self.google_translator_api_key = google_translator_api_key
-        self.run_code = run_code
         self.verify = verify
         self.auto_close = auto_close
         self.close_delay = close_delay
@@ -219,11 +205,16 @@ class GeminiClient:
 
     def _get_cookies(self, auto_cookies: bool) -> None:
         """
-        Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
+        Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag. If self.cookies already contains cookies, it will use these existing cookies and not attempt to update them.
         """
-        # Initialize cookies dictionary if not already ini/tialized
+        # Initialize cookies dictionary if not already initialized
         if not hasattr(self, "cookies"):
             self.cookies = {}
+
+        # If cookies already exist, skip updating and use the existing ones
+        if self.cookies:  # Check if self.cookies is not empty
+            print("Using existing cookies.")
+            return  # Exit the method if cookies already exist
 
         # Attempt to load cookies automatically from the browser if necessary
         if auto_cookies and not self.cookies:
@@ -232,7 +223,7 @@ class GeminiClient:
             except Exception as e:
                 raise Exception("Failed to extract cookies from browser.") from e
 
-        # Warning if no cookies are available
+        # Warning if no cookies are available and auto_cookies is False
         if not auto_cookies and not self.cookies:
             print(
                 "Cookie loading issue, try setting auto_cookies to True. Restart browser, log out, log in for Gemini Web UI to work. Keep a single browser open."
@@ -240,7 +231,6 @@ class GeminiClient:
             try:
                 self.auto_cookies = True
                 self._get_cookies_from_browser()
-
             except Exception as e:
                 print(e)
 
@@ -317,34 +307,50 @@ class GeminiClient:
         except Exception as e:
             print(f"An error occurred while updating cookies: {e}")
 
-    def _prepare_data(
-        self, prompt: str, gemini_session: Optional["GeminiSession"] = None
-    ) -> dict:
-        session_metadata = (
-            gemini_session.metadata
-            if gemini_session and gemini_session.metadata
-            else None
+    def _construct_params(self, sid: str) -> str:
+        """
+        Constructs URL-encoded parameters for a request.
+
+        Parameters:
+            sid (str): The session ID.
+
+        Returns:
+            str: URL-encoded string of parameters.
+        """
+        return urllib.parse.urlencode(
+            {
+                "bl": BOT_SERVER,
+                "hl": os.environ.get("GEMINI_LANGUAGE", "en"),
+                "_reqid": self.get_reqid(),
+                "rt": "c",
+                "f.sid": sid,
+            }
         )
-        request_body = [None, [[prompt], None, session_metadata]]
 
-        data = {
-            "at": self.token,
-            "f.req": json.dumps([None, json.dumps(request_body)]),
-        }
-        return data
+    def _construct_payload(self, prompt: str, nonce: str) -> str:
+        """
+        Constructs URL-encoded payload for a request.
 
-    def _prepare_params(self) -> dict:
-        return {
-            "bl": BOT_SERVER,
-            "_reqid": str(self._reqid),
-            "rt": "c",
-        }
+        Parameters:
+            prompt (str): The user prompt to send.
+            nonce (str): A one-time token used for request verification.
+
+        Returns:
+            str: URL-encoded string of the payload.
+        """
+        return urllib.parse.urlencode(
+            {
+                "at": nonce,
+                "f.req": json.dumps([None, json.dumps([[prompt], None, None])]),
+            }
+        )
 
     async def post_prompt(
-        self, prompt: str, gemini_session: Optional["GeminiSession"] = None
+        self,
+        prompt: str,
     ) -> dict:
-        data = self._prepare_data(prompt, gemini_session)
-        params = self._prepare_params()
+        data = self._construct_payload(prompt)
+        params = self._construct_params()
 
         response = await self.session.post(
             POST_ENDPOINT,
@@ -356,51 +362,21 @@ class GeminiClient:
 
         return response
 
-    async def _post_initial_prompt(self, prompt: str) -> dict:
-        """Sends the initial prompt request and returns the response."""
-        response = await self.post_prompt(prompt)
-        await asyncio.sleep(self.latency)
-        print(f"Batch execute status: {response.status_code}")
-        return response
-
-    async def attempt_fetch_with_retries(
-        self, prompt: str, wait_time: int = 40
-    ) -> dict:
-        """Attempts to fetch the content with retries until a status code 200 is received or a timeout occurs."""
+    async def generate_content(self, prompt: str) -> dict:
         try:
-            request_batch_execute = await self._post_initial_prompt(prompt)
-            await asyncio.sleep(5)
-            self._update_cookies(self.update_cookie_list)
+            response = await self.post_prompt(prompt)
+            response_data = await response.json()
+            response_status_code = response.status
 
-            start_time = time.time()
-            while True:
-                response = await self.post_prompt(prompt)
-                print(f"Current batch execution status: {response.status_code}")
-                if response.status_code == 200:
-                    print("Received status code 200. Processing response.")
-                    return response
-                else:
-                    request_batch_execute = response
-                    elapsed_time = time.time() - start_time
-                    if elapsed_time >= wait_time:
-                        print(
-                            f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response."
-                        )
-                        return request_batch_execute
-                    await asyncio.sleep(self.latency)
-
-        except asyncio.TimeoutError:
-            print(
-                f"Timeout: Did not receive status code 200 within {wait_time} seconds. Returning last response."
-            )
-            return request_batch_execute
+            if response_status_code != 200:
+                raise ValueError(f"Response status: {response_status_code}")
+            return response_data
         except Exception as e:
-            print(f"Failed to process request: {e}")
-            raise
+            print(f"An error occurred: {e}")
+            return {}
 
     async def request_share(
         self,
-        session: Optional["GeminiSession"] = None,
     ) -> dict:
         """
         Asynchronously generates content by querying the Gemini API, supporting text and optional image input alongside a specified tool for content generation.
@@ -411,156 +387,14 @@ class GeminiClient:
         Returns:
             dict: A dictionary containing the response from the Gemini API.
         """
-        url = SHARE_ENDPOINT
 
         async with httpx.AsyncClient() as session:
             try:
-                async with session.post(url, timeout=self.timeout) as response:
+                async with session.post(
+                    SHARE_ENDPOINT, timeout=self.timeout
+                ) as response:
                     return await response.json()
             except asyncio.TimeoutError:
                 raise TimeoutError(
                     "Request timed out. If errors persist, increase the timeout parameter in the Gemini class to a higher number of seconds."
                 )
-
-
-class GeminiSession:
-    """
-    Represents a session to manage and retrieve conversation history in the context of Gemini services. This class facilitates interaction with the Gemini API, allowing for the retrieval of conversation history based on specified metadata identifiers.
-
-    Attributes:
-        gemini (Gemini): An instance of the Gemini client interface used for interactions with https://gemini.google.com/. This attribute is essential for making API calls and retrieving data.
-        __metadata (list[str], optional): A list of strings representing chat metadata, potentially including chat ID (`cid`), reply ID (`rid`), and reply candidate ID (`rcid`). This list can vary in length, accommodating fewer than three elements to match provided identifiers.
-        gemini_output: Stores the output from the Gemini API calls. This attribute is managed internally and populated based on interactions facilitated by the session.
-
-    Parameters:
-        gemini (Gemini): The Gemini client interface, providing the necessary functionality to interact with the Gemini API.
-        metadata (list[str], optional): A list containing identifiers for chat metadata, such as `[cid, rid, rcid]`. The list can be shorter, with one or two elements like `[cid]` or `[cid, rid]`, depending on the available information.
-        cid (str, optional): A specific chat ID. If provided along with `metadata`, it will replace the first element in the metadata list, signifying the chat ID.
-        rid (str, optional): A specific reply ID. If provided along with `metadata`, it will replace the second element in the metadata list, indicating the reply ID.
-        rcid (str, optional): A specific reply candidate ID. If provided along with `metadata`, it will replace the third element in the metadata list, denoting the reply candidate ID.
-
-    The class requires a Gemini instance to function correctly. It uses the provided metadata, along with optional specific identifiers (`cid`, `rid`, `rcid`), to manage and retrieve conversation history. Only when all three identifiers are provided will the complete conversation history be retrieved.
-    """
-
-    __slots__ = ["__metadata", "gemini", "gemini_output"]
-
-    def __init__(
-        self,
-        gemini: GeminiClient,
-        metadata: Optional[List[str]] = None,
-        cid: Optional[str] = None,  # chat id
-        rid: Optional[str] = None,  # reply id
-        rcid: Optional[str] = None,  # reply candidate id
-    ):
-        self.__metadata: list[Optional[str]] = [None, None, None]
-        self.gemini: GeminiClient = gemini
-        self.gemini_output: Optional[GeminiOutput] = None
-
-        if metadata:
-            self.metadata = metadata
-        if cid:
-            self.cid = cid
-        if rid:
-            self.rid = rid
-        if rcid:
-            self.rcid = rcid
-
-    def __str__(self):
-        return f"GeminiSession(cid='{self.cid}', rid='{self.rid}', rcid='{self.rcid}')"
-
-    __repr__ = __str__
-
-    def __setattr__(self, name: str, value: Any) -> None:
-        super().__setattr__(name, value)
-        if name == "gemini_output" and isinstance(value, GeminiOutput):
-            self.metadata = value.metadata
-            self.rcid = value.rcid
-
-    def send_message(self, prompt: str) -> GeminiOutput:
-        """
-        Generates content by submitting a prompt to the Gemini API, acting as a shortcut method for `Gemini.generate_content(prompt, self)`.
-
-        This method simplifies the process of content generation by directly accepting a user-provided prompt and leveraging the Gemini API to generate relevant content. The output encompasses a variety of content forms, including text responses, images, and a list of all answer candidates.
-
-        Parameters:
-            prompt (str): The input text provided by the user, serving as the basis for content generation.
-
-        Returns:
-            GeminiOutput: An object encapsulating the output data from gemini.google.com. The `GeminiOutput` object offers several attributes for accessing different parts of the response:
-                - `text` for retrieving the default text reply.
-                - `images` for obtaining a list of images included in the default reply.
-                - `candidates` for accessing a comprehensive list of all answer candidates within the gemini_output.
-
-        The method ensures a streamlined interface for interacting with the Gemini API, facilitating the retrieval of diverse content types based on the input prompt.
-        """
-        return self.gemini.generate_content(prompt, self)
-
-    def choose_candidate(self, index: int) -> GeminiOutput:
-        """
-        Selects a specific candidate from the most recent `GeminiOutput` to direct the flow of an ongoing conversation.
-
-        This method allows the user to influence the direction of the conversation by choosing one of the answer candidates provided by the last Gemini API call. By specifying the index of the desired candidate, the conversation can be steered towards a particular topic or response style.
-
-        Parameters:
-            index (int): The zero-based index of the candidate to be selected. This index corresponds to the position of the candidate within the list of answer candidates provided in the last `GeminiOutput`.
-
-        The chosen candidate will affect subsequent interactions with the Gemini API, guiding the content and responses generated based on the selected conversational path.
-        """
-        if not self.gemini_output:
-            raise ValueError(
-                "No previous gemini_output data found in this chat session."
-            )
-
-        self.gemini_output.chosen = index
-        self.rcid = self.gemini_output.rcid
-        return self.gemini_output
-
-    @property
-    def metadata(self):
-        return self.__metadata
-
-    @metadata.setter
-    def metadata(self, value: List[str]):
-        if len(value) > 3:
-            raise ValueError("metadata cannot exceed 3 elements")
-        self.__metadata[: len(value)] = value
-
-    @property
-    def cid(self):
-        return self.__metadata[0]
-
-    @cid.setter
-    def cid(self, value: str):
-        self.__metadata[0] = value
-
-    @property
-    def rid(self):
-        return self.__metadata[1]
-
-    @rid.setter
-    def rid(self, value: str):
-        self.__metadata[1] = value
-
-    @property
-    def rcid(self):
-        return self.__metadata[2]
-
-    @rcid.setter
-    def rcid(self, value: str):
-        self.__metadata[2] = value
-
-
-def running(func) -> callable:
-    async def wrapper(self: "GeminiClient", *args, **kwargs):
-        if not self.running:
-            await self.init(auto_close=self.auto_close, close_delay=self.close_delay)
-            if self.running:
-                return await func(self, *args, **kwargs)
-
-            raise Exception(
-                f"Invalid function call: GeminiClient.{func.__name__}. Client initialization failed."
-            )
-        else:
-            return await func(self, *args, **kwargs)
-
-    return wrapper
