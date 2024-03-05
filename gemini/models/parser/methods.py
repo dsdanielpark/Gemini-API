@@ -30,7 +30,7 @@ class ParseMethod1(ResponseParser):
         ]
         cleand_items = [item for item in cleand_items if item]
 
-        json_data = {"text": ""}
+        result = {"text": ""}
         choice_count = 0
         current_key = None
 
@@ -38,34 +38,38 @@ class ParseMethod1(ResponseParser):
             if item.startswith("rc_"):
                 choice_count += 1
                 current_key = f"choice{choice_count:02}"
-                json_data[current_key] = {"choice_id": item, "text": "", "links": []}
+                result[current_key] = {
+                    "choice_id": item,
+                    "text": "",
+                    "links": [],
+                } 
             elif "http" in item and current_key:
-                json_data[current_key]["links"].append(item)
+                result[current_key]["links"].append(item)
             elif current_key:
-                if json_data[current_key]["text"]:
-                    json_data[current_key]["text"] += "\n" + item
+                if result[current_key]["text"]:
+                    result[current_key]["text"] += "\n" + item
                 else:
-                    json_data[current_key]["text"] = item
+                    result[current_key]["text"] = item
             else:
-                if json_data["text"]:
-                    json_data["text"] += "\n" + item
+                if result["text"]:
+                    result["text"] += "\n" + item
                 else:
-                    json_data["text"] = item
+                    result["text"] = item
 
-        if "choice01" in json_data:
-            json_data["text"] = json_data["choice01"]["text"]
+        if "choice01" in result:
+            result["text"] = result["choice01"]["text"]
 
         parsed_response_text = {}
-        for key in sorted(json_data.keys()):
+        for key in sorted(result.keys()):
             if key.startswith("choice"):
                 sorted_choice = {
-                    "choice_id": json_data[key]["choice_id"],
-                    "text": json_data[key]["text"],
-                    "links": json_data[key]["links"],
+                    "choice_id": result[key]["choice_id"],
+                    "text": result[key]["text"],
+                    "links": result[key]["links"],
                 }
                 parsed_response_text[key] = sorted_choice
             else:
-                parsed_response_text[key] = json_data[key]
+                parsed_response_text[key] = result[key]
 
         return parsed_response_text
 
