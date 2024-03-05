@@ -1,32 +1,54 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import json
 import requests
-from gemini.constants import IMG_UPLOAD_HEADERS
+from .constants import IMG_UPLOAD_HEADERS, REPLIT_SUPPORT_PROGRAM_LANGUAGES
 
 
-def extract_links(data: list) -> list:
+def extract_code(text: str, language: str) -> str:
     """
-    Extract links from the given data.
+    Extracts code snippets for the specified programming language from the given text.
+    If only one snippet is found, returns it directly instead of a list.
+    If no snippets are found, returns the original text.
 
     Args:
-        data: Data to extract links from.
+        text (str): The text containing mixed code snippets.
+        language (str): The programming language of the code snippets to extract.
 
     Returns:
-        list: Extracted links.
+        str or list of str: A single code snippet string if only one is found, otherwise a list of all extracted code snippets for the specified language. Returns the original text if no snippets are found.
+
+    Raises:
+        ValueError: If the specified language is not supported.
     """
-    links = []
-    if isinstance(data, list):
-        for item in data:
-            if isinstance(item, list):
-                # recursive
-                links.extend(extract_links(item))
-            elif (
-                isinstance(item, str)
-                and item.startswith("http")
-                and "favicon" not in item
-            ):
-                links.append(item)
-    return links
+    language = language.lower()
+    if language not in REPLIT_SUPPORT_PROGRAM_LANGUAGES:
+        supported_languages = ", ".join(REPLIT_SUPPORT_PROGRAM_LANGUAGES.keys())
+        raise ValueError(
+            f"Unsupported language. Please choose from the following: {supported_languages}"
+        )
+
+    snippets = []
+    start_pattern = f"```{language}"
+    end_pattern = "```"
+    start_idx = text.find(start_pattern)
+
+    while start_idx != -1:
+        end_idx = text.find(end_pattern, start_idx + len(start_pattern))
+        if end_idx != -1:
+            snippet = text[start_idx + len(start_pattern) : end_idx].strip()
+            snippets.append(snippet)
+            start_idx = text.find(start_pattern, end_idx + len(end_pattern))
+        else:
+            break
+
+    # Return directly if only one snippet is found
+    if len(snippets) == 1:
+        return snippets[0]
+    elif len(snippets) > 1:
+        return snippets
+    else:
+        # Return the original text if no snippets are found
+        return text
 
 
 def upload_image(image: bytes, filename: str = "Photo.jpg"):
@@ -106,7 +128,7 @@ def max_sentence(text: str, n: int):
                 return result
 
 
-def build_input_replit_data_struct(instructions: str, code: str, filename: str) -> list:
+def build_replit_data(instructions: str, code: str, filename: str) -> list:
     """
     Creates and returns the input_image_data_struct based on provided parameters.
 
@@ -121,36 +143,6 @@ def build_input_replit_data_struct(instructions: str, code: str, filename: str) 
             [
                 "qACoKe",
                 json.dumps([instructions, 5, code, [[filename, code]]]),
-                None,
-                "generic",
-            ]
-        ]
-    ]
-
-
-def build_export_data_structure(
-    conv_id: int, resp_id: int, choice_id: int, title: str
-) -> list:
-    return [
-        [
-            [
-                "fuVx7",
-                json.dumps(
-                    [
-                        [
-                            None,
-                            [
-                                [
-                                    [conv_id, resp_id],
-                                    None,
-                                    None,
-                                    [[], [], [], choice_id, []],
-                                ]
-                            ],
-                            [0, title],
-                        ]
-                    ]
-                ),
                 None,
                 "generic",
             ]
