@@ -45,6 +45,7 @@ class ResponseParser(BaesParser):
                 raise ValueError(
                     "Failed to generate contents. Invalid response data received."
                 )
+            return body
 
     def _parse_candidates(self, candidates_data):
         for candidate_data in candidates_data:
