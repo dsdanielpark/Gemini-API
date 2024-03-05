@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class ResponseParser(ABC):
     """
     An abstract base class for response parsers.
