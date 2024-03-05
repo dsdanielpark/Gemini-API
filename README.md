@@ -311,6 +311,7 @@ Core maintainers:
 ## References
 [1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
 [2] Github [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
+[3] GitHub [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API)) <br>
 [3] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [4] Web [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
