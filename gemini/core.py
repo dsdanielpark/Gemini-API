@@ -10,7 +10,8 @@ import urllib.parse
 from typing import Optional, Tuple, Dict
 from requests.exceptions import ConnectionError, RequestException
 
-from .models.parser.methods import ParseMethod1, ParseMethod2
+from .models.parser.custom_parser import ParseMethod1, ParseMethod2
+from .models.parser.response_parser import ResponseParser
 from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWSERS
 
 
@@ -58,6 +59,8 @@ class Gemini:
         self.session = session or self._initialize_session()
         self.base_url: str = HOST
         self.nonce = nonce
+        self._reqid = self.get_reqid()
+        self.parser = ResponseParser(cookies=self.cookies)
 
     def _initialize_session(
         self,
@@ -267,7 +270,7 @@ class Gemini:
             {
                 "bl": BOT_SERVER,
                 "hl": os.environ.get("GEMINI_LANGUAGE", "en"),
-                "_reqid": self.get_reqid(),
+                "_reqid": self._reqid,
                 "rt": "c",
                 "f.sid": sid,
             }
@@ -303,6 +306,7 @@ class Gemini:
                 timeout=self.timeout,
                 proxies=self.proxies,
             )
+            self._reqid += 100000
             response.raise_for_status()
         except (ConnectionError, RequestException) as e:
             print(f"Retry to generate content: {e}")
@@ -317,6 +321,7 @@ class Gemini:
                 timeout=self.timeout,
                 proxies=self.proxies,
             )
+            self._reqid += 100000
             if response.status_code != 200:
                 self.auto_cookies = False
                 print(
@@ -325,14 +330,17 @@ class Gemini:
             response.raise_for_status()
         return response.text, response.status_code
 
-    # def generate_content(self, prompt) -> dict:
-    #     response_text, response_status_code = self.send_request(prompt)
-    #     if response_status_code != 200:
-    #         raise ValueError(f"Response status: {response_status_code}")
+    def generate_content(self, prompt) -> dict:
+        response_text, response_status_code = self.send_request(prompt)
+        if response_status_code != 200:
+            raise ValueError(f"Response status: {response_status_code}")
+        else:
+            parsed_json = ResponseParser(cookies=self.cookies).parse_response_text(
+                response_text
+            )
+        return parsed_json
 
-    #     return response_text
-
-    def generate_content(self, prompt: str, *custom_parsers) -> str:
+    def generate_custom_content(self, prompt: str, *custom_parsers) -> str:
         """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""
         response_text, response_status_code = self.send_request(prompt)
         if response_status_code != 200:
