@@ -1,8 +1,13 @@
 Development Status :: 1 - Planning
 
-*Not fully prepared yet.*
+<div align="right">
+  <a href="https://pypi.org/project/bardapi/">
+    <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api">
+  </a>
+</div>
 
-# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API <a href="https://pypi.org/project/bardapi/"><img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api"></a>
+# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API 
+
 
 A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
 
@@ -90,7 +95,7 @@ prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
 print(response)
 ```
-> [!TIP]
+> [!NOTE]
 > If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. However, do not retry multiple times after one success to set session.
 
 #### Parser
