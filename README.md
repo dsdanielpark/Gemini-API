@@ -135,7 +135,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 
 
 ### Reusable session object
-You can continue the conversation using a reusable session. However, this feature is limited, and it is difficult for a package-level feature to perfectly maintain context. You can try to maintain the consistency of conversations same way as other LLM services, such as passing some sort of summary of past conversations to the DB.
+You can continue using a reusable session, but it may not perfectly maintain context due to limitations. Consider storing summaries of past conversations in the database for better consistency.
 ```python
 from gemini import Gemini, HEADERS
 import requests
@@ -197,7 +197,7 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 ## Contributions
 We would like to express our sincere gratitude to all the contributors.
 
-Contributors to the Bard API and Gemini API.
+Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [Gemini API](https://github.com/dsdanielpark/Gemini-API/).
 
 <a href="https://github.com/dsdanielpark/Bard_API/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=dsdanielpark/Bard_API" />
