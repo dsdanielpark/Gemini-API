@@ -352,16 +352,16 @@ class Gemini:
     @staticmethod
     def collect_candidates(data):
         collected = []
-        stack = [data] 
+        stack = [data]
 
         while stack:
-            current = stack.pop() 
+            current = stack.pop()
 
             if isinstance(current, dict):
-                if "rcid" in current and "text" in current:  
+                if "rcid" in current and "text" in current:
                     collected.append(GeminiCandidate(**current))
                 else:
-                    stack.extend(current.values()) 
+                    stack.extend(current.values())
 
             elif isinstance(current, list):
                 stack.extend(current)
