@@ -10,6 +10,8 @@ from gemini.client import GeminiClient
 from gemini.utils import (
     max_token,
     max_sentence,
+    build_replit_data,
+    extract_code
 )
 
 gemini_api_key = environ.get("GEMINI_COOKIES")
@@ -22,8 +24,10 @@ __all__ = [
     "HEADERS",
     "REPLIT_SUPPORT_PROGRAM_LANGUAGES",
     "Tool",
+    "build_replit_data",
+    "extract_code",
 ]
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __author__ = (
     "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>"
 )
