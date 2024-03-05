@@ -1,4 +1,4 @@
-from gemini.models.parser.base import BaesParser
+from gemini.src.parser.base import BaesParser
 import json
 
 
@@ -47,7 +47,6 @@ class ResponseParser(BaesParser):
                 )
 
     def _parse_candidates(self, candidates_data):
-        candidates = []
         for candidate_data in candidates_data:
             web_images = self._parse_web_images(candidate_data[4])
             generated_images = self._parse_generated_images(candidate_data[12])
@@ -57,8 +56,7 @@ class ResponseParser(BaesParser):
                 "web_images": web_images,
                 "generated_images": generated_images,
             }
-            candidates.append(candidate_dict)
-        return candidates
+        return candidate_dict
 
     def _parse_web_images(self, images_data):
         if not images_data:

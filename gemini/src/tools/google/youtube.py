@@ -1,6 +1,6 @@
-from typing import List, Optional, Union, Dict, Tuple
+from typing import List
 
-from gemini.models.user_content import UserContent
+from gemini.src.tools.user_content import UserContent
 
 
 class BardYoutubeVideo:
@@ -60,7 +60,7 @@ class BardYoutubeContent(UserContent):
         return len(self._input_list[4][0])
 
     @property
-    def videos(self) -> list[BardYoutubeVideo]:
+    def videos(self) -> List[BardYoutubeVideo]:
         return (
             [BardYoutubeVideo(video) for video in self._input_list[4][0]]
             if self._input_list[4]

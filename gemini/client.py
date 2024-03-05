@@ -11,7 +11,7 @@ import asyncio
 import requests
 from typing import Optional, Any, List
 
-from .constants import (
+from gemini.src.misc.constants import (
     HEADERS,
     SUPPORTED_BROWSERS,
     BOT_SERVER,

@@ -10,9 +10,16 @@ import urllib.parse
 from typing import Optional, Tuple, Dict
 from requests.exceptions import ConnectionError, RequestException
 
-from .models.parser.custom_parser import ParseMethod1, ParseMethod2
-from .models.parser.response_parser import ResponseParser
-from .constants import HEADERS, HOST, BOT_SERVER, POST_ENDPOINT, SUPPORTED_BROWSERS
+from .src.parser.custom_parser import ParseMethod1, ParseMethod2
+from .src.parser.response_parser import ResponseParser
+from .src.model.output import GeminiCandidate, GeminiModelOutput
+from .src.misc.constants import (
+    HEADERS,
+    HOST,
+    BOT_SERVER,
+    POST_ENDPOINT,
+    SUPPORTED_BROWSERS,
+)
 
 
 class Gemini:
@@ -339,6 +346,30 @@ class Gemini:
                 response_text
             )
         return parsed_json
+
+    def generate_content(self, prompt: str) -> GeminiModelOutput:
+        """Generates content based on the prompt and returns a GeminiModelOutput object."""
+        response_text, response_status_code = self.send_request(prompt)
+        if response_status_code != 200:
+            raise ValueError(f"Response status: {response_status_code}")
+        else:
+            parser = ResponseParser(cookies=self.cookies)
+            parsed_data = parser.parse(response_text)
+
+        return parsed_data
+        # return self._create_model_output(parsed_data, parsed_json=parsed_data)
+
+    def _create_model_output(
+        self, parsed_data: dict, parsed_json: dict
+    ) -> GeminiModelOutput:
+        candidates = [
+            GeminiCandidate(**details) for details in parsed_data["candidates"].values()
+        ]
+        return GeminiModelOutput(
+            metadata=parsed_data.get("metadata", []),
+            candidates=candidates,
+            response_dict=parsed_json,
+        )
 
     def generate_custom_content(self, prompt: str, *custom_parsers) -> str:
         """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""

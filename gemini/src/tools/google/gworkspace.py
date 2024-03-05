@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class GoogleWorkspaceContentKind(Enum):
@@ -61,7 +62,7 @@ class GoogleWorkspaceContent:
         return self._input_list[5]
 
     @property
-    def timestamp_seconds(self) -> [int]:
+    def timestamp_seconds(self) -> List[int]:
         return self._input_list[6]
 
     def __str__(self) -> str:

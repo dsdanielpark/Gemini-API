@@ -1,4 +1,3 @@
-# Legacy code from Bard, not used in Gemini.
 from typing import Optional
 
 
@@ -14,7 +13,7 @@ class GeminiImage:
         return f"{self.urls[0]} ({self.width}x{self.height})"
 
 
-class BardImageContent:
+class GeminiImageContent:
     def __init__(self, input_list: list):
         self._input_list = input_list
 

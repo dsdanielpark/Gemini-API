@@ -1,8 +1,7 @@
-# Legacy code from Bard, not used in Gemini.
-from typing import List, Optional, Union, Dict, Tuple
+from typing import List, Optional
 
-from gemini.models.draft import GeminiDraft
-from gemini.models.tools.tool import GeminiTool
+from gemini.src.tools.draft import GeminiDraft
+from gemini.src.tools.google.tool import GeminiTool
 
 
 class GeminiUserLocation:
@@ -36,7 +35,7 @@ class GeminiResult:
         self.response_id = self._input_list[1][1]
 
     @property
-    def search_queries(self) -> list[str, int]:
+    def search_queries(self) -> List[str, int]:
         return self._input_list[2]
 
     @property
@@ -44,7 +43,7 @@ class GeminiResult:
         return self._input_list[3]
 
     @property
-    def drafts(self) -> list[GeminiDraft]:
+    def drafts(self) -> List[GeminiDraft]:
         return (
             [GeminiDraft(c) for c in self._input_list[4]] if self._input_list[4] else []
         )
@@ -68,7 +67,7 @@ class GeminiResult:
         return self._input_list[10][0]
 
     @property
-    def tools_applied(self) -> list[GeminiTool]:
+    def tools_applied(self) -> List[GeminiTool]:
         if len(self._input_list) < 12:
             return []
         return (

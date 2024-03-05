@@ -1,4 +1,3 @@
-# Legacy code from Bard, not used in Gemini.
 class DraftCitation:
     """Github source
     [[909, 1095, ['', 'edelahoz/Introduction-to-Python                 ', '', '', '', None, None, '', False, '', '', '', '', '', '',   ''], 1, 100, None, [1]],

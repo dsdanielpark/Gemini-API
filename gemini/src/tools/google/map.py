@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Union, Dict, Tuple
 
-from gemini.models.user_content import UserContent
+from gemini.src.tools.user_content import UserContent
 
 
 class BardMapsPoint:
@@ -122,21 +122,21 @@ class BardMapsRoadSection:
         return self._input_list[0]
 
     @property
-    def duration(self) -> [int, str]:
+    def duration(self) -> List[int, str]:
         # [16873, '4 hours 41 mins']
         return self._input_list[1]
 
     @property
-    def distance(self) -> [int, str]:
+    def distance(self) -> List[int, str]:
         # [313054, '313 km']
         return self._input_list[2]
 
     @property
-    def start_point(self) -> [float, float]:
+    def start_point(self) -> List[float, float]:
         return self._input_list[5]
 
     @property
-    def end_point(self) -> [float, float]:
+    def end_point(self) -> List[float, float]:
         return self._input_list[6]
 
     @property
@@ -172,7 +172,7 @@ class BardMapsDirections:
         return [BardMapsRoadSection(s) for s in self._map[1]]
 
     @property
-    def geo_position(self) -> [[float, float], [float, float]]:
+    def geo_position(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
         return self._map[6]
 
     def __str__(self):

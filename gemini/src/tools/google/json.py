@@ -1,6 +1,6 @@
 import json
 
-from gemini.models.user_content import UserContent
+from gemini.src.tools.user_content import UserContent
 
 
 class JsonContent(UserContent):

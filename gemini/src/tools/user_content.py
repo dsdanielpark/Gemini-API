@@ -1,5 +1,4 @@
-# Legacy code from Bard, not used in Gemini.
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 
 
 class UserContent(ABC):
@@ -8,7 +7,7 @@ class UserContent(ABC):
     def key(self) -> str:
         pass
 
-    # markdown representation as a long string
+    # Markdown representation as a long string
     @property
     @abstractmethod
     def markdown_text(self) -> str:
