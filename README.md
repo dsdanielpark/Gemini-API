@@ -10,10 +10,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [[Paper]](https://arxiv.org/abs/2312.11805), [[Official Website]](https://deepmind.google/technologies/gemini/#introduction), [[Official API]](https://aistudio.google.com/), [[API Documents]](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
-- [ Google - Gemini API](#-google---gemini-api)
-  - [What is Gemini?](#what-is-gemini)
+[[Paper](https://arxiv.org/abs/2312.11805)] [[Official Website](https://deepmind.google/technologies/gemini/#introduction)] [[Official API](https://aistudio.google.com/)] [[API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)]
+
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**.
+
   - [Installation](#installation)
   - [Authentication](#authentication)
   - [Usage](#usage)
@@ -46,11 +47,18 @@ pip install git+https://github.com/dsdanielpark/Gemini-API.git
 > [!NOTE]
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
 1. Visit https://gemini.google.com/ and wait for it to fully load.
-2. *(Recommended)* Export cookies on the gemini site using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), then open and copy the txt file contents. For manual collection, see [this image](assets/cookies.pdf).
-3. *(Additional requirement)* Some users need to set nonce value manually. To collect the nonce value: Press F12 → Network → Send any prompt to webui gemini → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. Reference [this image](assets/nonce_value.pdf).
+2. *(Recommended)* Export gemini site cookies using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open and copy the txt file contents.
+
+<details><summary>Further: For manual collection or Required for a few users upon error</summary>
+
+3. For manual cookie collection, refer to [this image](assets/cookies.pdf). Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Headers → Request Headers → Cookie → Copy and Reformat as JSON manually.
+4. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
+</details>
 
 ## Usage
-After changed Bard to Gemini, multiple cookies, *often updated*, are needed based on region or Google account. Thus, automatic cookie renewal logic is crucial.
+After switching from Bard to Gemini, multiple region or Google account-based cookies, *frequently updated*, are necessary. 
+
+
 ### Initialization
 You must appropriately set the `cookies_dict` parameter to `Gemini` class. When using the `auto_cookies` argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
 
@@ -64,13 +72,17 @@ cookies = {
 GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
-# GeminiClient = Gemini(cookies=cookies, nonce="value") # If you encounter nonce error, pass nonce value. See `Authentication` section above.
+
+# If you keep getting nonce errors, pass the nonce value. See the `Authentication.further` section above.
+# GeminiClient = Gemini(cookies=cookies, nonce="value") 
 ```
-Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality.
+Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality. (Currently in progress)
 
 > [!IMPORTANT]
 > *Before proceeding, ensure that the GeminiClient object is defined without any errors.*
-<br>
+
+
+
 
 ### Text generation
 ```python
@@ -78,6 +90,38 @@ prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
 print(response)
 ```
+> [!TIP]
+> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. However, do not retry multiple times after one success to set session.
+
+#### Parser
+
+Gemini web returns responses from various 3rd party services, requiring different types of parsers. If all parsing methods fail, it returns the response's text as is.
+Please refer to [gemini.models.parser.base](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/models/parser/base.py). The default parser attempted is [gemini.models.parser.methods](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/models/parser/methods.py), and you can also use custom parsers as arguments in `generate_content` like this.
+
+<details><summary>How to use CustomParser</summary>
+  
+```python
+class CustomParser(ResponseParser):
+    def parse(self, response_text):
+        """
+        Implements custom parsing logic.
+
+        Example logic: Simply returns the response_text as is.
+
+        Args:
+            response_text (str): The text to be parsed.
+
+        Returns:
+            str: The parsed (or in this case, unchanged) response text.
+        """
+        return parsed_response_text
+
+prompt = "Hello, Gemini. What's the weather like in Seoul today?"
+response = GeminiClient.generate_content(prompt, CustomParser)
+```
+</details>
+
+
 
 ### Image generation
 
@@ -92,6 +136,8 @@ for i, image in enumerate(response.images): # Save images
 
 ```
 
+
+
 ### Generate content with image
 
 As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
@@ -102,6 +148,8 @@ image = open("folder_path/image.jpg", "rb").read() # (jpeg, png, webp) are suppo
 
 response = GeminiClient.generate_content(prompt, image)
 ```
+
+
 
 ### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
 Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
@@ -168,13 +216,11 @@ response = GeminiClient.generate_content("What was my last prompt?")
 
 ## [More features](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md)
 - [Chat Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#chatbard)
-- [Get image links](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#get-image-links)
 - [Multi-language Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#multi-language-bard-api)
 - [Export Conversation](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#export-conversation)
 - [Export Code to Repl.it](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#export-code-to-replit)
 - [Executing Python code received as a response from Gemini](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#chatbard)
 - [Max_token, Max_sentences](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#max_token-max_sentence)
-- [Translation to another programming language](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_DEV.md#translation-to-another-programming-language)
 
 <br>
 
@@ -194,9 +240,6 @@ input_ids = tokenizer(input_text, return_tensors="pt")
 outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
-
-
-
 
 
 ## Sponsor
@@ -262,8 +305,9 @@ Core maintainers:
 ## References
 [1] Github [acheong08/Bard](https://github.com/acheong08/Bard) <br>
 [2] Github [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
-[3] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[4] [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[3] GitHub[HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[4] Github [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
+[5] Web [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 > *Warning**
 Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
