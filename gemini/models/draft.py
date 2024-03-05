@@ -15,7 +15,7 @@ from gemini.models.user_content import UserContent
 from gemini.models.tools.youtube import BardYoutubeContent
 
 
-class BardDraft:
+class GeminiDraft:
     def __init__(self, input_list: list):
         self._input_list = input_list
         self.id = self._input_list[0]
@@ -34,7 +34,7 @@ class BardDraft:
         return text
 
     @property
-    def citations(self) -> list[DraftCitation]:
+    def citations(self) -> List[DraftCitation]:
         text = self.text
         return (
             [DraftCitation(c, text) for c in self._input_list[2][0]]
@@ -43,7 +43,7 @@ class BardDraft:
         )
 
     @property
-    def images(self) -> list[BardImageContent]:
+    def images(self) -> List[BardImageContent]:
         # also in self._attachments[1]
         return (
             [BardImageContent(img) for img in self._input_list[4]]
@@ -61,7 +61,7 @@ class BardDraft:
         return self._input_list[12]
 
     @property
-    def map_content(self) -> list[BardMapContent]:
+    def map_content(self) -> List[BardMapContent]:
         if not self._attachments:
             return []
         return (
@@ -71,7 +71,7 @@ class BardDraft:
         )
 
     @property
-    def json_content(self) -> list[JsonContent]:
+    def json_content(self) -> List[JsonContent]:
         if not self._attachments:
             return []
         return (
@@ -81,7 +81,7 @@ class BardDraft:
         )
 
     @property
-    def gworkspace(self) -> list[GoogleWorkspaceContent]:
+    def gworkspace(self) -> List[GoogleWorkspaceContent]:
         if not self._attachments or len(self._attachments) < 13:
             return []
         return (
@@ -91,7 +91,7 @@ class BardDraft:
         )
 
     @property
-    def youtube(self) -> list[BardYoutubeContent]:
+    def youtube(self) -> List[BardYoutubeContent]:
         if not self._attachments:
             return []
         return (
@@ -101,7 +101,7 @@ class BardDraft:
         )
 
     @property
-    def python_code(self) -> list[CodeContent]:
+    def python_code(self) -> List[CodeContent]:
         # Google has a dedicated Python model that can also run code.
         # The text model uses the output of the Python model to generate answers,
         # including answers in other languages.
@@ -116,7 +116,7 @@ class BardDraft:
         )
 
     @property
-    def links(self) -> list[BardLink]:
+    def links(self) -> List[BardLink]:
         if not self._attachments:
             return []
         return (
@@ -124,7 +124,7 @@ class BardDraft:
         )
 
     @property
-    def flights(self) -> list[BardFlightContent]:
+    def flights(self) -> List[BardFlightContent]:
         if not self._attachments or len(self._attachments) < 17:
             return []
         return (
@@ -134,7 +134,7 @@ class BardDraft:
         )
 
     @property
-    def hotels(self) -> list[BardHotelContent]:
+    def hotels(self) -> List[BardHotelContent]:
         if not self._attachments or len(self._attachments) < 19:
             return []
         return (
@@ -144,7 +144,7 @@ class BardDraft:
         )
 
     @property
-    def tool_disclaimers(self) -> list[BardToolDeclaimer]:
+    def tool_disclaimers(self) -> List[BardToolDeclaimer]:
         if not self._attachments or len(self._attachments) < 23:
             return []
 
