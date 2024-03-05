@@ -1,4 +1,4 @@
-Development Status :: 1 - Planning
+Development Status :: 2 - Pre-Alpha
 
 <div align="right">
   <a href="https://pypi.org/project/python-gemini-api/">
