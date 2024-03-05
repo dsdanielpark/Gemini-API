@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class ResponseParser(ABC):
     @abstractmethod
     def parse(self, response_text):

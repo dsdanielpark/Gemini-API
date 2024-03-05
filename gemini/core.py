@@ -331,5 +331,5 @@ class Gemini:
             try:
                 return parse(response_text)
             except Exception as e:
-                continue  
+                continue
         return f"All parsing methods failed. Returning original response text. Consider implementing a new parser.\n\n{response_text}"
