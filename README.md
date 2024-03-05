@@ -1,8 +1,8 @@
 Development Status :: 1 - Planning
 
 <div align="right">
-  <a href="https://pypi.org/project/bardapi/">
-    <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api">
+  <a href="https://pypi.org/project/python-gemini-api/">
+    <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api?color=pink">
   </a>
 </div>
 
