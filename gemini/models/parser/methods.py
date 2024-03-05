@@ -42,7 +42,7 @@ class ParseMethod1(ResponseParser):
                     "choice_id": item,
                     "text": "",
                     "links": [],
-                } 
+                }
             elif "http" in item and current_key:
                 result[current_key]["links"].append(item)
             elif current_key:

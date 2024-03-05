@@ -7,12 +7,7 @@ from gemini.constants import (
     Tool,
 )
 from gemini.client import GeminiClient
-from gemini.utils import (
-    max_token,
-    max_sentence,
-    build_replit_data,
-    extract_code
-)
+from gemini.utils import max_token, max_sentence, build_replit_data, extract_code
 
 gemini_api_key = environ.get("GEMINI_COOKIES")
 
