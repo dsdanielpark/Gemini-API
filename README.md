@@ -1,12 +1,9 @@
-Development Status :: 2 - Pre-Alpha
 
 <div align="right">
-  <a href="https://pypi.org/project/python-gemini-api/">
-    <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api?color=black">
-  </a>
-</div>
+  </div>
 
-# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Google - Gemini API 
+# <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" alt="Gemini Icon" /> Gemini API  <a href="https://pypi.org/project/python-gemini-api/"> <img alt="PyPI" src="https://img.shields.io/pypi/v/python-gemini-api?color=black"></a>
+
 
 
 A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
@@ -28,11 +25,9 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
     - [Text generation](#text-generation)
     - [Image generation](#image-generation)
     - [Generate content with image](#generate-content-with-image)
-    - [Text To Speech(TTS) from Gemini](#text-to-speechtts-from-gemini)
   - [Further](#further)
     - [Behind a proxy](#behind-a-proxy)
     - [Use rotating proxies](#use-rotating-proxies)
-    - [Reusable session object](#reusable-session-object)
   - [More features](#more-features)
 
 
@@ -90,9 +85,6 @@ GeminiClient = Gemini(cookies=cookies)
 >  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster.
 
 
-
-<br>
-
 ### Generate Content
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
@@ -101,9 +93,6 @@ print(response)
 ```
 > [!NOTE]
 > If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. *Once connected and generating valid content, avoid closing the browser or revisiting Gemini web for cookie stability.*
-
-<br>
-
 
 <br>
 
@@ -134,26 +123,7 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ```
 
 
-### Reusable session object
-You can continue using a reusable session, but it may not perfectly maintain context due to limitations. Consider storing summaries of past conversations in the database for better consistency.
-```python
-from gemini import Gemini, HEADERS
-import requests
 
-cookies = {
-    "key": "value"
-}
-
-session = requests.Session()
-session.headers = HEADERS
-session.cookies.update(cookies)
-
-GeminiClient = Gemini(session=session, timeout=30)
-response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
-
-# Continued conversation without set new session
-response = GeminiClient.generate_content("What was my last prompt?")
-```
 
 
 <br>
