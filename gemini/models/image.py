@@ -2,7 +2,7 @@
 from typing import Optional
 
 
-class BardImage:
+class GeminiImage:
     def __init__(self, input_list: list):
         self._input_list = input_list
         self.urls = input_list[0]
@@ -19,8 +19,8 @@ class BardImageContent:
         self._input_list = input_list
 
     @property
-    def original(self) -> BardImage:
-        return BardImage(self._input_list[0])
+    def original(self) -> GeminiImage:
+        return GeminiImage(self._input_list[0])
 
     @property
     def source(self) -> dict:
@@ -33,8 +33,8 @@ class BardImageContent:
         return self._input_list[2]
 
     @property
-    def thumbnail(self) -> BardImage:
-        return BardImage(self._input_list[3])
+    def thumbnail(self) -> GeminiImage:
+        return GeminiImage(self._input_list[3])
 
     @property
     def markdown(self) -> list:
