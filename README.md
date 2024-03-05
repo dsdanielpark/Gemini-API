@@ -10,7 +10,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [Paper](https://arxiv.org/abs/2312.11805), [Official Website](https://deepmind.google/technologies/gemini/#introduction), [Official API](https://aistudio.google.com/), [API Documents](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
+Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**. [[Paper]](https://arxiv.org/abs/2312.11805), [[Official Website]](https://deepmind.google/technologies/gemini/#introduction), [[Official API]](https://aistudio.google.com/), [[API Documents]](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini).
 
 - [ Google - Gemini API](#-google---gemini-api)
   - [What is Gemini?](#what-is-gemini)
