@@ -23,7 +23,7 @@ class ResponseParser(BaesParser):
             )
 
         return {
-            "metadata": body[1],  # Assuming you still want to include some metadata
+            "metadata": body[1],
             "candidates": candidates,
         }
 
