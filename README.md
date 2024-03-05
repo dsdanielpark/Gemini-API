@@ -1,4 +1,4 @@
-Development Status :: 1 - Planning
+Development Status :: 2 - Pre-Alpha
 
 <div align="right">
   <a href="https://pypi.org/project/python-gemini-api/">
@@ -13,6 +13,7 @@ A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/pyth
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
+<br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 
@@ -54,21 +55,24 @@ pip install -q -U python-gemini-api
 ## Authentication
 > [!NOTE]
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
-1. Visit https://gemini.google.com/ and wait for it to fully load.
-2. *(Recommended)* Export gemini site cookies using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open and copy the txt file contents.
+1. Visit https://gemini.google.com/
+2. F12 for console → Session: Application → Cookies → Copy the value of `__Secure-1PSID` and `__Secure-1PSIDTS` cookie. If it doesn't work, go to step 3.
+
+3. *(Recommended)* Export gemini site cookies using a Chrome extension. Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open and copy the txt file contents.
 
 <details><summary>Further: For manual collection or Required for a few users upon error</summary>
 
-3. For manual cookie collection, refer to [this image](assets/cookies.pdf). Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Headers → Request Headers → Cookie → Copy and Reformat as JSON manually.
-4. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
+4. For manual cookie collection, refer to [this image](assets/cookies.pdf). Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Headers → Request Headers → Cookie → Copy and Reformat as JSON manually.
+5. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
 </details>
 
+<br>
+
 ## Usage
-After switching from Bard to Gemini, multiple region or Google account-based cookies, *frequently updated*, are necessary. 
 
 
 ### Initialization
-You must appropriately set the `cookies_dict` parameter to `Gemini` class. When using the `auto_cookies` argument to automatically collect cookies, keep the [Gemini web page](https://gemini.google.com/) opened that receives Gemini's response open in your web browser.<br>
+
 
 ```python
 from gemini import Gemini
@@ -80,19 +84,16 @@ cookies = {
 GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
-
-# If you keep getting nonce errors, pass the nonce value. See the `Authentication.further` section above.
-# GeminiClient = Gemini(cookies=cookies, nonce="value") 
 ```
-Can update cookies automatically using [broser_cookie3](https://github.com/borisbabic/browser_cookie3). For the first attempt, manually download the cookies to test the functionality. (Currently in progress)
 
 > [!IMPORTANT]
-> *Before proceeding, ensure that the GeminiClient object is defined without any errors.* If the session connects successfully and 'generate_content' runs well, close Gemini web. If Gemini web stays open in the browser, cookies may expire faster.
+>  **If the session connects successfully and 'generate_content' runs well, PLEASE CLOSE Gemini web.** If Gemini web stays open in the browser, cookies may expire faster.
 
 
 
+<br>
 
-### Text generation
+### Generate Content
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
@@ -101,73 +102,8 @@ print(response)
 > [!NOTE]
 > If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. However, do not retry multiple times after one success to set session.
 
-#### Parser
+<br>
 
-Gemini web returns responses from various 3rd party services, requiring different types of parsers. If all parsing methods fail, it returns the response's text as is.
-Please refer to [gemini.models.parser.base](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/models/parser/base.py). The default parser attempted is [gemini.models.parser.methods](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/models/parser/methods.py), and you can also use custom parsers as arguments in `generate_content` like this.
-
-<details><summary>How to use CustomParser</summary>
-  
-```python
-class CustomParser(ResponseParser):
-    def parse(self, response_text):
-        """
-        Implements custom parsing logic.
-
-        Example logic: Simply returns the response_text as is.
-
-        Args:
-            response_text (str): The text to be parsed.
-
-        Returns:
-            str: The parsed (or in this case, unchanged) response text.
-        """
-        return parsed_response_text
-
-prompt = "Hello, Gemini. What's the weather like in Seoul today?"
-response = GeminiClient.generate_content(prompt, CustomParser)
-```
-</details>
-
-
-
-### Image generation
-
-```
-prompt = "Hello, Gemini. Give me a beautiful photo of Seoul's scenery."
-response = GeminiClient.generate_content(prompt)
-
-print("\n".join(response.images)) # Print images
-
-for i, image in enumerate(response.images): # Save images
-    image.save(path="folder_path/", filename=f"seoul_{i}.png")
-
-```
-
-
-
-### Generate content with image
-
-As an experimental feature, it is possible to ask questions with an image. However, this functionality is only available for accounts with image upload capability in Gemini's web UI. 
-
-```
-prompt = "What is in the image?"
-image = open("folder_path/image.jpg", "rb").read() # (jpeg, png, webp) are supported.
-
-response = GeminiClient.generate_content(prompt, image)
-```
-
-
-
-### [Text To Speech(TTS)](https://cloud.google.com/text-to-speech?hl=ko) from Gemini
-Business users and high traffic volume may be subject to account restrictions according to Google's policies. Please use the [Official Google Cloud API](https://cloud.google.com/text-to-speech) for any other purpose. 
-```
-text = "Hello, I'm developer in seoul" # Gemini will speak this sentence
-response = GeminiClient.generate_content(prompt)
-audio = GeminiClient.speech(text)
-with open("speech.ogg", "wb") as f:
-    f.write(bytes(audio["audio"]))
-```
 
 <br>
 
