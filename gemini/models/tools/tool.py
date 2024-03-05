@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-class BardTool:
+class GeminiTool:
     def __init__(self, input_list: list):
         self._input_list = input_list
 
