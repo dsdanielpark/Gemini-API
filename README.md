@@ -72,8 +72,11 @@ pip install -q -U python-gemini-api
 from gemini import Gemini
 
 cookies = {
-    "key": "value"
-}
+    "__Secure-1PSID" : "value",
+    "__Secure-1PSIDTS" : "value",
+    "NID" : "value",
+    # Cookies may vary by account or region. Consider sending the entire cookie file.
+  }
 
 GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
