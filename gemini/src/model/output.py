@@ -1,8 +1,8 @@
+import asyncio
 import httpx
-from pathlib import Path
-from loguru import logger
-from typing import List, Optional, Dict
+from typing import List, Dict, Optional
 from pydantic import BaseModel, HttpUrl
+from pathlib import Path
 
 
 class GeminiImage(BaseModel):
@@ -13,59 +13,44 @@ class GeminiImage(BaseModel):
     def __str__(self):
         return f"{self.title}({self.url}) - {self.alt}"
 
-    async def save(
-        self,
-        path: str = "temp",
-        filename: Optional[str] = None,
-        cookies: Optional[dict] = None,
-    ) -> Optional[Path]:
-        filename = filename or Path(self.url).name
-        save_path = Path(path) / filename
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-
+    @staticmethod
+    async def fetch_bytes(
+        url: HttpUrl, cookies: Optional[dict] = None
+    ) -> Optional[bytes]:
         async with httpx.AsyncClient(follow_redirects=True, cookies=cookies) as client:
             try:
-                response = await client.get(self.url)
+                response = await client.get(url)
                 response.raise_for_status()
-                save_path.write_bytes(response.content)
-                return save_path
+                return response.content
+            except httpx.RequestError as e:
+                print(f"Request error: {e}")
+                return None
             except httpx.HTTPStatusError as e:
-                logger.error(
-                    f"Error downloading image: {e.response.status_code} {e.response.reason_phrase}"
+                print(
+                    f"HTTP error: {e.response.status_code} {e.response.reason_phrase}"
                 )
                 return None
 
+    async def save(
+        self,
+        path: str = "images",
+        filename: Optional[str] = None,
+        cookies: Optional[dict] = None,
+    ) -> Optional[Path]:
+        bytes_data = await self.fetch_bytes(self.url, cookies)
+        if bytes_data:
+            filename = filename or Path(self.url).name
+            save_path = Path(path) / filename
+            save_path.parent.mkdir(parents=True, exist_ok=True)
+            save_path.write_bytes(bytes_data)
+            return save_path
+        else:
+            return None
 
-class GeminiCandidate(BaseModel):
-    rcid: str
-    text: str
-    web_images: List[GeminiImage] = []
-    generated_images: List[GeminiImage] = []
-    response_dict: Dict = {}
-
-
-class GeminiModelOutput(BaseModel):
-    metadata: List[str]
-    candidates: List[GeminiCandidate]
-    chosen: int = 0
-    response_dict: Optional[dict] = None
-
-    @property
-    def rcid(self) -> str:
-        return self.candidates[self.chosen].rcid
-
-    @property
-    def text(self) -> str:
-        return self.candidates[self.chosen].text
-
-    @property
-    def web_images(self) -> List[GeminiImage]:
-        return self.candidates[self.chosen].web_images
-
-    @property
-    def generated_images(self) -> List[GeminiImage]:
-        return self.candidates[self.chosen].generated_images
-
-    @property
-    def response_dict(self) -> Optional[Dict]:
-        return self.response_dict
+    @staticmethod
+    async def fetch_images_as_bytes(
+        images: List["GeminiImage"],
+    ) -> Dict[str, Optional[bytes]]:
+        tasks = [GeminiImage.fetch_bytes(image.url) for image in images]
+        results = await asyncio.gather(*tasks)
+        return {images[i].title: results[i] for i in range(len(images)) if results[i]}
