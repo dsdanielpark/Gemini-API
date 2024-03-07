@@ -23,8 +23,11 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
   - [Installation](#installation)
   - [Authentication](#authentication)
   - [Usage](#usage)
-    - [Initialization](#initialization)
-    - [Generate Content](#generate-content)
+    - [# 01. Initialization](#-01-initialization)
+    - [# 02. Generate Content](#-02-generate-content)
+    - [# 03. Text generation](#-03-text-generation)
+    - [# 04. Image generation](#-04-image-generation)
+    - [# 05. Retrieving Images from Gemini Responses](#-05-retrieving-images-from-gemini-responses)
   - [Further](#further)
     - [Use rotating proxies](#use-rotating-proxies)
   - [More features](#more-features)
@@ -37,6 +40,8 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
   - [Contacts](#contacts)
   - [License](#license)
   - [References](#references)
+
+
 
 
 
