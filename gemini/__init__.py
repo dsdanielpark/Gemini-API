@@ -10,7 +10,7 @@ from .src.tools.google import *
 
 gemini_api_key = environ.get("GEMINI_COOKIES")
 
-__version__ = "1.0.4"
+__version__ = "1.0.4a"
 __author__ = (
     "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>"
 )
