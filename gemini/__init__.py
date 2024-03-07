@@ -2,6 +2,7 @@
 from os import environ
 from .client import GeminiClient
 from .core import Gemini
+from .src.model.output import GeminiImage, GeminiCandidate, GeminiModelOutput
 from .src.misc import *
 from .src.parser import *
 from .src.tools import *
