@@ -367,14 +367,13 @@ class Gemini:
     def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
         candidates = self.collect_candidates(parsed_response)
         metadata = parsed_response.get("metadata", [])
-        
+
         return GeminiModelOutput(
             metadata=metadata,
-            candidates=candidates, 
+            candidates=candidates,
             response_dict=parsed_response,
         )
 
-    
     @staticmethod
     def collect_candidates(data):
         collected = []
