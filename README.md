@@ -152,7 +152,6 @@ prompt = "Generate Seoul, South Korea illustrations."
 response = GeminiClient.generate_content(prompt)
 
 generated_images = response.generated_image # Check generated images [Dict]
-GeminiImage.fetch_images_dict_sync(generated_images) # Download images
 bytes_images_dict = GeminiImage.fetch_bytes_sync(generated_images) # Get bytes images dict
 GeminiImage.save_images_sync(bytes_images_dict, path="save_path") # Save to path
 ```
@@ -189,7 +188,6 @@ prompt = "Generate Seoul, South Korea illustrations."
 response = GeminiClient.generate_content(prompt)
 
 response_images = response.web_images # Check response images [Dict]
-GeminiImage.fetch_images_dict_sync(response_images) 
 bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images) # Get bytes images dict
 GeminiImage.save_images_sync(bytes_images_dict, path="save_path") # Save to path
 ```
