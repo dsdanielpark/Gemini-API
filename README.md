@@ -18,16 +18,25 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**.
 
+- [ Gemini API   ](#-gemini-api---)
+  - [What is Gemini?](#what-is-gemini)
   - [Installation](#installation)
   - [Authentication](#authentication)
   - [Usage](#usage)
     - [Initialization](#initialization)
-    - [Text generation](#text-generation)
-    - [Image generation](#image-generation)
-    - [Generate content with image](#generate-content-with-image)
+    - [Generate Content](#generate-content)
   - [Further](#further)
     - [Use rotating proxies](#use-rotating-proxies)
   - [More features](#more-features)
+  - [Open-source LLM, Gemma](#open-source-llm-gemma)
+    - [How to use Gemma](#how-to-use-gemma)
+  - [FAQ](#faq)
+  - [Sponsor](#sponsor)
+  - [Issues](#issues)
+  - [Contributors](#contributors)
+  - [Contacts](#contacts)
+  - [License](#license)
+  - [References](#references)
 
 
 
@@ -72,8 +81,11 @@ pip install -q -U python-gemini-api
 from gemini import Gemini
 
 cookies = {
+    "__Secure-1PSIDCC" : "value",
+
     "__Secure-1PSID" : "value",
     "__Secure-1PSIDTS" : "value",
+
     "NID" : "value",
     # Cookies may vary by account or region. Consider sending the entire cookie file.
   }
