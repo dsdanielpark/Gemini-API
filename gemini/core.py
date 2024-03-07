@@ -207,10 +207,26 @@ class Gemini:
         """
         Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
-        url = f"{HOST}/app"
-        response = requests.get(url, cookies=self.cookies)
-        self._sid = re.search(r'"FdrFJe":"([\d-]+)"', response.text).group(1)
-        self._nonce = re.search(r'"SNlM0e":"(.*?)"', response.text).group(1)
+        try:
+            response = requests.get(f"{HOST}/app", cookies=self.cookies)
+            response.raise_for_status()
+
+            sid_match, nonce_match = self.extract_sid_nonce(response.text)
+
+            if sid_match and nonce_match:
+                self._sid = sid_match.group(1)
+                self._nonce = nonce_match.group(1)
+            else:
+                raise ValueError(
+                    "Failed to parse SID or SNlM0e nonce from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                )
+
+        except requests.RequestException as e:
+            raise ConnectionError(f"Request failed: {e}")
+        except ValueError as e:
+            raise e  # Re-raise the exception after it's caught
+        except Exception as e:
+            raise RuntimeError(f"An unexpected error occurred: {e}")
 
     # def _set_sid_and_nonce(self) -> Tuple[str, str]:
     #     """
@@ -344,11 +360,21 @@ class Gemini:
             raise ValueError(f"Response status: {response_status_code}")
         else:
             parser = ResponseParser(cookies=self.cookies)
-            parsed_data = parser.parse(response_text)
+            parsed_response = parser.parse(response_text)
 
-        return parsed_data
-        # return self._create_model_output(parsed_data, parsed_json=parsed_data)
+        return self._create_model_output(parsed_response)
 
+    def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
+        candidates = self.collect_candidates(parsed_response)
+        metadata = parsed_response.get("metadata", [])
+        
+        return GeminiModelOutput(
+            metadata=metadata,
+            candidates=candidates, 
+            response_dict=parsed_response,
+        )
+
+    
     @staticmethod
     def collect_candidates(data):
         collected = []
@@ -367,14 +393,6 @@ class Gemini:
                 stack.extend(current)
 
         return collected
-
-    def _create_model_output(self, parsed_data: dict) -> GeminiModelOutput:
-        processed_parsed_data = self.collect_candidates(parsed_data)
-        return GeminiModelOutput(
-            metadata=processed_parsed_data.get("metadata", []),
-            candidates=processed_parsed_data,
-            response_dict=parsed_data,
-        )
 
     def generate_custom_content(self, prompt: str, *custom_parsers) -> str:
         """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""
