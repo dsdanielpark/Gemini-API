@@ -41,7 +41,7 @@ class GeminiCandidate(BaseModel):
     text: str
     web_images: List[GeminiImage] = []
     generated_images: List[GeminiImage] = []
-    raw: Dict
+    response_dict: Dict = {}
 
 
 class GeminiModelOutput(BaseModel):
@@ -67,5 +67,5 @@ class GeminiModelOutput(BaseModel):
         return self.candidates[self.chosen].generated_images
 
     @property
-    def raw(self) -> Optional[Dict]:
+    def response_dict(self) -> Optional[Dict]:
         return self.response_dict
