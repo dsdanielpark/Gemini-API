@@ -162,19 +162,39 @@ GeminiImage.save_sync(generated_images)
 import asyncio
 from gemini import Gemini, GeminiImage
 
-async def generate_and_save_images_async():
-    prompt = "Create illustrations of Seoul, South Korea."
+async def fetch_and_save_images_async(prompt: str):
     response = await GeminiClient.generate_content_async(prompt)
 
-    generated_images = response.generated_images  # Check generated images [Dict]
+    generated_images = response.generated_images  # Check response images [Dict]
+    for image in generated_images:
+        gemini_image = GeminiImage(url=image.url)
+        await gemini_image.save(path="save_path")  # Save to path asynchronously
+
+# Run the async function
+if __name__ == "__main__":
+    user_prompt = input("Enter your prompt: ")
+    asyncio.run(fetch_and_save_images_async(user_prompt))
+```
+<details><summary>GeminiImage.save logics</summary>
+  
+```python
+import asyncio
+from gemini import Gemini, GeminiImage
+
+async def fetch_and_save_images_async(prompt: str):
+    response = await GeminiClient.generate_content_async(prompt)
+
+    generated_images = response.generated_images  # Check response images [Dict]
     bytes_images_dict = await GeminiImage.fetch_images_dict(generated_images)  # Get bytes images dict asynchronously
     await GeminiImage.save_images(bytes_images_dict, path="save_path")  # Save to path asynchronously
 
 # Run the async function
 if __name__ == "__main__":
-    asyncio.run(generate_and_save_images_async())
-
+    user_prompt = input("Enter your prompt: ")
+    asyncio.run(fetch_and_save_images_async(user_prompt))
 ```
+
+</details>
 
 
 <br>
@@ -200,8 +220,26 @@ GeminiImage.save_sync(response_images)
 import asyncio
 from gemini import Gemini, GeminiImage
 
-async def fetch_and_save_images_async():
-    prompt = "Please recommend a travel itinerary for Seoul."
+async def fetch_and_save_images_async(prompt: str):
+    response = await GeminiClient.generate_content_async(prompt)
+
+    response_images = response.web_images  # Check response images [Dict]
+    for image in response_images:
+        gemini_image = GeminiImage(url=image.url)
+        await gemini_image.save(path="save_path")  # Save to path asynchronously
+
+# Run the async function
+if __name__ == "__main__":
+    user_prompt = input("Enter your prompt: ")
+    asyncio.run(fetch_and_save_images_async(user_prompt))
+```
+<details><summary>GeminiImage.save logics</summary>
+  
+```python
+import asyncio
+from gemini import Gemini, GeminiImage
+
+async def fetch_and_save_images_async(prompt: str):
     response = await GeminiClient.generate_content_async(prompt)
 
     response_images = response.web_images  # Check response images [Dict]
@@ -210,9 +248,11 @@ async def fetch_and_save_images_async():
 
 # Run the async function
 if __name__ == "__main__":
-    asyncio.run(fetch_and_save_images_async())
-
+    user_prompt = input("Enter your prompt: ")
+    asyncio.run(fetch_and_save_images_async(user_prompt))
 ```
+
+</details>
 
 
 <br>
