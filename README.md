@@ -151,7 +151,7 @@ from gemini import Gemini, GeminiImage
 prompt = "Create illustrations of Seoul, South Korea."
 response = GeminiClient.generate_content(prompt)
 
-generated_images = response.generated_image # Check generated images [Dict]
+generated_images = response.generated_images # Check generated images [Dict]
 
 GeminiImage.save_sync(generated_images)
 # bytes_images_dict = GeminiImage.fetch_bytes_sync(generated_images) # Get bytes images dict
@@ -166,7 +166,7 @@ async def generate_and_save_images_async():
     prompt = "Create illustrations of Seoul, South Korea."
     response = await GeminiClient.generate_content_async(prompt)
 
-    generated_images = response.generated_image  # Check generated images [Dict]
+    generated_images = response.generated_images  # Check generated images [Dict]
     bytes_images_dict = await GeminiImage.fetch_images_dict(generated_images)  # Get bytes images dict asynchronously
     await GeminiImage.save_images(bytes_images_dict, path="save_path")  # Save to path asynchronously
 
