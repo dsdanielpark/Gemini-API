@@ -3,6 +3,8 @@ func_text.ipynb
 func_test
 gemini/init_creator.py
 pyproject.toml
+test2.ipynb
+test3.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
