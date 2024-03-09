@@ -1,3 +1,4 @@
+# Legacy
 import json
 
 from gemini.src.tools.user_content import UserContent

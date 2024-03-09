@@ -1,3 +1,4 @@
+# Legacy
 from gemini.src.tools.user_content import UserContent
 from typing import List
 

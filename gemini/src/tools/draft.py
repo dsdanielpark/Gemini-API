@@ -1,3 +1,4 @@
+# Legacy
 from typing import List, Optional, Dict
 
 from gemini.src.tools.citation import DraftCitation

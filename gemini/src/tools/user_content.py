@@ -1,3 +1,4 @@
+# Legacy
 from abc import ABC, abstractmethod
 
 

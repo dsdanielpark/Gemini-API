@@ -1,3 +1,4 @@
+# Legacy
 class CodeContent:
     # 32 items
     def __init__(self, input_list: list):

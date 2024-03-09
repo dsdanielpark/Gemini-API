@@ -1,3 +1,4 @@
+# Legacy
 from typing import List, Optional
 
 from gemini.src.tools.draft import GeminiDraft
