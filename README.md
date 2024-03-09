@@ -153,7 +153,9 @@ response = GeminiClient.generate_content(prompt)
 
 generated_images = response.generated_images # Check generated images [Dict]
 
-GeminiImage.save_sync(generated_images)
+GeminiImage.save_sync(generated_images, save_path="cached_folder")
+
+# You can use byte type image dict as follow:
 # bytes_images_dict = GeminiImage.fetch_bytes_sync(generated_images) # Get bytes images dict
 # GeminiImage.save_images_sync(bytes_images_dict, path="save_path") # Save to path
 ```
@@ -168,7 +170,7 @@ async def fetch_and_save_images_async(prompt: str):
     generated_images = response.generated_images  # Check response images [Dict]
     for image in generated_images:
         gemini_image = GeminiImage(url=image.url)
-        await gemini_image.save(path="save_path")  # Save to path asynchronously
+        await gemini_image.save(path="cached_folder")  # Save to path asynchronously
 
 # Run the async function
 if __name__ == "__main__":
@@ -186,7 +188,7 @@ async def fetch_and_save_images_async(prompt: str):
 
     generated_images = response.generated_images  # Check response images [Dict]
     bytes_images_dict = await GeminiImage.fetch_images_dict(generated_images)  # Get bytes images dict asynchronously
-    await GeminiImage.save_images(bytes_images_dict, path="save_path")  # Save to path asynchronously
+    await GeminiImage.save_images(bytes_images_dict, path="cached_folder")  # Save to path asynchronously
 
 # Run the async function
 if __name__ == "__main__":
@@ -211,9 +213,11 @@ response = GeminiClient.generate_content(prompt)
 
 response_images = response.web_images # Check response images [Dict]
 
-GeminiImage.save_sync(response_images)
+GeminiImage.save_sync(response_images, save_path="cached_folder")
+
+# You can use byte type image dict as follow:
 # bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images) # Get bytes images dict
-# GeminiImage.save_images_sync(bytes_images_dict, path="save_path") # Save to path
+# GeminiImage.save_images_sync(bytes_images_dict, path="cached_folder") # Save to path
 ```
 *Async*
 ```python
@@ -226,7 +230,7 @@ async def fetch_and_save_images_async(prompt: str):
     response_images = response.web_images  # Check response images [Dict]
     for image in response_images:
         gemini_image = GeminiImage(url=image.url)
-        await gemini_image.save(path="save_path")  # Save to path asynchronously
+        await gemini_image.save(path="cached_folder")  # Save to path asynchronously
 
 # Run the async function
 if __name__ == "__main__":
@@ -244,7 +248,7 @@ async def fetch_and_save_images_async(prompt: str):
 
     response_images = response.web_images  # Check response images [Dict]
     bytes_images_dict = await GeminiImage.fetch_images_dict(response_images)  # Get bytes images dict asynchronously
-    await GeminiImage.save_images(bytes_images_dict, path="save_path")  # Save to path asynchronously
+    await GeminiImage.save_images(bytes_images_dict, path="cached_folder")  # Save to path asynchronously
 
 # Run the async function
 if __name__ == "__main__":
