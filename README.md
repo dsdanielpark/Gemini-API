@@ -153,8 +153,16 @@ generated_images = response.generated_images # Check generated images [Dict]
 
 GeminiImage.save_sync(generated_images, save_path="cached")
 
-# You can use byte type image dict as follow:
-# bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
+# You can use byte type image dict for printing images as follow:
+bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
+from IPython.display import display, Image
+import io
+
+for image_name, image_bytes in bytes_images_dict.items():
+    print(image_name)
+    image = Image(data=image_bytes)
+    display(image)
+
 # GeminiImage.save_images_sync(bytes_images_dict, path="cached") # Save to path
 ```
 *Async*
