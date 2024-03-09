@@ -11,7 +11,7 @@ from .src.tools.google import *
 
 gemini_api_key = environ.get("GEMINI_COOKIES")
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __author__ = (
     "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>"
 )
