@@ -1,45 +1,17 @@
 import httpx
 import asyncio
+import time
 from pathlib import Path
 from loguru import logger
 from typing import List, Optional, Dict
 from pydantic import BaseModel, HttpUrl
+from datetime import datetime
 
 
 class GeminiImage(BaseModel):
-    """A class for handling images from the Gemini API."""
-
     url: HttpUrl
     title: str = "[Image]"
     alt: str = ""
-
-    async def save(
-        self,
-        path: str = "images",
-        filename: Optional[str] = None,
-        cookies: Optional[dict] = None,
-    ) -> Optional[Path]:
-        """Asynchronously saves the image to the specified path.
-
-        Args:
-            path (str): The directory where the image will be saved.
-            filename (str, optional): The filename for the saved image. If not provided,
-                a filename is generated based on the image title.
-            cookies (dict, optional): Cookies to be used for downloading the image.
-
-        Returns:
-            Optional[Path]: The path where the image is saved, or None if saving fails.
-        """
-        bytes_data = await self.fetch_bytes(self.url, cookies)
-        if bytes_data:
-            filename = (
-                filename
-                or f"{self.title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}.jpg"
-            )
-            save_path = Path(path) / filename
-            save_path.parent.mkdir(parents=True, exist_ok=True)
-            save_path.write_bytes(bytes_data)
-            return save_path
 
     @staticmethod
     async def fetch_bytes(
@@ -63,6 +35,41 @@ class GeminiImage(BaseModel):
                 return response.content
         except Exception as e:
             print(f"Failed to download {url}: {str(e)}")
+            return None
+
+    async def save(
+        self,
+        save_path: str = "cached",
+        filename: Optional[str] = None,
+        cookies: Optional[dict] = None,
+    ) -> Optional[Path]:
+        """
+        Downloads the image from the URL and saves it to the specified save_path.
+
+        Args:
+            save_path: The directory to save the image (default: "cached").
+            filename: The filename for the saved image (optional, uses title if not provided).
+            cookies: Optional cookies dictionary for the download request.
+
+        Returns:
+            The save_path to the saved image file or None if download fails.
+        """
+        image_data = await self.fetch_bytes(self.url, cookies)
+        if not image_data:
+            return None
+
+        if not filename:
+            filename = f"{self.title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}.jpg"
+
+        save_path = Path(save_path) / filename
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            save_path.write_bytes(image_data)
+            print(f"Saved {self.title} to {save_path}")
+            return save_path
+        except Exception as e:
+            print(f"Failed to save image {self.title}: {str(e)}")
             return None
 
     @staticmethod
@@ -91,7 +98,7 @@ class GeminiImage(BaseModel):
             return {}
 
     @staticmethod
-    async def save_images(image_data: Dict[str, bytes], path: str = "images"):
+    async def save_images(image_data: Dict[str, bytes], save_path: str = "cached"):
         """Asynchronously saves images specified by their bytes data.
 
         Args:
@@ -99,17 +106,32 @@ class GeminiImage(BaseModel):
             path (str, optional): The directory where the images will be saved. Defaults to "images".
         """
         for title, data in image_data.items():
-            filename = f"{title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}.jpg"
-            save_path = Path(path) / filename
+            now = datetime.now().strftime("%y%m%d%H")
+            filename = f"{title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}_{now}.jpg"
+            save_path = Path(save_path) / filename
             save_path.parent.mkdir(parents=True, exist_ok=True)
             save_path.write_bytes(data)
             print(f"Saved {title} to {save_path}")
 
+    @staticmethod
+    def fetch_bytes_sync(
+        url: HttpUrl, cookies: Optional[dict] = None
+    ) -> Optional[bytes]:
+        try:
+            url_str = str(url)
+            with httpx.Client(follow_redirects=True, cookies=cookies) as client:
+                response = client.get(url_str)
+                response.raise_for_status()
+                return response.content
+        except Exception as e:
+            print(f"Failed to download {url}: {str(e)}")
+            return None
+
+    @staticmethod
     def save_sync(
-        self,
-        path: str = "images",
-        filename: Optional[str] = None,
+        images: List["GeminiImage"],
         cookies: Optional[dict] = None,
+        save_path: str = "cached",
     ) -> Optional[Path]:
         """Synchronously saves the image to the specified path.
 
@@ -122,21 +144,13 @@ class GeminiImage(BaseModel):
         Returns:
             Optional[Path]: The path where the image is saved, or None if saving fails.
         """
-        bytes_data = self.fetch_bytes_sync(self.url, cookies)
-        if bytes_data:
-            filename = (
-                filename
-                or f"{self.title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}.jpg"
-            )
-            save_path = Path(path) / filename
-            save_path.parent.mkdir(parents=True, exist_ok=True)
-            save_path.write_bytes(bytes_data)
-            return save_path
+        image_data = GeminiImage.fetch_images_dict_sync(images, cookies)
+        GeminiImage.save_images_sync(image_data, save_path)
 
     @staticmethod
-    def fetch_bytes_sync(
-        url: HttpUrl, cookies: Optional[dict] = None
-    ) -> Optional[bytes]:
+    def fetch_images_dict_sync(
+        images: List["GeminiImage"], cookies: Optional[dict] = None
+    ) -> Dict[str, bytes]:
         """Synchronously fetches the bytes data of an image from the given URL.
 
         Args:
@@ -146,36 +160,11 @@ class GeminiImage(BaseModel):
         Returns:
             Optional[bytes]: The bytes data of the image, or None if fetching fails.
         """
-        try:
-            url_str = str(url)
-            with httpx.Client(
-                follow_redirects=True, max_redirects=10, cookies=cookies
-            ) as client:
-                response = client.get(url_str)
-                response.raise_for_status()
-                return response.content
-        except Exception as e:
-            print(f"Failed to download {url}: {str(e)}")
-            return None
-
-    @staticmethod
-    def fetch_images_dict_sync(
-        images: List["GeminiImage"], cookies: Optional[dict] = None
-    ) -> Dict[str, bytes]:
-        """Synchronously fetches bytes data for a list of images.
-
-        Args:
-            images (List[GeminiImage]): A list of GeminiImage objects.
-            cookies (dict, optional): Cookies to be used for downloading the images.
-
-        Returns:
-            Dict[str, bytes]: A dictionary mapping image titles to bytes data.
-        """
         results = [GeminiImage.fetch_bytes_sync(image.url, cookies) for image in images]
         return {images[i].title: result for i, result in enumerate(results) if result}
 
     @staticmethod
-    def save_images_sync(image_data: Dict[str, bytes], path: str = "images"):
+    def save_images_sync(image_data: Dict[str, bytes], save_path: str = "cached"):
         """Synchronously saves images specified by their bytes data.
 
         Args:
@@ -183,9 +172,12 @@ class GeminiImage(BaseModel):
             path (str, optional): The directory where the images will be saved. Defaults to "images".
         """
         for title, data in image_data.items():
-            filename = f"{title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}.jpg"
-            save_path = Path(path) / filename
+            now = datetime.now().strftime("%y%m%d%H")
+            filename = f"{title.replace(' ', '_').replace('[Image]', '').replace('/', '_').replace(':', '_')}_{now}.jpg"
+            save_path = Path(save_path) / filename
             save_path.parent.mkdir(parents=True, exist_ok=True)
+            save_path.write_bytes(data)
+            print(f"Saved {title} to {save_path}")
 
 
 class GeminiCandidate(BaseModel):
