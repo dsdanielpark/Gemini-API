@@ -218,9 +218,7 @@ Returns images in response of Gemini.
 ```python
 from gemini import Gemini, GeminiImage
 
-prompt = "Please recommend a travel itinerary for Seoul."
-response = GeminiClient.generate_content(prompt)
-
+response = GeminiClient.generate_content("Please recommend a travel itinerary for Seoul.")
 response_images = response.web_images # Check response images [Dict]
 
 GeminiImage.save_sync(response_images, save_path="cached")
