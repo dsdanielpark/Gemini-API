@@ -153,8 +153,7 @@ response = GeminiClient.generate_content(prompt)
 
 generated_images = response.generated_images # Check generated images [Dict]
 
-for image in generated_images:
-  GeminiImage.save_sync(path="cached_folder")
+GeminiImage.save_sync(generated_images, save_path="cached_folder")
 
 # You can use byte type image dict as follow:
 # bytes_images_dict = GeminiImage.fetch_bytes_sync(generated_images) # Get bytes images dict
@@ -214,8 +213,7 @@ response = GeminiClient.generate_content(prompt)
 
 response_images = response.web_images # Check response images [Dict]
 
-for image in generated_images:
-  GeminiImage.save_sync(path="cached_folder")
+GeminiImage.save_sync(response_images, save_path="cached_folder")
 
 # You can use byte type image dict as follow:
 # bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images) # Get bytes images dict
