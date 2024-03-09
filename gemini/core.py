@@ -66,7 +66,7 @@ class Gemini:
         self.session = session or self._initialize_session()
         self.base_url: str = HOST
         self.nonce = nonce
-        self._reqid = self.get_reqid()
+        self._reqid = int("".join(random.choices(string.digits, k=7)))
         self.parser = ResponseParser(cookies=self.cookies)
 
     def _initialize_session(
@@ -269,15 +269,6 @@ class Gemini:
         nonce_match = re.search(r'"SNlM0e":"(.*?)"', response_text)
         return sid_match, nonce_match
 
-    @staticmethod
-    def get_reqid() -> int:
-        """
-        Generates a random 7-digit request ID.
-
-        Returns:
-            int: A random 7-digit integer used as a request ID.
-        """
-        return int("".join(random.choices(string.digits, k=7)))
 
     def _construct_params(self, sid: str) -> str:
         """
