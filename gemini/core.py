@@ -269,7 +269,6 @@ class Gemini:
         nonce_match = re.search(r'"SNlM0e":"(.*?)"', response_text)
         return sid_match, nonce_match
 
-
     def _construct_params(self, sid: str) -> str:
         """
         Constructs URL-encoded parameters for a request.

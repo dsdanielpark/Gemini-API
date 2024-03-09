@@ -107,11 +107,7 @@ class GeminiClient:
         """
         self.session = await self._create_async_session()
 
-        
-
-    async def _create_async_session(
-        self
-    ) -> httpx.AsyncClient:
+    async def _create_async_session(self) -> httpx.AsyncClient:
         """
         Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
 
@@ -134,8 +130,8 @@ class GeminiClient:
             headers=HEADERS,
             cookies=self.cookies,
             timeout=self.timeout,
-            auto_close=self.auto_close, 
-            close_delay=self.close_delay
+            auto_close=self.auto_close,
+            close_delay=self.close_delay,
         )
 
         if hasattr(self, "session"):
@@ -144,7 +140,7 @@ class GeminiClient:
             self.running = False
 
         return self.session
-    
+
     def _load_cookies_from_file(self, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
@@ -216,7 +212,6 @@ class GeminiClient:
                 raise ValueError(
                     "Failed to parse SID or SNlM0e nonce from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
                 )
-            
 
         except requests.RequestException as e:
             raise ConnectionError(f"Request failed: {e}")
@@ -241,7 +236,7 @@ class GeminiClient:
         sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response_text)
         nonce_match = re.search(r'"SNlM0e":"(.*?)"', response_text)
         return sid_match, nonce_match
-    
+
     def _get_cookies_from_browser(self) -> dict:
         """
         Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
@@ -279,8 +274,6 @@ class GeminiClient:
             raise ValueError(
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
-
-
 
     def _construct_params(self, sid: str) -> str:
         """
