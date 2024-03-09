@@ -59,14 +59,11 @@ class GeminiClient:
     def __init__(
         self,
         auto_cookies: bool = False,
-        token: str = None,
         session: Optional[httpx.AsyncClient] = None,
         cookies: Optional[dict] = {},
+        cookie_fp: str = None,
         timeout: int = 30,
         proxies: Optional[dict] = {},
-        language: Optional[str] = None,
-        verify: bool = True,
-        latency: int = 10,
         auto_close=True,
         close_delay: int = 60,
     ):
@@ -89,19 +86,16 @@ class GeminiClient:
             auto_close (bool): If True, the session will automatically close after a specified delay. Defaults to True.
             close_delay (int): The delay in seconds before the session is automatically closed, applicable if auto_close is True. Defaults to 60.
         """
-        self.auto_cookies = auto_cookies
-        self.latency = latency
-        self.running = False
+        self._nonce = None
+        self._sid = None
         self._reqid = int("".join(random.choices(string.digits, k=4)))
+        self.running = False
         self.cookies = cookies
-        self._get_cookies(auto_cookies)
+        self.cookie_fp = cookie_fp
+        self.auto_cookies = auto_cookies
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = session
-        self.token = token
-        self.token = self.get_nonce_value()
-        self.language = language or os.getenv("GEMINI_LANGUAGE")
-        self.verify = verify
         self.auto_close = auto_close
         self.close_delay = close_delay
 
@@ -110,17 +104,13 @@ class GeminiClient:
     ) -> None:
         """
         Initializes the asynchronous session with optional auto-close functionality.
-
-        Args:
-            auto_close (bool): Flag to enable automatic session closure.
-            close_delay (int): Delay in seconds before automatically closing the session.
         """
-        self.session = await self._create_async_session(
-            auto_close=self.auto_close, close_delay=self.close_delay
-        )
+        self.session = await self._create_async_session()
+
+        
 
     async def _create_async_session(
-        self, auto_close: bool, close_delay: int
+        self
     ) -> httpx.AsyncClient:
         """
         Initializes or configures the httpx.AsyncClient session with predefined session headers, proxies, and cookies.
@@ -133,16 +123,19 @@ class GeminiClient:
         """
         if self.session is not None:
             return self.session
-
-        print(self.cookies)
-        if not self.cookies:
+        if self.cookies:
+            self.session.cookies.update(self.cookies)
+        elif self.cookie_fp:
+            self._load_cookies_from_file(self.cookie_fp)
+        elif not self.cookies:
             raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
         self.session = httpx.AsyncClient(
             headers=HEADERS,
             cookies=self.cookies,
-            proxies=self.proxies,
             timeout=self.timeout,
+            auto_close=self.auto_close, 
+            close_delay=self.close_delay
         )
 
         if hasattr(self, "session"):
@@ -151,6 +144,23 @@ class GeminiClient:
             self.running = False
 
         return self.session
+    
+    def _load_cookies_from_file(self, file_path: str) -> None:
+        """Loads cookies from a file and updates the session."""
+        try:
+            if file_path.endswith(".json"):
+                with open(file_path, "r") as file:
+                    cookies = json.load(file)
+            else:
+                with open(file_path, "r") as file:
+                    content = file.read()
+                    try:
+                        cookies = eval(content)
+                    except NameError:
+                        cookies = json.loads(content.replace("'", '"'))
+            self.session.cookies.update(cookies)
+        except Exception as e:
+            print(f"Error loading cookie file: {e}")
 
     async def close(self):
         if self.session:
@@ -189,21 +199,31 @@ class GeminiClient:
         else:
             print("Session not initialized.")
 
-    def get_nonce_value(self) -> str:
+    def _set_sid_and_nonce(self):
         """
-        Get the Nonce Token value from the Gemini API response.
+        Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
-        error_message = "Nonce token value not found or response status is not 200."
+        try:
+            response = requests.get(f"{HOST}/app", cookies=self.cookies)
+            response.raise_for_status()
 
-        with requests.Session() as session:
-            response = session.get(HOST, timeout=self.timeout, proxies=self.proxies)
-            if response.status_code == 200:
-                match = re.search(r'nonce="([^"]+)"', response.text)
-                if match:
-                    return match.group(1)
-            raise Exception(error_message)
+            sid_match, nonce_match = self.extract_sid_nonce(response.text)
 
-    def _get_cookies(self, auto_cookies: bool) -> None:
+            if sid_match and nonce_match:
+                self._sid = sid_match.group(1)
+                self._nonce = nonce_match.group(1)
+            else:
+                raise ValueError(
+                    "Failed to parse SID or SNlM0e nonce from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                )
+            
+
+        except requests.RequestException as e:
+            raise ConnectionError(f"Request failed: {e}")
+        except ValueError as e:
+            raise e  # Re-raise the exception after it's caught
+        except Exception as e:
+            raise RuntimeError(f"An unexpected error occurred: {e}")
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag. If self.cookies already contains cookies, it will use these existing cookies and not attempt to update them.
         """
@@ -216,30 +236,12 @@ class GeminiClient:
             print("Using existing cookies.")
             return  # Exit the method if cookies already exist
 
-        # Attempt to load cookies automatically from the browser if necessary
-        if auto_cookies and not self.cookies:
-            try:
-                self._get_cookies_from_browser()
-            except Exception as e:
-                raise Exception("Failed to extract cookies from browser.") from e
-
-        # Warning if no cookies are available and auto_cookies is False
-        if not auto_cookies and not self.cookies:
-            print(
-                "Cookie loading issue, try setting auto_cookies to True. Restart browser, log out, log in for Gemini Web UI to work. Keep a single browser open."
-            )
-            try:
-                self.auto_cookies = True
-                self._get_cookies_from_browser()
-            except Exception as e:
-                print(e)
-
-        # Raise an exception if still no cookies
-        if not self.cookies:
-            raise Exception(
-                "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
-            )
-
+    @staticmethod
+    def extract_sid_nonce(response_text):
+        sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response_text)
+        nonce_match = re.search(r'"SNlM0e":"(.*?)"', response_text)
+        return sid_match, nonce_match
+    
     def _get_cookies_from_browser(self) -> dict:
         """
         Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
@@ -278,34 +280,7 @@ class GeminiClient:
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
 
-    def _update_cookies(self, update_cookie_list: List[str] = None):
-        """
-        Updates specified cookies in the httpx client. If update_cookie_list is not provided,
-        updates all cookies stored in self.cookies.
 
-        Parameters:
-        - update_cookie_list (List[str], optional): A list of cookie names to update.
-                                                If None, updates all cookies from self.cookies.
-        """
-        self._get_cookies(True)
-
-        cookies_to_update = (
-            {k: self.cookies[k] for k in update_cookie_list}
-            if update_cookie_list is not None
-            else self.cookies
-        )
-
-        try:
-            for cookie_name, cookie_value in cookies_to_update.items():
-                if cookie_value:
-                    self.session.cookies.set(cookie_name, cookie_value)
-                    print(f"Succefully update cookies: {cookies_to_update}")
-                else:
-                    print(
-                        f"Warning: Cookie value for {cookie_name} is missing; skipping update."
-                    )
-        except Exception as e:
-            print(f"An error occurred while updating cookies: {e}")
 
     def _construct_params(self, sid: str) -> str:
         """
