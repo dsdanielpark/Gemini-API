@@ -186,7 +186,9 @@ if __name__ == "__main__":
     user_prompt = input("Enter your prompt: ")
     asyncio.run(fetch_and_save_images_async(user_prompt))
 ```
+
 `GeminiImage.save` method logic
+
 ```
 import asyncio
 from gemini import Gemini, GeminiImage
@@ -255,7 +257,9 @@ if __name__ == "__main__":
     user_prompt = input("Enter your prompt: ")
     asyncio.run(fetch_and_save_images_async(user_prompt))
 ```
+
 `GeminiImage.save` method logic
+
 ```
 import asyncio
 from gemini import Gemini, GeminiImage
@@ -272,6 +276,8 @@ if __name__ == "__main__":
     user_prompt = input("Enter your prompt: ")
     asyncio.run(fetch_and_save_images_async(user_prompt))
 ```
+
+</details>
 
 <br>
 
@@ -354,10 +360,10 @@ Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [G
   - [x] `messages`
       - [x] `content`
         - [x] `text`  
-          - [ ] `parsing`
-        - [ ] `image`
-          - [ ] `parsing`
-      - [ ] `response format structure class`
+          - [x] `parsing`
+        - [x] `image`
+          - [x] `parsing`
+      - [x] `response format structure class`
       - [ ] `tool_calls`
   - [ ] `third party`
     - [ ] `replit`
