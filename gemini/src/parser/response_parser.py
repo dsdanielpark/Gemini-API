@@ -29,12 +29,10 @@ class ResponseParser(BaesParser):
 
     def _extract_body(self, response_text):
         try:
-            body = json.loads(
-                json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[0][2]
-            )
+            body = json.loads(json.loads(max(response_text.split("\n"), key=len))[0][2])
             if not body[4]:
                 body = json.loads(
-                    json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[4][2]
+                    json.loads(max(response_text.split("\n"), key=len))[4][2]
                 )
             return body
         except:
