@@ -95,28 +95,6 @@ class Gemini:
 
         return session
 
-    def check_session_cookies(self) -> None:
-        """
-        Prints the session's cookies. Indicates if the session is uninitialized.
-        """
-        if self.session:
-            cookies = self.session.cookies.get_dict()
-            cookies_str = "\n".join(f"{key}: {value}" for key, value in cookies.items())
-            print(f"Session Cookies:\n{cookies_str}")
-        else:
-            print("Session not initialized.")
-
-    def check_session_headers(self) -> None:
-        """
-        Prints the session's headers. Indicates if the session is uninitialized.
-        """
-        if self.session:
-            headers = self.session.headers
-            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
-            print(f"Session Headers:\n{headers_str}")
-        else:
-            print("Session not initialized.")
-
     def _load_cookies_from_file(self, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
@@ -133,75 +111,6 @@ class Gemini:
             self.session.cookies.update(cookies)
         except Exception as e:
             print(f"Error loading cookie file: {e}")
-
-    def _set_cookies_automatically(self) -> None:
-        """
-        Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
-        """
-        if len(getattr(self, "cookies", {})) > 5:
-            return
-
-        if self.auto_cookies:
-            try:
-                self._update_cookies_from_browser()
-                if not self.cookies:
-                    raise ValueError("No cookies were loaded from the browser.")
-            except Exception as e:
-                raise Exception("Failed to extract cookies from browser.") from e
-        else:
-            print(
-                "Cookie loading issue, try setting auto_cookies to True. Restart browser, log out, log in for Gemini Web UI to work. Keep a single browser open."
-            )
-            try:
-                self.auto_cookies = True
-                self._update_cookies_from_browser()
-                if not self.cookies:
-                    raise ValueError("No cookies were loaded from the browser.")
-            except Exception as e:
-                print(f"Automatic cookie retrieval failed: {e}")
-
-        if not self.cookies:
-            raise Exception(
-                "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
-            )
-
-    def _update_cookies_from_browser(self) -> dict:
-        """
-        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
-
-        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
-
-        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
-
-        Raises:
-            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
-        """
-
-        for browser_fn in SUPPORTED_BROWSERS:
-            try:
-                print(
-                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
-                )
-                cj = browser_fn(domain_name=".google.com")
-                found_cookies = {cookie.name: cookie.value for cookie in cj}
-                if len(found_cookies) >= 5:
-                    print(
-                        f"Successfully retrieved cookies from {browser_fn}.\n{found_cookies}"
-                    )
-                    self.cookies = found_cookies
-                    break
-                else:
-                    print(
-                        f"Automatically configure cookies with detected ones but found only {len(found_cookies)} cookies.\n{found_cookies}"
-                    )
-            except Exception as e:
-                print(e)
-                continue
-
-        if not self.cookies:
-            raise ValueError(
-                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
-            )
 
     def _set_sid_and_nonce(self):
         """
@@ -227,41 +136,6 @@ class Gemini:
             raise e  # Re-raise the exception after it's caught
         except Exception as e:
             raise RuntimeError(f"An unexpected error occurred: {e}")
-
-    # def _set_sid_and_nonce(self) -> Tuple[str, str]:
-    #     """
-    #     Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
-    #     """
-    #     url = f"{HOST}/app"
-    #     try:
-    #         response = requests.get(
-    #             url, cookies=self.cookies
-    #         )
-    #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
-
-    #         if not sid_match or not nonce_match:
-    #             print(
-    #                 "Failed to get SID or nonce. Trying to update cookies automatically..."
-    #             )
-    #             self._set_cookies_automatically()
-    #             response = requests.get(
-    #                 url, cookies=self.cookies
-    #             )
-    #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
-
-    #             if not nonce_match:
-    #                 if self.nonce:
-    #                     return (sid_match, self.nonce)
-    #                 else:
-    #                     raise Exception(
-    #                         "Can not retrieve SID and nonce even after automatic cookie update."
-    #                     )
-    #         return (sid_match.group(1), nonce_match.group(1))
-
-    #     except Exception as e:
-    #         raise ConnectionError(
-    #             f"Failed to retrive SID or Nonce valuse:\n{e}"
-    #         )
 
     @staticmethod
     def extract_sid_nonce(response_text):
@@ -407,3 +281,129 @@ class Gemini:
                 continue
         print("Parsing failed; returning original text. Consider using CustomParser.")
         return response_text
+
+    def check_session_cookies(self) -> None:
+        """
+        Prints the session's cookies. Indicates if the session is uninitialized.
+        """
+        if self.session:
+            cookies = self.session.cookies.get_dict()
+            cookies_str = "\n".join(f"{key}: {value}" for key, value in cookies.items())
+            print(f"Session Cookies:\n{cookies_str}")
+        else:
+            print("Session not initialized.")
+
+    def check_session_headers(self) -> None:
+        """
+        Prints the session's headers. Indicates if the session is uninitialized.
+        """
+        if self.session:
+            headers = self.session.headers
+            headers_str = "\n".join(f"{key}: {value}" for key, value in headers.items())
+            print(f"Session Headers:\n{headers_str}")
+        else:
+            print("Session not initialized.")
+
+    def _set_cookies_automatically(self) -> None:
+        """
+        Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
+        """
+        if len(getattr(self, "cookies", {})) > 5:
+            return
+
+        if self.auto_cookies:
+            try:
+                self._update_cookies_from_browser()
+                if not self.cookies:
+                    raise ValueError("No cookies were loaded from the browser.")
+            except Exception as e:
+                raise Exception("Failed to extract cookies from browser.") from e
+        else:
+            print(
+                "Cookie loading issue, try setting auto_cookies to True. Restart browser, log out, log in for Gemini Web UI to work. Keep a single browser open."
+            )
+            try:
+                self.auto_cookies = True
+                self._update_cookies_from_browser()
+                if not self.cookies:
+                    raise ValueError("No cookies were loaded from the browser.")
+            except Exception as e:
+                print(f"Automatic cookie retrieval failed: {e}")
+
+        if not self.cookies:
+            raise Exception(
+                "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
+            )
+
+    def _update_cookies_from_browser(self) -> dict:
+        """
+        Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
+
+        This method iterates over a predefined list of supported browsers, attempting to retrieve cookies that match a specific domain (e.g., ".google.com"). If the required cookies are found, they are added to the instance's cookie store. The process supports multiple modern web browsers across different operating systems.
+
+        The method updates the instance's `cookies` attribute with any found cookies that match the specified criteria.
+
+        Raises:
+            ValueError: If no supported browser is found with the required cookies, or if an essential cookie is missing after attempting retrieval from all supported browsers.
+        """
+
+        for browser_fn in SUPPORTED_BROWSERS:
+            try:
+                print(
+                    f"Trying to automatically retrieve cookies from {browser_fn} using the browser_cookie3 package."
+                )
+                cj = browser_fn(domain_name=".google.com")
+                found_cookies = {cookie.name: cookie.value for cookie in cj}
+                if len(found_cookies) >= 5:
+                    print(
+                        f"Successfully retrieved cookies from {browser_fn}.\n{found_cookies}"
+                    )
+                    self.cookies = found_cookies
+                    break
+                else:
+                    print(
+                        f"Automatically configure cookies with detected ones but found only {len(found_cookies)} cookies.\n{found_cookies}"
+                    )
+            except Exception as e:
+                print(e)
+                continue
+
+        if not self.cookies:
+            raise ValueError(
+                "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
+            )
+
+    # def _set_sid_and_nonce(self) -> Tuple[str, str]:
+    #     """
+    #     Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
+    #     """
+    #     url = f"{HOST}/app"
+    #     try:
+    #         response = requests.get(
+    #             url, cookies=self.cookies
+    #         )
+    #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
+
+    #         if not sid_match or not nonce_match:
+    #             print(
+    #                 "Failed to get SID or nonce. Trying to update cookies automatically..."
+    #             )
+    #             self._set_cookies_automatically()
+    #             response = requests.get(
+    #                 url, cookies=self.cookies
+    #             )
+    #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
+
+    #             if not nonce_match:
+    #                 if self.nonce:
+    #                     return (sid_match, self.nonce)
+    #                 else:
+    #                     raise Exception(
+    #                         "Can not retrieve SID and nonce even after automatic cookie update."
+    #                     )
+    #         return (sid_match.group(1), nonce_match.group(1))
+
+    #     except Exception as e:
+    #         raise ConnectionError(
+    #             f"Failed to retrive SID or Nonce valuse:\n{e}"
+    #         )
