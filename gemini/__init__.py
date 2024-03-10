@@ -1,6 +1,6 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 from os import environ
-from .client import GeminiClient
+from .async_core import GeminiClient
 from .core import Gemini
 from .src.model.image import GeminiImage
 from .src.model.output import GeminiCandidate, GeminiModelOutput
