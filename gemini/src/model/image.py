@@ -17,13 +17,29 @@ class GeminiImage(BaseModel):
     @classmethod
     def validate_images(cls, images):
         if not images:
-            raise ValueError("Input is empty. Please provide images to proceed.")
+            raise ValueError(
+                "Input is empty. Please provide images infomation to proceed."
+            )
+
+    # Async downloader
+    @classmethod
+    async def save(
+        cls,
+        images: List["GeminiImage"],
+        save_path: str = "cached",
+        cookies: Optional[dict] = None,
+    ) -> Optional[Path]:
+        cls.validate_images(images)
+        image_data = await cls.fetch_images_dict(images, cookies)
+        await cls.save_images(image_data, save_path)
 
     @staticmethod
-    async def fetch_bytes(url: HttpUrl) -> Optional[bytes]:
+    async def fetch_bytes(
+        url: HttpUrl, cookies: Optional[dict] = None
+    ) -> Optional[bytes]:
         try:
             async with httpx.AsyncClient(follow_redirects=True) as client:
-                response = await client.get(str(url))
+                response = await client.get(str(url), cookies=cookies)
                 response.raise_for_status()
                 return response.content
         except Exception as e:
@@ -31,17 +47,11 @@ class GeminiImage(BaseModel):
             return None
 
     @classmethod
-    async def save(
-        cls, images: List["GeminiImage"], save_path: str = "cached"
-    ) -> Optional[Path]:
+    async def fetch_images_dict(
+        cls, images: List["GeminiImage"], cookies: Optional[dict] = None
+    ) -> Dict[str, bytes]:
         cls.validate_images(images)
-        image_data = await cls.fetch_images_dict(images)
-        await cls.save_images(image_data, save_path)
-
-    @classmethod
-    async def fetch_images_dict(cls, images: List["GeminiImage"]) -> Dict[str, bytes]:
-        cls.validate_images(images)
-        tasks = [cls.fetch_bytes(image.url) for image in images]
+        tasks = [cls.fetch_bytes(image.url, cookies=cookies) for image in images]
         results = await asyncio.gather(*tasks)
         return {image.title: result for image, result in zip(images, results) if result}
 
@@ -59,42 +69,7 @@ class GeminiImage(BaseModel):
             except Exception as e:
                 print(f"Error saving {title}: {str(e)}")
 
-    @staticmethod
-    def fetch_bytes_sync(url: HttpUrl) -> Optional[bytes]:
-        """Synchronously fetches the bytes data of an image from the given URL.
-
-        Args:
-            url (str): The URL of the image.
-
-        Returns:
-            Optional[bytes]: The bytes data of the image, or None if fetching fails.
-        """
-        try:
-            with httpx.Client(follow_redirects=True) as client:
-                response = client.get(str(url))
-                response.raise_for_status()
-                return response.content
-        except Exception as e:
-            print(f"Failed to download {url}: {str(e)}")
-            return None
-
-    @staticmethod
-    def fetch_bytes_sync(
-        url: HttpUrl, cookies: Optional[dict] = None
-    ) -> Optional[bytes]:
-        try:
-            url_str = str(url)
-            with httpx.Client(follow_redirects=True, cookies=cookies) as client:
-                try:
-                    response = client.get(url_str)
-                except:
-                    response = client.get(url)
-                response.raise_for_status()
-                return response.content
-        except Exception as e:
-            print(f"Failed to download {url}: {str(e)}")
-            pass
-
+    # Sync downloader
     @staticmethod
     def save_sync(
         images: List["GeminiImage"],
@@ -115,6 +90,23 @@ class GeminiImage(BaseModel):
         image_data = GeminiImage.fetch_images_dict_sync(images, cookies)
         GeminiImage.validate_images(image_data)
         GeminiImage.save_images_sync(image_data, save_path)
+
+    @staticmethod
+    def fetch_bytes_sync(
+        url: HttpUrl, cookies: Optional[dict] = None
+    ) -> Optional[bytes]:
+        try:
+            url_str = str(url)
+            with httpx.Client(follow_redirects=True, cookies=cookies) as client:
+                try:
+                    response = client.get(url_str)
+                except:
+                    response = client.get(url)
+                response.raise_for_status()
+                return response.content
+        except Exception as e:
+            print(f"Failed to download {url}: {str(e)}")
+            pass
 
     @staticmethod
     def fetch_images_dict_sync(
