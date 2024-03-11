@@ -6,6 +6,8 @@ Development Status :: 3 - Alpha
 pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
+This section aims to implement functionalities of the Bard API. While there are many readily portable codes, updates may be delayed.
+
 
 # Contents
 - [GitHub installation required for the following features.](#github-installation-required-for-the-following-features)

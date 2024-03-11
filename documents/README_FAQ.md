@@ -1,7 +1,15 @@
 Development Status :: 3 - Alpha
 
 # FAQ
-Cookie values may only be valid for a limited time (approximately 15-20 minutes and may be subject to rate limiting even sooner). Again, it's challenging to implement this in official services. Also, this is not an official Google package, and its availability for future use is uncertain.
+The most important notice is to close the Gemini website or browser immediately after confirming a successful response from generate_content, and not to visit the Gemini web again.
+
+
+I've been able to receive valid responses for several days without refreshing the cookie values using this method (as of March 11, 2024). However, this information may change depending on Google's revisions, similar to the Bard API. 
+
+While the latest bot_server param is available, I choose not to use it. This decision is based on past experiences where security measures, such as frequent changes in cookies or enhancements in rate limiting, were enforced in newer services for security purposes.
+
+
+
 
 ## Before using the Gemini API
 - Google Gemini can return different responses based on various factors such as account, country, region, IP, etc., following Google's policies. It cannot be resolved at the package level. (e.g., [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) or [HTTP 429 error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429))
@@ -9,38 +17,14 @@ Cookie values may only be valid for a limited time (approximately 15-20 minutes 
 - This service has very limited and variable call limits per unit of time, and exceeding rate limiting temporarily prevents obtaining normal response results.
 - Sending the same question multiple times in requests can also temporarily prevent obtaining normal response results.
 - Some regions may require additional cookie values besides __Secure-1PSID; refer to the issue page.
-- The __Secure-1PSID cookie value may change frequently. Logout, restart your web browser, and enter the new __Secure-1PSID cookie value.
 - Using this package for real-world applications is highly inappropriate. Due to rate limiting and variable API policies, it will only function temporarily.
 - If the time interval between requests is very short, the Google API process may interpret it as performing a large number of requests and may not return normal responses.
 - All these policies are subject to change, and the interface is also variable.
 - The reason this Gemini API's method names do not follow the typical inference format of general LLMs is to prevent confusion with the official API. This Python package merely serves as an unofficial API to fetch responses from Gemini's website, so please do not be mistaken.
-- The official API format for Gemini will likely be as follows.
 
 <br>
 
-***
 
-### Q: Why is the package structure so messy and unorganized like this?
-
-### A: While rapidly adapting to Google's interface changes, various unexpected features were added, causing the structure to become messy. This package is not intended for providing stable services, and it may become unusable at any time based on Google's decisions, so it hasn't been heavily optimized. It would be advisable to use it temporarily for testing purposes only.
-
-[#263](https://github.com/dsdanielpark/Gemini-API/discussions/267)
-
-Originally, Gemini had very simple functionality as it was meant for experimental purposes. It used to fetch only a single response through a single cookie even in the 'get_answer' function. However, various additional features were added to Gemini over time, such as uploading images, fetching image links, or executing code, among others. The Gemini API package was developed quickly in Python to implement these features and perform lightweight testing.
-
-In other words, the package initially lacked these diverse functionalities, and as unexpected features were added, the focus was solely on getting the functionality to work. This resulted in a messy package structure and less-than-clean code.
-
-Additionally, implementing asynchronous functionality did not provide significant benefits, but it was added upon the requests of some developers to quickly implement the features. It was discovered that some users needed more than one cookie, so the goal was to implement these functionalities within the existing structure in the shortest possible time.
-
-Overall, it was difficult to predict the interface or structure, and this package was created primarily for temporary and lightweight prototyping, as it was not meant for providing a stable service.
-
-Therefore, it is very messy and not optimized, and this continues to be a major concern. The package's functionality may stop working at any time due to changes in Google's interface decisions.
-
-Furthermore, adapting to new features or removing them is not straightforward. I feel a great responsibility for providing developers with unoptimized code that has caused inefficiencies, but developing a new package to address this issue has been challenging given the uncertainty of when the functionality might come to an end.
-
-Nevertheless, I am making efforts to revise the package structure whenever possible. Your understanding is appreciated.
-
-***
 
 ### #01. Response Error
 ```python
