@@ -6,9 +6,12 @@
 
 
 
-A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
+A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en). This repository is not expected to be updated frequently, and it will be modified for personal use. 
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
+
+Please, check [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) first. 
+
 
 <br>
 
@@ -416,4 +419,3 @@ Users bear all legal responsibilities when using the GeminiAPI package, which of
 <br>
 
 
-*Copyright (c) 2024 Minwoo(Daniel) Park, South Korea*<br>
