@@ -105,7 +105,7 @@ GeminiClient = Gemini(cookies=cookies)
 
 <br>
 
-### # 02. Generate Content
+### # 02. Generate content
 To check regardless of the data type of the model output, return the response_dict argument. And use it appropriately.
 
 ```python
@@ -294,11 +294,11 @@ if __name__ == "__main__":
 
 <br>
 
-### # 06. Generate Content from Images
+### # 06. Generate content from images
 
 <br>
 
-### # 07. Generate Content Using Google Services
+### # 07. Generate content using Google Services
 
 <br>
 
