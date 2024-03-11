@@ -1,22 +1,16 @@
-class AuthError(Exception):
+class PackageError(Exception):
     """Invalid credentials/cookies."""
 
     pass
 
 
-class APIError(Exception):
-    """Package-level error."""
-
-    pass
-
-
-class GeminiError(Exception):
+class GeminiAPIError(Exception):
     """Unhandled server error."""
 
     pass
 
 
-class TimeoutError(GeminiError):
+class TimeoutError(GeminiAPIError):
     """Request timeout."""
 
     pass

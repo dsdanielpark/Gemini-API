@@ -23,7 +23,7 @@ class GeminiModelOutput(BaseModel):
 
     @property
     def rcid(self) -> str:
-        """The RCID (Reversed-Cloze ID) of the chosen candidate."""
+        """The RCID (Response Choice ID) of the chosen candidate."""
         return self.candidates[self.chosen].rcid
 
     @property
