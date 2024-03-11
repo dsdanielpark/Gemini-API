@@ -295,12 +295,83 @@ if __name__ == "__main__":
 <br>
 
 ### # 06. Generate content from images
+Takes an image as input and returns a response.
+
+```python
+image = 'folder/image.jpg'
+# image = open('folder/image.jpg', 'rb').read() # (jpeg, png, webp) are supported.
+
+response = GeminiClient.generate_content("What does the text in this image say?", image=image)
+response.response_dict
+```
 
 <br>
 
 ### # 07. Generate content using Google Services
+To begin, you must link Google Workspace to activate this extension via the [Gemini web extension](https://gemini.google.com/extensions). Please refer to the [official notice](https://support.google.com/gemini/answer/13695044) and review the [privacy policies](https://support.google.com/gemini/answer/13594961?visit_id=638457301410420313-1578971242&p=privacy_help&rd=1) for more details.
+
+*extention flags*
+```
+@Gmail, @Google Drive, @Google Docs, @Google Maps, @Google Flights, @Google Hotels, @YouTube
+```
+```python
+response = GeminiClient.generate_content("@YouTube Search clips related with Google Gemini")
+response.response_dict
+```
+<details><summary>Extension description</summary>
+  
+### Google Workspace
+- **Services**: @Gmail, @Google Drive, @Google Docs 
+- **Description**: Summarize, search, and find desired information quickly in your content for efficient personal task management.
+- **Features**: Information retrieval, document summarization, information categorization
+
+### Google Maps
+- **Service**: @Google Maps
+- **Description**: Execute plans using location-based information. Note: Google Maps features may be limited in some regions.
+- **Features**: Route guidance, nearby search, navigation
+
+### Google Flights
+- **Service**: @Google Flights
+- **Description**: Search real-time flight information to plan tailored travel itineraries.
+- **Features**: Holiday preparation, price comparison, trip planning
+
+### Google Hotels
+- **Service**: @Google Hotels
+- **Description**: Search for hotels considering what matters most to you, like having a conversation with a friend.
+- **Features**: Packing for travel, sightseeing, special relaxation
+
+### YouTube
+- **Service**: @YouTube
+- **Description**: Explore YouTube videos and ask questions about what interests you.
+- **Features**: Problem-solving, generating ideas, search, exploring topics
+</details>
 
 <br>
+
+
+### # 08. Fix context setting rcid
+You can specify a particular response by setting its Response Choice ID (RCID).
+
+```python
+# Generate content for the prompt "Give me some information about the USA."
+response1 = GeminiClient.generate_content("Give me some information about the USA.")
+# After reviewing the responses, choose the one you prefer and copy its RCID.
+GeminiClient.rcid = "rc_xxxx"
+
+# Now, generate content for the next prompt "How long does it take from LA to New York?"
+response2 = GeminiClient.generate_content("How long does it take from LA to New York?")
+```
+
+<br>
+
+### # 09. Changing the Selected Response from 0 to n
+In Gemini, generate_content returns the first response. This may vary depending on length or sorting. Therefore, you can specify the index of the chosen response from 0 to n as follows. However, if there is only one response, revert it back to 0.
+```python
+from gemini import GeminiModelOutput
+GeminiModelOutput.chosen = 1 # default is 0
+response1 = GeminiClient.generate_content("Give me some information about the USA.")
+```
+
 
 ## Further
 
@@ -412,7 +483,7 @@ Core maintainers:
 
 
 ## License
-[MIT](https://opensource.org/license/mit/) license, 2024, Minwoo(Daniel) Park. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
+[MIT](https://opensource.org/license/mit/) license, 2024. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
 
 
 ## References
