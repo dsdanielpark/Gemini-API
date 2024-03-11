@@ -450,32 +450,16 @@ Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [G
 <br>
 
 <details><summary>Further development potential</summary>
-  
-- [ ] `refactoring`
-- [x] `gemini/core`: httpx.session
-  - [x] `messages`
-      - [x] `content`
-        - [x] `text`  
-          - [x] `parsing`
-        - [x] `image`
-          - [x] `parsing`
-      - [x] `response format structure class`
-      - [ ] `tool_calls`
-  - [ ] `third party`
-    - [ ] `replit`
-    - [ ] `google tools`
-- [ ] `gemini/client`: httpx.AsyncClient
-  - [ ] `messages`
-      - [ ] `content`
-        - [ ] `text`  
-          - [ ] `parsing`
-        - [ ] `image`
-          - [ ] `parsing`
-      - [ ] `response format structure class`
-      - [ ] `tool_calls`
-  - [ ] `third party`
-    - [ ] `replit`
-    - [ ] `google tools`   
+
+Modifications to the async client using my logic are needed, along with automatic cookie collection via browser_cookie3, and implementation of other Bard API features (such as code extraction, export to Replit, graph drawing, etc.).
+
+Please note that while reviewing automatic cookie collection, it appears that cookies expire immediately upon sending a request for collection. Efforts to make it more user-friendly were unsuccessful. Also, the _sid value seems to work normally even when returned as None.
+
+Lastly, if the CustomParser and ResponseParser algorithms do not function properly, new parsing methods can be updated through conditional statements in the relevant sections.
+
+I do not plan to actively curate this repository. Please review [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) first.
+
+Thank you, and have a great day.
 </details>
 
 ## Contacts
@@ -492,8 +476,8 @@ Core maintainers:
 
 ## References
 [1] Github: [acheong08/Bard](https://github.com/acheong08/Bard) <br>
-[2] Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
-[3] GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[2] GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[3] Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
 [4] Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
 [5] WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
