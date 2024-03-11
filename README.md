@@ -375,6 +375,7 @@ GeminiModelOutput.chosen = 1 # default is 0
 response1 = GeminiClient.generate_content("Give me some information about the USA.")
 ```
 
+<br>
 
 ## Further
 
