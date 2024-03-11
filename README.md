@@ -76,8 +76,8 @@ pip install -q -U python-gemini-api
 
 <details><summary>Further: For manual collection or Required for a few users upon error</summary>
 
-4. For manual cookie collection, refer to [this image](assets/cookies.pdf). Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Headers → Request Headers → Cookie → Copy and Reformat as JSON manually.
-5. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
+4. For manual cookie collection, refer to [this image](assets/cookies.pdf). Press F12 → Network → Send any prompt to Gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Headers → Request Headers → Cookie → Copy and Reformat as JSON manually.
+5. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to Gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
 </details>
 
 <br>
@@ -119,20 +119,20 @@ response = GeminiClient.generate_content(prompt)
 print(response.response_dict)
 ```
 > [!IMPORTANT]
->  Once connected and generating valid content, **Be sure to CLOSE the gemini website or CLOSE your browser** for cookie stability. 
+>  Once connected and generating valid content, **Be sure to CLOSE the Gemini website or CLOSE your browser** for cookie stability. 
 
 <br>
 
 The output of the generate_content function is `GeminiModelOutput`, with the following structure:
 
 **Properties of GeminiModelOutput:**
-https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 - *rcid*: returns the response candidate id of the chosen candidate.
 - *text*: returns the text of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
 - *response_dict*: returns the response dictionary, if available.
 
+https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 
 
 > [!NOTE]
@@ -173,7 +173,7 @@ GeminiImage.save_sync(generated_images, save_path="save_dir", cookies=cookies)
   
   You can display the image or transmit it to another application in byte format.
   
-  ```python
+  ```
   bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
   from IPython.display import display, Image
   import io
@@ -391,6 +391,11 @@ https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a2
 
 Using `Gemini.generate_custom_content`, specify custom parsing to extract specific values. Utilize ParseMethod1 and ParseMethod2 by default, and you can pass custom parsing methods as arguments if desired. Refer to [custom_parser.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/parser/custom_parser.py).
 
+```python
+# Use custom_parser function or class inheriting from BaseParser
+response = GeminiClient.generate_custom_content("Give me some information about the USA.", *custom_parser)
+```
+
 <br>
 
 ## Further
@@ -500,7 +505,7 @@ Core maintainers:
 [5] WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 > *Warning*
-Users bear all legal responsibilities when using the GeminiAPI package, which offers easy access to Google Gemini for developers. This unofficial Python package isn't affiliated with Google and may lead to Google account restrictions if used excessively or commercially due to its reliance on Google account cookies. Frequent changes in Google's interface, Google's API policies, and your country/region, as well as the status of your Google account, may affect functionality. Utilize the issue page and discussion page.
+Users assume full legal responsibility for GeminiAPI. Not endorsed by Google. Excessive use may lead to account restrictions. Changes in policies or account status may affect functionality. Utilize issue and discussion pages.
 
 <br>
 
