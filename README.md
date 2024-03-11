@@ -97,7 +97,7 @@ response = GeminiClient.generate_content("Hello, Gemini. What's the weather like
 response.response_dict
 ```
 
-Generate content from images
+Generate content from image
 ```python
 from gemini import Gemini
 
