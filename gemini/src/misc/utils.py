@@ -2,7 +2,7 @@
 import json
 import requests
 from typing import Union
-from .constants import REPLIT_SUPPORT_PROGRAM_LANGUAGES
+from .constants import REPLIT_SUPPORT_PROGRAM_LANGUAGES, IMAGE_PUSH_ID
 
 
 def extract_code(text: str, language: str) -> str:
@@ -68,7 +68,7 @@ def upload_image(file: Union[bytes, str]) -> str:
     response = requests.post(
         url="https://content-push.googleapis.com/upload/",
         headers={
-            "Push-ID": "feeds/mcudyrk2a4khkz",
+            "Push-ID": IMAGE_PUSH_ID,
             "Content-Type": "application/octet-stream",
         },
         data=file_data,
@@ -77,6 +77,30 @@ def upload_image(file: Union[bytes, str]) -> str:
     response.raise_for_status()
 
     return response.text
+
+
+def build_replit_structure(instructions: str, code: str, filename: str) -> list:
+    """
+    Creates and returns the input image data structure based on provided parameters.
+
+    Args:
+        instructions (str): The instruction text.
+        code (str): The code.
+        filename (str): The filename.
+
+    Returns:
+        list: The input image data structure.
+    """
+    return [
+        [
+            [
+                "qACoKe",
+                json.dumps([instructions, 5, code, [[filename, code]]]),
+                None,
+                "generic",
+            ]
+        ]
+    ]
 
 
 def max_token(text: str, n: int) -> str:
@@ -122,25 +146,3 @@ def max_sentence(text: str, n: int):
             if sentence_count == n:
                 result = "".join(sentences).strip()
                 return result
-
-
-def build_replit_data(instructions: str, code: str, filename: str) -> list:
-    """
-    Creates and returns the input_image_data_struct based on provided parameters.
-
-    :param instructions: The instruction text.
-    :param code: The code.
-    :param filename: The filename.
-
-    :return: The input_image_data_struct.
-    """
-    return [
-        [
-            [
-                "qACoKe",
-                json.dumps([instructions, 5, code, [[filename, code]]]),
-                None,
-                "generic",
-            ]
-        ]
-    ]

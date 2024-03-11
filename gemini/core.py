@@ -41,6 +41,7 @@ class Gemini:
         auto_cookies (bool): Automatically manage cookies if True.
         timeout (int): Timeout for requests, defaults to 30 seconds.
         proxies (Optional[dict]): Proxy configuration for requests, if any.
+        rcid (str): Response candidate ID.
     """
 
     def __init__(
@@ -179,6 +180,7 @@ class Gemini:
 
         Parameters:
             prompt (str): The user prompt to send.
+            image (Union[bytes, str]): The image data as bytes or file path. Supported formats: webp, jpeg, png.
             nonce (str): A one-time token used for request verification.
 
         Returns:
@@ -261,6 +263,15 @@ class Gemini:
         return self._create_model_output(parsed_response)
 
     def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
+        """
+        Creates model output from parsed response.
+
+        Args:
+            parsed_response (dict): The parsed response data.
+
+        Returns:
+            GeminiModelOutput: The model output containing metadata, candidates, and response dictionary.
+        """
         candidates = self.collect_candidates(parsed_response)
         metadata = parsed_response.get("metadata", [])
         try:
@@ -277,6 +288,15 @@ class Gemini:
 
     @staticmethod
     def collect_candidates(data):
+        """
+        Collects candidate data from parsed response.
+
+        Args:
+            data: The parsed response data.
+
+        Returns:
+            List: A list of GeminiCandidate objects.
+        """
         collected = []
         stack = [data]
 

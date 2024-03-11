@@ -1,15 +1,50 @@
-from gemini.src.parser.base import BaesParser
 import json
+from typing import Dict
+from gemini.src.parser.base import BaesParser
 
 
 class ResponseParser(BaesParser):
-    def __init__(self, cookies):
+    """
+    Parses response text and extracts relevant data.
+
+    Attributes:
+        cookies: Cookies used for parsing.
+
+    Methods:
+        parse(response_text: str) -> Dict: Parses the response text and returns a dictionary containing relevant data.
+    """
+
+    def __init__(self, cookies: dict) -> None:
+        """
+        Initializes the ResponseParser object.
+
+        Args:
+            cookies (dict): Cookies used for parsing.
+        """
         self.cookies = cookies
 
-    def parse(self, response_text):
+    def parse(self, response_text: str) -> Dict:
+        """
+        Parses the response text and extracts relevant data.
+
+        Args:
+            response_text (str): The response text to parse.
+
+        Returns:
+            Dict: A dictionary containing parsed data.
+        """
         return self.parse_response_text(response_text)
 
-    def parse_response_text(self, response_text):
+    def parse_response_text(self, response_text: str) -> Dict:
+        """
+        Parses the response text and extracts relevant data.
+
+        Args:
+            response_text (str): The response text to parse.
+
+        Returns:
+            Dict: A dictionary containing parsed data.
+        """
         body = self._extract_body(response_text)
 
         if not body or not body[4]:
@@ -39,7 +74,16 @@ class ResponseParser(BaesParser):
             "candidates": candidates,
         }
 
-    def _extract_body(self, response_text):
+    def _extract_body(self, response_text: str) -> Dict:
+        """
+        Extracts the body from the response text.
+
+        Args:
+            response_text (str): The response text.
+
+        Returns:
+            Dict: The extracted body.
+        """
         try:
             body = json.loads(
                 json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[0][2]
@@ -68,7 +112,16 @@ class ResponseParser(BaesParser):
                     body = json.loads(json.loads(max_response)[4][2])
                 return body
 
-    def _parse_candidates(self, candidates_data):
+    def _parse_candidates(self, candidates_data: Dict) -> Dict:
+        """
+        Parses the candidate data.
+
+        Args:
+            candidates_data (Dict): The candidate data to parse.
+
+        Returns:
+            Dict: The parsed candidate data.
+        """
         candidates_list = []
         for candidate_data in candidates_data:
             web_images = self._parse_web_images(candidate_data[4])
@@ -82,7 +135,16 @@ class ResponseParser(BaesParser):
             candidates_list.append(candidate_dict)
         return candidates_list
 
-    def _parse_web_images(self, images_data):
+    def _parse_web_images(self, images_data: Dict) -> Dict:
+        """
+        Parses web images data.
+
+        Args:
+            images_data (Dict): The web images data to parse.
+
+        Returns:
+            Dict: The parsed web images data.
+        """
         if not images_data:
             return []
         return [
@@ -94,7 +156,16 @@ class ResponseParser(BaesParser):
             for image in images_data
         ]
 
-    def _parse_generated_images(self, images_data):
+    def _parse_generated_images(self, images_data: Dict) -> Dict:
+        """
+        Parses generated images data.
+
+        Args:
+            images_data (Dict): The generated images data to parse.
+
+        Returns:
+            Dict: The parsed generated images data.
+        """
         if not images_data or not images_data[7] or not images_data[7][0]:
             return []
         return [

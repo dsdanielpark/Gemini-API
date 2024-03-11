@@ -10,12 +10,41 @@ from pydantic import BaseModel, HttpUrl
 
 
 class GeminiImage(BaseModel):
+    """
+    Represents an image with URL, title, and alt text.
+
+    Attributes:
+        url (HttpUrl): The URL of the image.
+        title (str): The title of the image. Defaults to "[Image]".
+        alt (str): The alt text of the image. Defaults to "".
+
+    Methods:
+        validate_images(cls, images): Validates the input images list.
+        save(cls, images: List["GeminiImage"], save_path: str = "cached", cookies: Optional[dict] = None) -> Optional[Path]:
+            Downloads and saves images asynchronously.
+        fetch_bytes(url: HttpUrl, cookies: Optional[dict] = None) -> Optional[bytes]:
+            Fetches bytes of an image asynchronously.
+        fetch_images_dict(cls, images: List["GeminiImage"], cookies: Optional[dict] = None) -> Dict[str, bytes]:
+            Fetches images asynchronously and returns a dictionary of image data.
+        save_images(cls, image_data: Dict[str, bytes], save_path: str = "cached"):
+            Saves images locally.
+    """
+
     url: HttpUrl
     title: str = "[Image]"
     alt: str = ""
 
     @classmethod
     def validate_images(cls, images):
+        """
+        Validates the input images list.
+
+        Args:
+            images: The list of GeminiImage objects.
+
+        Raises:
+            ValueError: If the input images list is empty.
+        """
         if not images:
             raise ValueError(
                 "Input is empty. Please provide images infomation to proceed."
@@ -29,6 +58,17 @@ class GeminiImage(BaseModel):
         save_path: str = "cached",
         cookies: Optional[dict] = None,
     ) -> Optional[Path]:
+        """
+        Downloads and saves images asynchronously.
+
+        Args:
+            images (List["GeminiImage"]): The list of GeminiImage objects to download.
+            save_path (str): The directory path to save the images. Defaults to "cached".
+            cookies (Optional[dict]): Cookies to be used for downloading images. Defaults to None.
+
+        Returns:
+            Optional[Path]: The path to the directory where the images are saved, or None if saving fails.
+        """
         cls.validate_images(images)
         image_data = await cls.fetch_images_dict(images, cookies)
         await cls.save_images(image_data, save_path)
@@ -37,6 +77,16 @@ class GeminiImage(BaseModel):
     async def fetch_bytes(
         url: HttpUrl, cookies: Optional[dict] = None
     ) -> Optional[bytes]:
+        """
+        Fetches bytes of an image asynchronously.
+
+        Args:
+            url (HttpUrl): The URL of the image.
+            cookies (Optional[dict]): Cookies to be used for fetching the image. Defaults to None.
+
+        Returns:
+            Optional[bytes]: The bytes of the image, or None if fetching fails.
+        """
         try:
             async with httpx.AsyncClient(follow_redirects=True) as client:
                 response = await client.get(str(url), cookies=cookies)
@@ -50,6 +100,16 @@ class GeminiImage(BaseModel):
     async def fetch_images_dict(
         cls, images: List["GeminiImage"], cookies: Optional[dict] = None
     ) -> Dict[str, bytes]:
+        """
+        Fetches images asynchronously and returns a dictionary of image data.
+
+        Args:
+            images (List["GeminiImage"]): The list of GeminiImage objects to fetch.
+            cookies (Optional[dict]): Cookies to be used for fetching the images. Defaults to None.
+
+        Returns:
+            Dict[str, bytes]: A dictionary containing image titles as keys and image bytes as values.
+        """
         cls.validate_images(images)
         tasks = [cls.fetch_bytes(image.url, cookies=cookies) for image in images]
         results = await asyncio.gather(*tasks)
@@ -57,6 +117,13 @@ class GeminiImage(BaseModel):
 
     @staticmethod
     async def save_images(image_data: Dict[str, bytes], save_path: str = "cached"):
+        """
+        Saves images locally.
+
+        Args:
+            image_data (Dict[str, bytes]): A dictionary containing image titles as keys and image bytes as values.
+            save_path (str): The directory path to save the images. Defaults to "cached".
+        """
         os.makedirs(save_path, exist_ok=True)
         for title, data in image_data.items():
             now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")

@@ -13,6 +13,8 @@ class Tool(Enum):
     YOUTUBE = ["youtube_tool"]
 
 
+IMAGE_PUSH_ID = "feeds/mcudyrk2a4khkz"
+
 DEFAULT_LANGUAGE = "en"
 POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
 HOST = "https://gemini.google.com"

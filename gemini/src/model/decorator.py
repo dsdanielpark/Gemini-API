@@ -1,10 +1,23 @@
 import functools
 import time
 import requests
+from typing import Callable
 
 
-def retry(attempts=3, delay=2, backoff=2):
-    def retry_decorator(func):
+def retry(attempts: int = 3, delay: int = 2, backoff: int = 2) -> Callable:
+    """
+    Retries a function call with exponential backoff.
+
+    Args:
+        attempts (int): The maximum number of attempts. Defaults to 3.
+        delay (int): The initial delay in seconds between retries. Defaults to 2.
+        backoff (int): The backoff factor. Defaults to 2.
+
+    Returns:
+        Callable: Decorator function.
+    """
+
+    def retry_decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             _attempts, _delay = attempts, delay
@@ -23,7 +36,17 @@ def retry(attempts=3, delay=2, backoff=2):
     return retry_decorator
 
 
-def log_method(func):
+def log_method(func: Callable) -> Callable:
+    """
+    Logs method entry and exit.
+
+    Args:
+        func (Callable): The function to decorate.
+
+    Returns:
+        Callable: Decorated function.
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         className = args[0].__class__.__name__
@@ -39,7 +62,17 @@ def log_method(func):
     return wrapper
 
 
-def time_execution(func):
+def time_execution(func: Callable) -> Callable:
+    """
+    Measures the execution time of a function.
+
+    Args:
+        func (Callable): The function to decorate.
+
+    Returns:
+        Callable: Decorated function.
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -51,7 +84,17 @@ def time_execution(func):
     return wrapper
 
 
-def handle_errors(func):
+def handle_errors(func: Callable) -> Callable:
+    """
+    Handles errors that occur during function execution.
+
+    Args:
+        func (Callable): The function to decorate.
+
+    Returns:
+        Callable: Decorated function.
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
