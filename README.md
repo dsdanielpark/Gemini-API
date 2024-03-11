@@ -35,6 +35,7 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
     - [# 07. Generate content using Google Services](#-07-generate-content-using-google-services)
     - [# 08. Fix context setting rcid](#-08-fix-context-setting-rcid)
     - [# 09. Changing the Selected Response from 0 to n](#-09-changing-the-selected-response-from-0-to-n)
+    - [# 10. Generate custom content](#-10-generate-custom-content)
   - [More features](#more-features)
   - [Open-source LLM, Gemma](#open-source-llm-gemma)
     - [How to use Gemma](#how-to-use-gemma)
