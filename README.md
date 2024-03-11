@@ -10,7 +10,7 @@ A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/pyth
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
-Please, check [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) first. 
+Please, check <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="15px" alt="Gemini Icon" />[HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) first. 
 
 
 <br>
@@ -294,6 +294,14 @@ if __name__ == "__main__":
 
 <br>
 
+### # 06. Generate Content from Images
+
+<br>
+
+### # 07. Generate Content Using Google Services
+
+<br>
+
 ## Further
 
 ### Use rotating proxies
@@ -396,6 +404,7 @@ Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [G
 </details>
 
 ## Contacts
+
 Core maintainers:
 - [Antonio Cheong](https://github.com/acheong08) / teapotv8@proton.me <br>
 - [Daniel Park](https://github.com/DSDanielPark) / parkminwoo1991@gmail.com
