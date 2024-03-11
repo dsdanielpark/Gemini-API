@@ -84,6 +84,31 @@ pip install -q -U python-gemini-api
 
 ## Usage
 
+*Simple usage*
+
+Generate content
+```python
+from gemini import Gemini
+
+cookies = {} # Cookies may vary by account or region. Consider sending the entire cookie file.
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+response.response_dict
+```
+
+Generate content from images
+```python
+from gemini import Gemini
+
+cookies = {} # Cookies may vary by account or region. Consider sending the entire cookie file.
+
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+response = GeminiClient.generate_content("What does the text in this image say?", image='folder/image.jpg')
+response.response_dict
+```
+
+<br>
 
 ### # 01. Initialization
 Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
@@ -309,7 +334,7 @@ Takes an image as input and returns a response.
 
 ```python
 image = 'folder/image.jpg'
-# image = open('folder/image.jpg', 'rb').read() # (jpeg, png, webp) are supported.
+# image = open('folder/image.jpg', 'rb').read() # (jpg, jpeg, png, webp) are supported.
 
 response = GeminiClient.generate_content("What does the text in this image say?", image=image)
 response.response_dict
@@ -392,6 +417,9 @@ https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a2
 Using `Gemini.generate_custom_content`, specify custom parsing to extract specific values. Utilize ParseMethod1 and ParseMethod2 by default, and you can pass custom parsing methods as arguments if desired. Refer to [custom_parser.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/parser/custom_parser.py).
 
 ```python
+# You can create a parser method that takes response_text as the input for custom_parser.
+response_text, response_status = GeminiClient.send_request("Give me some information about the USA.")
+
 # Use custom_parser function or class inheriting from BaseParser
 response = GeminiClient.generate_custom_content("Give me some information about the USA.", *custom_parser)
 ```
