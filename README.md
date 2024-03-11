@@ -27,15 +27,26 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
   - [Authentication](#authentication)
   - [Usage](#usage)
     - [# 01. Initialization](#-01-initialization)
-    - [# 02. Generate Content](#-02-generate-content)
+    - [# 02. Generate content](#-02-generate-content)
     - [# 03. Text generation](#-03-text-generation)
     - [# 04. Image generation](#-04-image-generation)
     - [# 05. Retrieving Images from Gemini Responses](#-05-retrieving-images-from-gemini-responses)
+    - [# 06. Generate content from images](#-06-generate-content-from-images)
+    - [# 07. Generate content using Google Services](#-07-generate-content-using-google-services)
+    - [# 08. Fix context setting rcid](#-08-fix-context-setting-rcid)
+    - [# 09. Changing the Selected Response from 0 to n](#-09-changing-the-selected-response-from-0-to-n)
   - [Further](#further)
     - [Use rotating proxies](#use-rotating-proxies)
   - [More features](#more-features)
   - [Open-source LLM, Gemma](#open-source-llm-gemma)
     - [How to use Gemma](#how-to-use-gemma)
+  - [FAQ](#faq)
+  - [Sponsor](#sponsor)
+  - [Issues](#issues)
+  - [Contributors](#contributors)
+  - [Contacts](#contacts)
+  - [License](#license)
+  - [References](#references)
 
 
 
@@ -320,30 +331,30 @@ response.response_dict
 ```
 <details><summary>Extension description</summary>
   
-### Google Workspace
-- **Services**: @Gmail, @Google Drive, @Google Docs 
-- **Description**: Summarize, search, and find desired information quickly in your content for efficient personal task management.
-- **Features**: Information retrieval, document summarization, information categorization
+- Google Workspace
+  - Services: @Gmail, @Google Drive, @Google Docs 
+  - Description: Summarize, search, and find desired information quickly in your content for efficient personal task management.
+  - Features: Information retrieval, document summarization, information categorization
 
-### Google Maps
-- **Service**: @Google Maps
-- **Description**: Execute plans using location-based information. Note: Google Maps features may be limited in some regions.
-- **Features**: Route guidance, nearby search, navigation
+- Google Maps
+  - Service: @Google Maps
+  - Description: Execute plans using location-based information. Note: Google Maps features may be limited in some regions.
+  - Features: Route guidance, nearby search, navigation
 
-### Google Flights
-- **Service**: @Google Flights
-- **Description**: Search real-time flight information to plan tailored travel itineraries.
-- **Features**: Holiday preparation, price comparison, trip planning
+- Google Flights
+  - Service: @Google Flights
+  - Description: Search real-time flight information to plan tailored travel itineraries.
+  - Features: Holiday preparation, price comparison, trip planning
 
-### Google Hotels
-- **Service**: @Google Hotels
-- **Description**: Search for hotels considering what matters most to you, like having a conversation with a friend.
-- **Features**: Packing for travel, sightseeing, special relaxation
+- Google Hotels
+  - Service: @Google Hotels
+  - Description: Search for hotels considering what matters most to you, like having a conversation with a friend.
+  - Features: Packing for travel, sightseeing, special relaxation
 
-### YouTube
-- **Service**: @YouTube
-- **Description**: Explore YouTube videos and ask questions about what interests you.
-- **Features**: Problem-solving, generating ideas, search, exploring topics
+- YouTube
+  - Service: @YouTube
+  - Description: Explore YouTube videos and ask questions about what interests you.
+  - Features: Problem-solving, generating ideas, search, exploring topics
 </details>
 
 <br>
