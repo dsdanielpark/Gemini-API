@@ -10,7 +10,7 @@ A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/pyth
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
-Please, check <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="15px" alt="Gemini Icon" />[HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) first. 
+Please, first review [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) and the [Official Google Gemini API](https://aistudio.google.com/) before using this package.
 
 
 <br>
