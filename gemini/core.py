@@ -1,4 +1,3 @@
-# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import os
 import re
 import json
@@ -7,12 +6,13 @@ import string
 import inspect
 import requests
 import urllib.parse
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple, Dict, Union
 from requests.exceptions import ConnectionError, RequestException
 
 from .src.parser.custom_parser import ParseMethod1, ParseMethod2
 from .src.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
+from .src.misc.utils import upload_image
 from .src.misc.constants import (
     HEADERS,
     HOST,
@@ -52,12 +52,16 @@ class Gemini:
         auto_cookies: bool = False,
         timeout: int = 30,
         proxies: Optional[dict] = None,
+        rcid: str = None,
     ) -> None:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
         """
         self._nonce = None
         self._sid = None
+        self._rcid = rcid or None
+        self._rid = None
+        self._cid = None
         self.auto_cookies = auto_cookies
         self.cookie_fp = cookie_fp
         self.cookies = cookies
@@ -68,6 +72,14 @@ class Gemini:
         self.nonce = nonce
         self._reqid = int("".join(random.choices(string.digits, k=7)))
         self.parser = ResponseParser(cookies=self.cookies)
+
+    @property
+    def rcid(self):
+        return self._rcid
+
+    @rcid.setter
+    def rcid(self, value):
+        self._rcid = value
 
     def _initialize_session(
         self,
@@ -87,7 +99,7 @@ class Gemini:
         if self.cookies:
             session.cookies.update(self.cookies)
         elif self.cookie_fp:
-            self._load_cookies_from_file(self.cookie_fp)
+            self._set_cookies_from_file(self.cookie_fp)
         elif self.auto_cookies == True:
             self._set_cookies_automatically()
 
@@ -95,7 +107,7 @@ class Gemini:
 
         return session
 
-    def _load_cookies_from_file(self, file_path: str) -> None:
+    def _set_cookies_from_file(self, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
             if file_path.endswith(".json"):
@@ -120,15 +132,17 @@ class Gemini:
             response = requests.get(f"{HOST}/app", cookies=self.cookies)
             response.raise_for_status()
 
-            sid_match, nonce_match = self.extract_sid_nonce(response.text)
+            sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
+            nonce_match = re.search(r'"SNlM0e":"(.*?)"', response.text)
 
-            if sid_match and nonce_match:
+            if sid_match:
                 self._sid = sid_match.group(1)
-                self._nonce = nonce_match.group(1)
             else:
                 raise ValueError(
                     "Failed to parse SID or SNlM0e nonce from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
                 )
+            if nonce_match:
+                self._nonce = nonce_match.group(1)
 
         except requests.RequestException as e:
             raise ConnectionError(f"Request failed: {e}")
@@ -136,12 +150,6 @@ class Gemini:
             raise e  # Re-raise the exception after it's caught
         except Exception as e:
             raise RuntimeError(f"An unexpected error occurred: {e}")
-
-    @staticmethod
-    def extract_sid_nonce(response_text):
-        sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response_text)
-        nonce_match = re.search(r'"SNlM0e":"(.*?)"', response_text)
-        return sid_match, nonce_match
 
     def _construct_params(self, sid: str) -> str:
         """
@@ -163,7 +171,9 @@ class Gemini:
             }
         )
 
-    def _construct_payload(self, prompt: str, nonce: str) -> str:
+    def _construct_payload(
+        self, prompt: str, image: Union[bytes, str], nonce: str
+    ) -> str:
         """
         Constructs URL-encoded payload for a request.
 
@@ -177,15 +187,35 @@ class Gemini:
         return urllib.parse.urlencode(
             {
                 "at": nonce,
-                "f.req": json.dumps([None, json.dumps([[prompt], None, None])]),
-            }
+                "f.req": json.dumps(
+                    [
+                        None,
+                        json.dumps(
+                            [
+                                image
+                                and [
+                                    prompt,
+                                    0,
+                                    None,
+                                    [[[upload_image(image), 1]]],
+                                ]
+                                or [prompt],
+                                None,
+                                [self._cid, self._rid, self._rcid],
+                            ]
+                        ),
+                    ]
+                ),
+            },
         )
 
-    def send_request(self, prompt: str) -> Tuple[str, int]:
+    def send_request(
+        self, prompt: str, image: Union[bytes, str] = None
+    ) -> Tuple[str, int]:
         """Sends a request and returns the response text and status code."""
         try:
             params = self._construct_params(self._sid)
-            data = self._construct_payload(prompt, self._nonce)
+            data = self._construct_payload(prompt, image, self._nonce)
             response = self.session.post(
                 POST_ENDPOINT,
                 params=params,
@@ -200,7 +230,7 @@ class Gemini:
             # self._update_cookies_from_browser()
             self._set_sid_and_nonce()
             params = self._construct_params(self._sid)
-            data = self._construct_payload(prompt, self._nonce)
+            data = self._construct_payload(prompt, image, self._nonce)
             response = self.session.post(
                 POST_ENDPOINT,
                 params=params,
@@ -217,9 +247,11 @@ class Gemini:
             response.raise_for_status()
         return response.text, response.status_code
 
-    def generate_content(self, prompt: str) -> GeminiModelOutput:
+    def generate_content(
+        self, prompt: str, image: Union[bytes, str] = None
+    ) -> GeminiModelOutput:
         """Generates content based on the prompt and returns a GeminiModelOutput object."""
-        response_text, response_status_code = self.send_request(prompt)
+        response_text, response_status_code = self.send_request(prompt, image)
         if response_status_code != 200:
             raise ValueError(f"Response status: {response_status_code}")
         else:
@@ -231,7 +263,12 @@ class Gemini:
     def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
         candidates = self.collect_candidates(parsed_response)
         metadata = parsed_response.get("metadata", [])
-
+        try:
+            self._cid = metadata[0]
+            self._rid = metadata[1]
+            # self._rcid = candidates["candidates"][0]["rcid"]
+        except:
+            pass
         return GeminiModelOutput(
             metadata=metadata,
             candidates=candidates,

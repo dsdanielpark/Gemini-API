@@ -27,18 +27,10 @@ setup(
     install_requires=[
         "httpx[http2]>=0.20.0",
         "requests",
-        "colorama",
         "browser_cookie3",
         "loguru",
         "pydantic",
     ],
-    extras_require={
-        "translate": [
-            "deep_translator",
-            "google-cloud-translate",
-            "langdetect",
-        ]
-    },
     keywords="Python, API, Gemini, Google Gemini, Large Language Model, Chatbot API, Google API, Chatbot",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

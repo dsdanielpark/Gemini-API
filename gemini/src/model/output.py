@@ -21,6 +21,12 @@ class GeminiModelOutput(BaseModel):
     chosen: int = 0
     response_dict: Optional[dict] = None
 
+    def __setattr__(self, name, value):
+        if name == "chosen":
+            self.chosen = value
+        else:
+            super().__setattr__(name, value)
+
     @property
     def rcid(self) -> str:
         """The RCID (Response Choice ID) of the chosen candidate."""

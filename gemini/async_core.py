@@ -1,4 +1,3 @@
-# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import os
 import re
 import json

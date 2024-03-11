@@ -1,7 +1,8 @@
 # Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import json
 import requests
-from .constants import IMG_UPLOAD_HEADERS, REPLIT_SUPPORT_PROGRAM_LANGUAGES
+from typing import Union
+from .constants import REPLIT_SUPPORT_PROGRAM_LANGUAGES
 
 
 def extract_code(text: str, language: str) -> str:
@@ -51,36 +52,31 @@ def extract_code(text: str, language: str) -> str:
         return text
 
 
-def upload_image(image: bytes, filename: str = "Photo.jpg"):
+def upload_image(file: Union[bytes, str]) -> str:
     """
     Upload image into bard bucket on Google API, do not need session.
 
     Returns:
         str: relative URL of image.
     """
-    resp = requests.options("https://content-push.googleapis.com/upload/")
-    resp.raise_for_status()
-    size = len(image)
+    if isinstance(file, str):
+        with open(file, "rb") as f:
+            file_data = f.read()
+    else:
+        file_data = file
 
-    headers = IMG_UPLOAD_HEADERS
-    headers["size"] = str(size)
-    headers["x-goog-upload-command"] = "start"
-
-    data = f"File name: {filename}"
-    resp = requests.post(
-        "https://content-push.googleapis.com/upload/", headers=headers, data=data
+    response = requests.post(
+        url="https://content-push.googleapis.com/upload/",
+        headers={
+            "Push-ID": "feeds/mcudyrk2a4khkz",
+            "Content-Type": "application/octet-stream",
+        },
+        data=file_data,
+        allow_redirects=True,
     )
-    resp.raise_for_status()
-    upload_url = resp.headers["X-Goog-Upload-Url"]
-    resp = requests.options(upload_url, headers=headers)
-    resp.raise_for_status()
-    headers["x-goog-upload-command"] = "upload, finalize"
+    response.raise_for_status()
 
-    # It can be that we need to check returned offset
-    headers["X-Goog-Upload-Offset"] = "0"
-    resp = requests.post(upload_url, headers=headers, data=image)
-    resp.raise_for_status()
-    return resp.text
+    return response.text
 
 
 def max_token(text: str, n: int) -> str:
