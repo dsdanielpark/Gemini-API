@@ -8,6 +8,7 @@ class GeminiCandidate(BaseModel):
 
     rcid: str
     text: str
+    code: List[str] = []
     web_images: List[GeminiImage] = []
     generated_images: List[GeminiImage] = []
     response_dict: Dict = {}
@@ -34,8 +35,13 @@ class GeminiModelOutput(BaseModel):
 
     @property
     def text(self) -> str:
-        """The text of the chosen candidate."""
+        """The code of the chosen candidate."""
         return self.candidates[self.chosen].text
+    
+    @property
+    def code(self) -> str:
+        """The text of the chosen candidate."""
+        return self.candidates[self.chosen].code
 
     @property
     def web_images(self) -> List[GeminiImage]:

@@ -1,42 +1,31 @@
-# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 import json
 import requests
 from typing import Union
-from .constants import REPLIT_SUPPORT_PROGRAM_LANGUAGES, IMAGE_PUSH_ID
+from .constants import IMAGE_PUSH_ID
 
-
-def extract_code(text: str, language: str) -> str:
+def extract_code(text: str) -> str:
     """
-    Extracts code snippets for the specified programming language from the given text.
+    Extracts code snippets from the given text.
     If only one snippet is found, returns it directly instead of a list.
     If no snippets are found, returns the original text.
 
     Args:
         text (str): The text containing mixed code snippets.
-        language (str): The programming language of the code snippets to extract.
 
     Returns:
-        str or list of str: A single code snippet string if only one is found, otherwise a list of all extracted code snippets for the specified language. Returns the original text if no snippets are found.
-
-    Raises:
-        ValueError: If the specified language is not supported.
+        str or list of str: A single code snippet string if only one is found, otherwise a list of all extracted code snippets. Returns the original text if no snippets are found.
     """
-    language = language.lower()
-    if language not in REPLIT_SUPPORT_PROGRAM_LANGUAGES:
-        supported_languages = ", ".join(REPLIT_SUPPORT_PROGRAM_LANGUAGES.keys())
-        raise ValueError(
-            f"Unsupported language. Please choose from the following: {supported_languages}"
-        )
-
+    if not text:
+        return []
     snippets = []
-    start_pattern = f"```{language}"
+    start_pattern = "```"
     end_pattern = "```"
     start_idx = text.find(start_pattern)
 
     while start_idx != -1:
         end_idx = text.find(end_pattern, start_idx + len(start_pattern))
         if end_idx != -1:
-            snippet = text[start_idx + len(start_pattern) : end_idx].strip()
+            snippet = text[start_idx:end_idx + len(end_pattern)].strip()
             snippets.append(snippet)
             start_idx = text.find(start_pattern, end_idx + len(end_pattern))
         else:
@@ -50,6 +39,8 @@ def extract_code(text: str, language: str) -> str:
     else:
         # Return the original text if no snippets are found
         return text
+
+
 
 
 def upload_image(file: Union[bytes, str]) -> str:
@@ -79,7 +70,7 @@ def upload_image(file: Union[bytes, str]) -> str:
     return response.text
 
 
-def build_replit_structure(instructions: str, code: str, filename: str) -> list:
+def prepare_replit_data(instructions: str, code: str, filename: str) -> list:
     """
     Creates and returns the input image data structure based on provided parameters.
 

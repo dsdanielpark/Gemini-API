@@ -1,6 +1,7 @@
 import json
 from typing import Dict
 from gemini.src.parser.base import BaesParser
+from gemini.src.misc.utils import extract_code
 
 
 class ResponseParser(BaesParser):
@@ -74,6 +75,9 @@ class ResponseParser(BaesParser):
             "candidates": candidates,
         }
 
+
+
+
     def _extract_body(self, response_text: str) -> Dict:
         """
         Extracts the body from the response text.
@@ -112,6 +116,7 @@ class ResponseParser(BaesParser):
                     body = json.loads(json.loads(max_response)[4][2])
                 return body
 
+
     def _parse_candidates(self, candidates_data: Dict) -> Dict:
         """
         Parses the candidate data.
@@ -129,6 +134,7 @@ class ResponseParser(BaesParser):
             candidate_dict = {
                 "rcid": candidate_data[0],
                 "text": candidate_data[1][0],
+                "code": extract_code(candidate_data[1][0]),
                 "web_images": web_images,
                 "generated_images": generated_images,
             }
@@ -177,3 +183,7 @@ class ResponseParser(BaesParser):
             }
             for i, image in enumerate(images_data[7][0])
         ]
+
+
+    def _parse_code(self, text):
+        return extract_code(text)
