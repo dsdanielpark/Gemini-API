@@ -441,6 +441,19 @@ GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
 GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
 ```
 
+### Reusable session object
+Gemini class suffices for most cases, but use session objects for special cases.
+```python
+from gemini import Gemini, HEADERS
+import requests
+cookies = {} 
+
+session = requests.Session()
+session.headers = HEADERS
+
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+```
 
 
 
