@@ -130,7 +130,7 @@ class ResponseParser(BaesParser):
             candidate_dict = {
                 "rcid": candidate_data[0],
                 "text": candidate_data[1][0],
-                "code": extract_code(candidate_data[1][0]),
+                "code": self._parse_code(candidate_data[1][0]),
                 "web_images": web_images,
                 "generated_images": generated_images,
             }
@@ -181,4 +181,6 @@ class ResponseParser(BaesParser):
         ]
 
     def _parse_code(self, text):
+        if not text:
+            return []
         return extract_code(text)

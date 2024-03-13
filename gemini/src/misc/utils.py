@@ -16,8 +16,7 @@ def extract_code(text: str) -> str:
     Returns:
         str or list of str: A single code snippet string if only one is found, otherwise a list of all extracted code snippets. Returns the original text if no snippets are found.
     """
-    if not text:
-        return []
+
     snippets = []
     start_pattern = "```"
     end_pattern = "```"
