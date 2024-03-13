@@ -84,6 +84,31 @@ pip install -q -U python-gemini-api
 
 ## Usage
 
+*Simple usage*
+
+Generate content
+```python
+from gemini import Gemini
+
+cookies = {} # Cookies may vary by account or region. Consider sending the entire cookie file.
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+response.response_dict
+```
+
+Generate content from image
+```python
+from gemini import Gemini
+
+cookies = {} # Cookies may vary by account or region. Consider sending the entire cookie file.
+
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+response = GeminiClient.generate_content("What does the text in this image say?", image='folder/image.jpg')
+response.response_dict
+```
+
+<br>
 
 ### # 01. Initialization
 Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
@@ -309,7 +334,7 @@ Takes an image as input and returns a response.
 
 ```python
 image = 'folder/image.jpg'
-# image = open('folder/image.jpg', 'rb').read() # (jpeg, png, webp) are supported.
+# image = open('folder/image.jpg', 'rb').read() # (jpg, jpeg, png, webp) are supported.
 
 response = GeminiClient.generate_content("What does the text in this image say?", image=image)
 response.response_dict
@@ -392,6 +417,9 @@ https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a2
 Using `Gemini.generate_custom_content`, specify custom parsing to extract specific values. Utilize ParseMethod1 and ParseMethod2 by default, and you can pass custom parsing methods as arguments if desired. Refer to [custom_parser.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/parser/custom_parser.py).
 
 ```python
+# You can create a parser method that takes response_text as the input for custom_parser.
+response_text, response_status = GeminiClient.send_request("Give me some information about the USA.")
+
 # Use custom_parser function or class inheriting from BaseParser
 response = GeminiClient.generate_custom_content("Give me some information about the USA.", *custom_parser)
 ```
@@ -413,6 +441,19 @@ GeminiClient = Gemini(cookies=cookies, proxies=proxies, timeout=30)
 GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul's scenery.")
 ```
 
+### Reusable session object
+Gemini class suffices for most cases, but use session objects for special cases.
+```python
+from gemini import Gemini, HEADERS
+import requests
+cookies = {} 
+
+session = requests.Session()
+session.headers = HEADERS
+
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+```
 
 
 
@@ -462,7 +503,9 @@ Sincerely grateful for any reports on new features or bugs. Your valuable feedba
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
 ## Contributors
-We would like to express our sincere gratitude to all the contributors.
+We would like to express our sincere gratitude to all the contributors. 
+
+This package aims to re-implement the functionality of the [Bard API](https://github.com/dsdanielpark/Bard-API/), which has been archived for the contributions of the beloved open-source community, despite Gemini's official API already being available.
 
 Contributors to the [Bard API](https://github.com/dsdanielpark/Bard-API/) and [Gemini API](https://github.com/dsdanielpark/Gemini-API/).
 
