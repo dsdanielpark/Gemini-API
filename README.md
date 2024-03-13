@@ -85,6 +85,11 @@ pip install -q -U python-gemini-api
 5. *(Required for a few users upon error)* If errors persist after manually collecting cookies, refresh the Gemini website and collect cookies again. If errors continue, some users may need to manually set the nonce value. To do this: Press F12 → Network → Send any prompt to Gemini webui → Click the post address starting with "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate" → Payload → Form Data → Copy the "at" key value. See [this image](assets/nonce_value.pdf) for reference.
 </details>
 
+
+> [!IMPORTANT] 
+>  Try different Google accounts until you find a working cookie. Use a fresh browser to ensure no remaining cookie values. Use secret browsing mode with independent cookies. Results may vary depending on factors like IP and account status. Providing the entire set of cookies seems to fix one cookie per account. Additionally, once successfully connected with that cookie, it seems to work flawlessly for over three weeks without any errors. *Try various methods until you succeed. Experiment in different environments.*
+
+
 <br>
 
 ## Usage
@@ -158,6 +163,7 @@ The output of the generate_content function is `GeminiModelOutput`, with the fol
 **Properties of GeminiModelOutput:**
 - *rcid*: returns the response candidate id of the chosen candidate.
 - *text*: returns the text of the chosen candidate.
+- *code*: returns the codes of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
 - *response_dict*: returns the response dictionary, if available.
@@ -451,12 +457,15 @@ Gemini class suffices for most cases, but use session objects for special cases.
 ```python
 from gemini import Gemini, HEADERS
 import requests
+
 cookies = {} 
 
 session = requests.Session()
 session.headers = HEADERS
+for key, value in cookies.items():
+    session.cookies.update({key: value})
 
-GeminiClient = Gemini(cookies=cookies) # You can use various args
+GeminiClient = Gemini(session=session) # You can use various args
 response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
 ```
 
