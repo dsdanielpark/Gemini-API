@@ -3,6 +3,7 @@ import requests
 from typing import Union
 from .constants import IMAGE_PUSH_ID
 
+
 def extract_code(text: str) -> str:
     """
     Extracts code snippets from the given text.
@@ -25,7 +26,7 @@ def extract_code(text: str) -> str:
     while start_idx != -1:
         end_idx = text.find(end_pattern, start_idx + len(start_pattern))
         if end_idx != -1:
-            snippet = text[start_idx:end_idx + len(end_pattern)].strip()
+            snippet = text[start_idx : end_idx + len(end_pattern)].strip()
             snippets.append(snippet)
             start_idx = text.find(start_pattern, end_idx + len(end_pattern))
         else:
@@ -39,8 +40,6 @@ def extract_code(text: str) -> str:
     else:
         # Return the original text if no snippets are found
         return text
-
-
 
 
 def upload_image(file: Union[bytes, str]) -> str:

@@ -37,7 +37,7 @@ class GeminiModelOutput(BaseModel):
     def text(self) -> str:
         """The code of the chosen candidate."""
         return self.candidates[self.chosen].text
-    
+
     @property
     def code(self) -> str:
         """The text of the chosen candidate."""

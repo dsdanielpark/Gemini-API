@@ -75,9 +75,6 @@ class ResponseParser(BaesParser):
             "candidates": candidates,
         }
 
-
-
-
     def _extract_body(self, response_text: str) -> Dict:
         """
         Extracts the body from the response text.
@@ -115,7 +112,6 @@ class ResponseParser(BaesParser):
                 if not body[4]:
                     body = json.loads(json.loads(max_response)[4][2])
                 return body
-
 
     def _parse_candidates(self, candidates_data: Dict) -> Dict:
         """
@@ -183,7 +179,6 @@ class ResponseParser(BaesParser):
             }
             for i, image in enumerate(images_data[7][0])
         ]
-
 
     def _parse_code(self, text):
         return extract_code(text)
