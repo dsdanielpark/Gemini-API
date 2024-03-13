@@ -1,4 +1,3 @@
-# Copyright 2024 Daniel Park, Antonio Cheang, MIT License
 from enum import Enum
 import browser_cookie3
 
