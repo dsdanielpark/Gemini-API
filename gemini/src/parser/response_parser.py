@@ -77,41 +77,60 @@ class ResponseParser(BaesParser):
 
     def _extract_body(self, response_text: str) -> Dict:
         """
-        Extracts the body from the response text.
+        Attempts to extract the body from the response text using three different
+        strategies. It stops and returns the body as soon as one of the strategies
+        succeeds without raising an error.
 
         Args:
-            response_text (str): The response text.
+            response_text (str): The response text to parse.
 
         Returns:
             Dict: The extracted body.
         """
-        try:
-            body = json.loads(
-                json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[0][2]
-            )
-            if not body[4]:
-                body = json.loads(
-                    json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[4][2]
-                )
-            return body
-        except:
+        parsing_strategies = [
+            self.__parse_strategy_1,
+            self.__parse_strategy_2,
+            self.__parse_strategy_3,
+        ]
+
+        for strategy in parsing_strategies:
             try:
-                body = json.loads(json.loads(response_text.text.split("\n")[2])[0][2])
-                if not body[4]:
-                    body = json.loads(
-                        json.loads(response_text.text.split("\n")[2])[4][2]
-                    )
-                else:
-                    raise ValueError(
-                        "Failed to generate contents. Invalid response data received."
-                    )
-                return body
-            except:
-                max_response = max(response_text.split("\n"), key=len)
-                body = json.loads(json.loads(max_response)[0][2])
-                if not body[4]:
-                    body = json.loads(json.loads(max_response)[4][2])
-                return body
+                body = strategy(response_text)
+                if (
+                    body
+                ):  # Assuming the strategy returns None or a non-empty dict on success.
+                    return body
+            except Exception as e:
+                # Log or print the exception if needed
+                print(f"Parsing failed with strategy {strategy.__name__}: {e}")
+                continue
+
+        raise ValueError("All parsing strategies failed.")
+
+    def __parse_strategy_1(self, response_text: str) -> Dict:
+        body = json.loads(
+            json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[0][2]
+        )
+        if not body[4]:
+            body = json.loads(
+                json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[4][2]
+            )
+        return body
+
+    def __parse_strategy_2(self, response_text: str) -> Dict:
+        body = json.loads(json.loads(response_text.text.split("\n")[2])[0][2])
+        if not body[4]:
+            body = json.loads(json.loads(response_text.text.split("\n")[2])[4][2])
+        else:
+            raise ValueError("Invalid response data received.")
+        return body
+
+    def __parse_strategy_3(self, response_text: str) -> Dict:
+        max_response = max(response_text.split("\n"), key=len)
+        body = json.loads(json.loads(max_response)[0][2])
+        if not body[4]:
+            body = json.loads(json.loads(max_response)[4][2])
+        return body
 
     def _parse_candidates(self, candidates_data: Dict) -> Dict:
         """
@@ -180,7 +199,26 @@ class ResponseParser(BaesParser):
             for i, image in enumerate(images_data[7][0])
         ]
 
-    def _parse_code(self, text):
-        if not text:
-            return []
-        return extract_code(text)
+
+from typing import List
+
+
+def _parse_code(self, text: str) -> List[str]:
+    """
+    Parses the provided text to extract code snippets.
+
+    This method checks if the input text is not empty and then attempts to extract
+    code snippets from it using the `extract_code` function. If the input text is
+    empty, it returns an empty list.
+
+    Parameters:
+    - text (str): The text from which code snippets are to be extracted.
+
+    Returns:
+    - List[str]: A list of extracted code snippets. Returns an empty list if no
+                 code is found or if the input text is empty.
+
+    """
+    if not text:
+        return []
+    return extract_code(text)
