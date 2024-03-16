@@ -54,7 +54,7 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
 
 
 
-## Installation
+## Installation 📦
 ```bash
 pip install python-gemini-api
 ```
@@ -552,7 +552,7 @@ Core maintainers:
  
 
 
-## License
+## License ©️ 
 [MIT](https://opensource.org/license/mit/) license, 2024. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
 
 
