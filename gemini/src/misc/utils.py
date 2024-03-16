@@ -1,7 +1,6 @@
-import json
 import requests
 from typing import Union
-from .constants import IMAGE_PUSH_ID
+from gemini.src.misc.constants import IMAGE_PUSH_ID
 
 
 def extract_code(text: str) -> str:
@@ -66,30 +65,6 @@ def upload_image(file: Union[bytes, str]) -> str:
     response.raise_for_status()
 
     return response.text
-
-
-def prepare_replit_data(instructions: str, code: str, filename: str) -> list:
-    """
-    Creates and returns the input image data structure based on provided parameters.
-
-    Args:
-        instructions (str): The instruction text.
-        code (str): The code.
-        filename (str): The filename.
-
-    Returns:
-        list: The input image data structure.
-    """
-    return [
-        [
-            [
-                "qACoKe",
-                json.dumps([instructions, 5, code, [[filename, code]]]),
-                None,
-                "generic",
-            ]
-        ]
-    ]
 
 
 def max_token(text: str, n: int) -> str:

@@ -18,14 +18,14 @@ Please make sure to check for more efficient package management. *Please priorit
 
 Example
 ```
-pip uninstall bardapi # and restart kernel
-pip install bardapi==0.1.29 # check proper version
-pip install -u bardapi==0.1.29 # upgrade version
+pip uninstall python-gemini-api            # and restart kernel
+pip install python-gemini-api==2.0.0       # check proper version
+pip install -u python-gemini-api==2.0.0    # upgrade version
 ```
 
 ```python
-import bardapi
-bardapi.__version__
+import gemini
+gemini.__version__
 ```
 ----------Please delete the content above this line, including this line.-------------
 

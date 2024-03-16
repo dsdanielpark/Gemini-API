@@ -31,6 +31,13 @@ setup(
         "loguru",
         "pydantic",
     ],
+    extras_require={
+        "voice": [
+            "gTTS",  # Google Text-to-Speech
+            "SpeechRecognition",  # Library for performing speech recognition, with support for several engines and APIs, including Google Speech Recognition
+            "openai",
+        ]
+    },
     keywords="Python, API, Gemini, Google Gemini, Large Language Model, Chatbot API, Google API, Chatbot",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

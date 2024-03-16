@@ -1,4 +1,4 @@
-from gemini.src.parser.base import BaesParser
+from gemini.src.model.parser.base import BaesParser
 from typing import Dict, Any
 
 

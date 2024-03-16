@@ -1,3 +1,4 @@
+# TO-DO: Current logic contains traces of development attempts, so need to add asynchronous processing based on core.py and document it.
 import os
 import re
 import json

@@ -6,7 +6,7 @@ Development Status :: 3 - Alpha
 pip install git+https://github.com/dsdanielpark/Gemini-API.git
 ```
 
-This section aims to implement functionalities of the Bard API. While there are many readily portable codes, updates may be delayed.
+This section aims to implement functionalities of the Gemini API. While there are many readily portable codes, updates may be delayed.
 
 
 # Contents
@@ -31,7 +31,7 @@ This section aims to implement functionalities of the Bard API. While there are 
 
 
 ### Multi-language Gemini
-For commercial use cases, please refrain from using the unofficial Google Translate package included in bardapi for non-commercial purposes. Instead, kindly visit the official Google Cloud Translation website. Please use it responsibly, taking full responsibility for your actions, as bardapi package does not assume any implicit or explicit liability.
+For commercial use cases, please refrain from using the unofficial Google Translate package included in `python-gemini-api` for non-commercial purposes. Instead, kindly visit the official Google Cloud Translation website. Please use it responsibly, taking full responsibility for your actions, as `python-gemini-api` package does not assume any implicit or explicit liability.
 > Official Google Translation API
 - Support Languages: https://cloud.google.com/translate/docs/languages?hl=ko
 > Unofficial Google Trnaslator for non-profit purposes (such as feature testing)
@@ -90,7 +90,7 @@ GeminiAsync is not using requests library instead it is using httpx library and 
 
 ### Translation to Another Programming Language
 Please check the translation results in [this folder](https://github.com/dsdanielpark/Gemini-API/tree/main/translate_to).
-- Copy the code of [Core.py](https://github.com/dsdanielpark/Gemini-API/blob/17d5e948d4afc535317de3964232ab82fe223521/bardapi/core.py).
+- Copy the code of [Core.py](https://github.com/dsdanielpark/Gemini-API/blob/17d5e948d4afc535317de3964232ab82fe223521/`python-gemini-api`/core.py).
 - Ask ChatGPT to translate like "Translate to Swift."
 - Ask ChatGPT to optimize the code or provide any desired instructions until you're satisfied.<br>
 

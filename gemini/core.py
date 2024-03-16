@@ -9,8 +9,8 @@ import urllib.parse
 from typing import Optional, Tuple, Dict, Union
 from requests.exceptions import ConnectionError, RequestException
 
-from .src.parser.custom_parser import ParseMethod1, ParseMethod2
-from .src.parser.response_parser import ResponseParser
+from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
+from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.misc.utils import upload_image
 from .src.misc.constants import (
