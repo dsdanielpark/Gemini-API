@@ -27,7 +27,7 @@ def google_tts(text, cache_dir, lang="en"):
     return save_path
 
 
-def speech_to_text(audio_file_path: str, recognizer: str = 'google') -> str:
+def speech_to_text(audio_file_path: str, recognizer: str = "google") -> str:
     """
     Converts speech in an audio file to text using various Speech Recognition APIs.
 
@@ -56,13 +56,13 @@ def speech_to_text(audio_file_path: str, recognizer: str = 'google') -> str:
 
     try:
         text = {
-            'google': lambda audio: r.recognize_google(audio),
+            "google": lambda audio: r.recognize_google(audio),
             # Add other recognizers here following the pattern
         }.get(recognizer, lambda audio: None)(audio_text)
-        
+
         if text is None:
             raise ValueError(f"Recognizer '{recognizer}' is not supported.")
-        
+
         return text
     except Exception as e:
         return f"Failed to convert speech to text: {e}."
