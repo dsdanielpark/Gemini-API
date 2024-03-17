@@ -39,7 +39,7 @@ class GeminiModelOutput(BaseModel):
         return self.candidates[self.chosen].text
 
     @property
-    def code(self) ->  Optional[Dict]:
+    def code(self) -> Optional[Dict]:
         """The text of the chosen candidate."""
         return self.candidates[self.chosen].code
 

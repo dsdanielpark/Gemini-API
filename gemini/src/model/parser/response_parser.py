@@ -114,7 +114,7 @@ class ResponseParser(BaesParser):
         else:
             raise ValueError("Invalid response data received.")
         return body
-    
+
     def __extract_strategy_2(self, response_text: str) -> Dict:
         body = json.loads(json.loads(response_text.split("\n")[2])[0][2])
         if not body[4]:
@@ -122,7 +122,6 @@ class ResponseParser(BaesParser):
         else:
             raise ValueError("Invalid response data received.")
         return body
-        
 
     def __extract_strategy_3(self, response_text: str) -> Dict:
         body = json.loads(
@@ -133,7 +132,6 @@ class ResponseParser(BaesParser):
                 json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[4][2]
             )
         return body
-        
 
     def __extract_strategy_4(self, response_text: str) -> Dict:
         max_response = max(response_text.split("\n"), key=len)
@@ -187,7 +185,7 @@ class ResponseParser(BaesParser):
             }
             for image in images_data
         ]
-    
+
     def _parse_generated_images(self, images_data: Dict) -> Dict:
         """
         Parses generated images data.
