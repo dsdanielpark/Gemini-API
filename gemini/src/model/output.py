@@ -8,7 +8,7 @@ class GeminiCandidate(BaseModel):
 
     rcid: str
     text: str
-    code: List[str] = []
+    code: Dict = {}
     web_images: List[GeminiImage] = []
     generated_images: List[GeminiImage] = []
     response_dict: Dict = {}
@@ -39,7 +39,7 @@ class GeminiModelOutput(BaseModel):
         return self.candidates[self.chosen].text
 
     @property
-    def code(self) -> str:
+    def code(self) ->  Optional[Dict]:
         """The text of the chosen candidate."""
         return self.candidates[self.chosen].code
 

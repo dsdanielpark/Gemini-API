@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List
 from gemini.src.model.parser.base import BaesParser
 from gemini.src.misc.utils import extract_code
 
@@ -88,9 +88,10 @@ class ResponseParser(BaesParser):
             Dict: The extracted body.
         """
         parsing_strategies = [
-            self.__parse_strategy_1,
-            self.__parse_strategy_2,
-            self.__parse_strategy_3,
+            self.__extract_strategy_1,
+            self.__extract_strategy_2,
+            self.__extract_strategy_3,
+            self.__extract_strategy_4,
         ]
 
         for strategy in parsing_strategies:
@@ -101,13 +102,29 @@ class ResponseParser(BaesParser):
                 ):  # Assuming the strategy returns None or a non-empty dict on success.
                     return body
             except Exception as e:
-                # Log or print the exception if needed
-                print(f"Parsing failed with strategy {strategy.__name__}: {e}")
+                # print(f"Parsing failed with strategy {strategy.__name__}: {e}")
                 continue
 
         raise ValueError("All parsing strategies failed.")
 
-    def __parse_strategy_1(self, response_text: str) -> Dict:
+    def __extract_strategy_1(self, response_text: str) -> Dict:
+        body = json.loads(json.loads(response_text.split("\n")[3])[0][2])
+        if not body[4]:
+            body = json.loads(json.loads(response_text.split("\n")[3])[4][2])
+        else:
+            raise ValueError("Invalid response data received.")
+        return body
+    
+    def __extract_strategy_2(self, response_text: str) -> Dict:
+        body = json.loads(json.loads(response_text.split("\n")[2])[0][2])
+        if not body[4]:
+            body = json.loads(json.loads(response_text.split("\n")[2])[4][2])
+        else:
+            raise ValueError("Invalid response data received.")
+        return body
+        
+
+    def __extract_strategy_3(self, response_text: str) -> Dict:
         body = json.loads(
             json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[0][2]
         )
@@ -116,16 +133,9 @@ class ResponseParser(BaesParser):
                 json.loads(response_text.lstrip("')]}'\n\n").split("\n")[1])[4][2]
             )
         return body
+        
 
-    def __parse_strategy_2(self, response_text: str) -> Dict:
-        body = json.loads(json.loads(response_text.text.split("\n")[2])[0][2])
-        if not body[4]:
-            body = json.loads(json.loads(response_text.text.split("\n")[2])[4][2])
-        else:
-            raise ValueError("Invalid response data received.")
-        return body
-
-    def __parse_strategy_3(self, response_text: str) -> Dict:
+    def __extract_strategy_4(self, response_text: str) -> Dict:
         max_response = max(response_text.split("\n"), key=len)
         body = json.loads(json.loads(max_response)[0][2])
         if not body[4]:
@@ -146,10 +156,11 @@ class ResponseParser(BaesParser):
         for candidate_data in candidates_data:
             web_images = self._parse_web_images(candidate_data[4])
             generated_images = self._parse_generated_images(candidate_data[12])
+            codes = self._parse_code(candidate_data[1][0])
             candidate_dict = {
                 "rcid": candidate_data[0],
                 "text": candidate_data[1][0],
-                "code": self._parse_code(candidate_data[1][0]),
+                "code": codes,
                 "web_images": web_images,
                 "generated_images": generated_images,
             }
@@ -176,7 +187,7 @@ class ResponseParser(BaesParser):
             }
             for image in images_data
         ]
-
+    
     def _parse_generated_images(self, images_data: Dict) -> Dict:
         """
         Parses generated images data.
@@ -199,26 +210,29 @@ class ResponseParser(BaesParser):
             for i, image in enumerate(images_data[7][0])
         ]
 
+    def _parse_code(self, text: str) -> Dict:
+        """
+        Parses the provided text to extract code snippets and structures them similarly to how generated images are parsed.
 
-from typing import List
+        Args:
+            text (str): The text from which code snippets are to be extracted.
 
+        Returns:
+            Dict: A structured dictionary of extracted code snippets, with each key being a unique
+                    identifier for the snippet. Each value is another dictionary holding the snippet
+                    and potentially additional metadata. Returns an empty dictionary if no snippets are found.
+        """
+        if not text:
+            return {}
+        extracted_code = extract_code(text)
+        code_dict = {}
 
-def _parse_code(self, text: str) -> List[str]:
-    """
-    Parses the provided text to extract code snippets.
+        if isinstance(extracted_code, str) and extracted_code != text:
+            code_dict["snippett_01"] = extracted_code
+        elif isinstance(extracted_code, list):
+            for i, snippet in enumerate(extracted_code):
+                code_dict[f"snippett_0{i+1}"] = snippet
+        else:
+            return {}
 
-    This method checks if the input text is not empty and then attempts to extract
-    code snippets from it using the `extract_code` function. If the input text is
-    empty, it returns an empty list.
-
-    Parameters:
-    - text (str): The text from which code snippets are to be extracted.
-
-    Returns:
-    - List[str]: A list of extracted code snippets. Returns an empty list if no
-                 code is found or if the input text is empty.
-
-    """
-    if not text:
-        return []
-    return extract_code(text)
+        return code_dict
