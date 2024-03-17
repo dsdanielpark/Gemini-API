@@ -7,7 +7,7 @@ from .src.model.image import GeminiImage
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.model.parser.base import BaesParser
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
-from .src.model.parser.response_parser import ResponseParser, _parse_code
+from .src.model.parser.response_parser import ResponseParser
 
 from .src.misc.constants import Tool
 from .src.misc.decorator import retry, log_method, time_execution, handle_errors
