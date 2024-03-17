@@ -166,7 +166,7 @@ The output of the generate_content function is `GeminiModelOutput`, with the fol
 - *code*: returns the codes of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
-- *response_dict*: returns the response dictionary, if available.
+- *payload*: returns the response dictionary, if available. (same as *reponse_dict*)
 
 https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 
