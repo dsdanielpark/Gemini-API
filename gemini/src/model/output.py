@@ -54,6 +54,6 @@ class GeminiModelOutput(BaseModel):
         return self.candidates[self.chosen].generated_images
 
     @property
-    def response_dict(self) -> Optional[Dict]:
+    def payload(self) -> Optional[Dict]:
         """The response dictionary associated with the model output."""
         return self.response_dict
