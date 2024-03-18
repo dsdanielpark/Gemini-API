@@ -242,15 +242,14 @@ class Gemini:
                     f"Non-successful response status: {response_status_code}. Check Gemini session status."
                 )
                 return None
-
             parser = ResponseParser(cookies=self.cookies)
             parsed_response = parser.parse(response_text)
             return self._create_model_output(parsed_response)
         except Exception as e:
             print(
-                f"Failed to generate content due to an error: {e}.\nIf the issue persists, submit it at https://github.com/dsdanielpark/Gemini-API/issues"
+                f"Failed to generate content due to an error: {e}.\nReturn reponse without parse. If the issue persists, submit it at https://github.com/dsdanielpark/Gemini-API/issues"
             )
-            return None
+            return response_text
 
     def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
         """
