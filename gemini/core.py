@@ -7,18 +7,16 @@ import inspect
 import requests
 import urllib.parse
 from typing import Optional, Tuple, Dict, Union
-from requests.exceptions import ConnectionError, RequestException
+from requests.exceptions import ConnectionError
 
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
 from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.misc.utils import upload_image
 from .src.misc.constants import (
-    HEADERS,
-    HOST,
-    BOT_SERVER,
-    POST_ENDPOINT,
-    SUPPORTED_BROWSERS,
+    URLs,
+    Headers,
+    SUPPORTED_BROWSERS,  # no-qa
 )
 
 
@@ -59,17 +57,17 @@ class Gemini:
         Initializes the Gemini object with session, cookies, and other configurations.
         """
         self._nonce = None
-        self._sid = None
-        self._rcid = rcid or None
-        self._rid = None
-        self._cid = None
+        self._sid = None  # session id
+        self._rcid = rcid or None  # response candidate id
+        self._rid = None  # response id
+        self._cid = None  # candidate id
         self.auto_cookies = auto_cookies
         self.cookie_fp = cookie_fp
         self.cookies = cookies
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = session or self._initialize_session()
-        self.base_url: str = HOST
+        self.base_url: str = URLs.BASE_URL.value
         self.nonce = nonce
         self._reqid = int("".join(random.choices(string.digits, k=7)))
         self.parser = ResponseParser(cookies=self.cookies)
@@ -96,7 +94,7 @@ class Gemini:
             requests.Session: The initialized session.
         """
         session = requests.Session()
-        session.headers.update(HEADERS)
+        session.headers.update(Headers.MAIN)
         if self.cookies:
             session.cookies.update(self.cookies)
         elif self.cookie_fp:
@@ -130,7 +128,7 @@ class Gemini:
         Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
         try:
-            response = requests.get(f"{HOST}/app", cookies=self.cookies)
+            response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
             response.raise_for_status()
 
             sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
@@ -140,10 +138,14 @@ class Gemini:
                 self._sid = sid_match.group(1)
             else:
                 raise ValueError(
-                    "Failed to parse SID or SNlM0e nonce from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                    "Failed to parse SID value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
                 )
             if nonce_match:
                 self._nonce = nonce_match.group(1)
+            else:
+                raise ValueError(
+                    "Failed to parse SNlM0e nonce value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                )
 
         except requests.RequestException as e:
             raise ConnectionError(f"Request failed: {e}")
@@ -164,7 +166,7 @@ class Gemini:
         """
         return urllib.parse.urlencode(
             {
-                "bl": BOT_SERVER,
+                "bl": URLs.BOT_SERVER.value,
                 "hl": os.environ.get("GEMINI_LANGUAGE", "en"),
                 "_reqid": self._reqid,
                 "rt": "c",
@@ -215,52 +217,40 @@ class Gemini:
         self, prompt: str, image: Union[bytes, str] = None
     ) -> Tuple[str, int]:
         """Sends a request and returns the response text and status code."""
-        try:
-            params = self._construct_params(self._sid)
-            data = self._construct_payload(prompt, image, self._nonce)
-            response = self.session.post(
-                POST_ENDPOINT,
-                params=params,
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-            )
-            self._reqid += 100000
-            response.raise_for_status()
-        except (ConnectionError, RequestException) as e:
-            print(f"Retry to generate content: {e}")
-            # self._update_cookies_from_browser()
-            self._set_sid_and_nonce()
-            params = self._construct_params(self._sid)
-            data = self._construct_payload(prompt, image, self._nonce)
-            response = self.session.post(
-                POST_ENDPOINT,
-                params=params,
-                data=data,
-                timeout=self.timeout,
-                proxies=self.proxies,
-            )
-            self._reqid += 100000
-            if response.status_code != 200:
-                self.auto_cookies = False
-                print(
-                    "Re-try to generate content failed. Update cookie values manually."
-                )
-            response.raise_for_status()
+        params = self._construct_params(self._sid)
+        data = self._construct_payload(prompt, image, self._nonce)
+        response = self.session.post(
+            URLs.POST_ENDPOINT.value,
+            params=params,
+            data=data,
+            timeout=self.timeout,
+            proxies=self.proxies,
+        )
+        self._reqid += 100000
+        response.raise_for_status()
+
         return response.text, response.status_code
 
     def generate_content(
         self, prompt: str, image: Union[bytes, str] = None
     ) -> GeminiModelOutput:
         """Generates content based on the prompt and returns a GeminiModelOutput object."""
-        response_text, response_status_code = self.send_request(prompt, image)
-        if response_status_code != 200:
-            raise ValueError(f"Response status: {response_status_code}")
-        else:
+        try:
+            response_text, response_status_code = self.send_request(prompt, image)
+            if response_status_code != 200:
+                print(
+                    f"Non-successful response status: {response_status_code}. Check Gemini session status."
+                )
+                return None
+
             parser = ResponseParser(cookies=self.cookies)
             parsed_response = parser.parse(response_text)
-
-        return self._create_model_output(parsed_response)
+            return self._create_model_output(parsed_response)
+        except Exception as e:
+            print(
+                f"Failed to generate content due to an error: {e}.\nIf the issue persists, submit it at https://github.com/dsdanielpark/Gemini-API/issues"
+            )
+            return None
 
     def _create_model_output(self, parsed_response: dict) -> GeminiModelOutput:
         """
@@ -314,6 +304,8 @@ class Gemini:
 
         return collected
 
+    # End of Code. The following codes need improvement or can be additionally used.
+
     def generate_custom_content(self, prompt: str, *custom_parsers) -> str:
         """Generates content based on the prompt, attempting to parse with ParseMethod1, ParseMethod2, and any additional parsers provided."""
         response_text, response_status_code = self.send_request(prompt)
@@ -361,6 +353,43 @@ class Gemini:
         else:
             print("Session not initialized.")
 
+    # To-Do: Update cookies automatically using browser cookie3 or others.
+    # def _set_sid_and_nonce(self) -> Tuple[str, str]:
+    #     """
+    #     Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
+    #     """
+    #     url = f"{HOST}/app"
+    #     try:
+    #         response = requests.get(
+    #             url, cookies=self.cookies
+    #         )
+    #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
+
+    #         if not sid_match or not nonce_match:
+    #             print(
+    #                 "Failed to get SID or nonce. Trying to update cookies automatically..."
+    #             )
+    #             self._set_cookies_automatically()
+    #             response = requests.get(
+    #                 url, cookies=self.cookies
+    #             )
+    #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
+
+    #             if not nonce_match:
+    #                 if self.nonce:
+    #                     return (sid_match, self.nonce)
+    #                 else:
+    #                     raise Exception(
+    #                         "Can not retrieve SID and nonce even after automatic cookie update."
+    #                     )
+    #         return (sid_match.group(1), nonce_match.group(1))
+
+    #     except Exception as e:
+    #         raise ConnectionError(
+    #             f"Failed to retrive SID or Nonce valuse:\n{e}"
+    #         )
+
+    # To-Do: Get cookie values automatically.
     def _set_cookies_automatically(self) -> None:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
@@ -392,6 +421,7 @@ class Gemini:
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
 
+    # To-Do: Get cookie values automatically.
     def _update_cookies_from_browser(self) -> dict:
         """
         Attempts to extract specific Gemini cookies from the cookies stored by web browsers on the current system.
@@ -429,38 +459,3 @@ class Gemini:
             raise ValueError(
                 "Failed to get cookies. Set 'cookies' argument or 'auto_cookies' as True."
             )
-
-    # def _set_sid_and_nonce(self) -> Tuple[str, str]:
-    #     """
-    #     Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
-    #     """
-    #     url = f"{HOST}/app"
-    #     try:
-    #         response = requests.get(
-    #             url, cookies=self.cookies
-    #         )
-    #         sid_match, nonce_match = self.extract_sid_nonce(response.text)
-
-    #         if not sid_match or not nonce_match:
-    #             print(
-    #                 "Failed to get SID or nonce. Trying to update cookies automatically..."
-    #             )
-    #             self._set_cookies_automatically()
-    #             response = requests.get(
-    #                 url, cookies=self.cookies
-    #             )
-    #             sid_match, nonce_match = self.extract_sid_nonce(response.text)
-
-    #             if not nonce_match:
-    #                 if self.nonce:
-    #                     return (sid_match, self.nonce)
-    #                 else:
-    #                     raise Exception(
-    #                         "Can not retrieve SID and nonce even after automatic cookie update."
-    #                     )
-    #         return (sid_match.group(1), nonce_match.group(1))
-
-    #     except Exception as e:
-    #         raise ConnectionError(
-    #             f"Failed to retrive SID or Nonce valuse:\n{e}"
-    #         )
