@@ -4,8 +4,8 @@ import httpx
 import asyncio
 import datetime
 from pathlib import Path
-from typing import List, Optional, Dict
 from loguru import logger
+from typing import List, Optional, Dict
 from pydantic import BaseModel, HttpUrl
 
 

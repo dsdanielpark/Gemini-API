@@ -1,4 +1,4 @@
-# TO-DO: Current logic contains traces of development attempts, so need to add asynchronous processing based on core.py and document it.
+# To-Do: Current logic contains traces of development attempts, so need to add asynchronous processing based on core.py and document it.
 import os
 import re
 import json
@@ -12,12 +12,9 @@ import requests
 from typing import Optional, Any, List
 
 from gemini.src.misc.constants import (
-    HEADERS,
+    URLs,
+    Headers,
     SUPPORTED_BROWSERS,
-    BOT_SERVER,
-    SHARE_ENDPOINT,
-    POST_ENDPOINT,
-    HOST,
 )
 
 
@@ -127,7 +124,7 @@ class GeminiClient:
             raise ValueError("Failed to set session. 'cookies' dictionary is empty.")
 
         self.session = httpx.AsyncClient(
-            headers=HEADERS,
+            headers=Headers.MAIN,
             cookies=self.cookies,
             timeout=self.timeout,
             auto_close=self.auto_close,
@@ -200,7 +197,7 @@ class GeminiClient:
         Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
         try:
-            response = requests.get(f"{HOST}/app", cookies=self.cookies)
+            response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
             response.raise_for_status()
 
             sid_match, nonce_match = self.extract_sid_nonce(response.text)
@@ -287,7 +284,7 @@ class GeminiClient:
         """
         return urllib.parse.urlencode(
             {
-                "bl": BOT_SERVER,
+                "bl": URLs.BOT_SERVER.value,
                 "hl": os.environ.get("GEMINI_LANGUAGE", "en"),
                 "_reqid": self.get_reqid(),
                 "rt": "c",
@@ -321,7 +318,7 @@ class GeminiClient:
         params = self._construct_params()
 
         response = await self.session.post(
-            POST_ENDPOINT,
+            URLs.POST_ENDPOINT.value,
             data=data,
             params=params,
             timeout=self.timeout,
@@ -359,7 +356,7 @@ class GeminiClient:
         async with httpx.AsyncClient() as session:
             try:
                 async with session.post(
-                    SHARE_ENDPOINT, timeout=self.timeout
+                    URLs.SHARE_ENDPOINT.value, timeout=self.timeout
                 ) as response:
                     return await response.json()
             except asyncio.TimeoutError:

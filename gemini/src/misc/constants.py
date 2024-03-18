@@ -2,55 +2,45 @@ from enum import Enum
 import browser_cookie3
 
 
-class Tool(Enum):
-    GMAIL = ["workspace_tool", "Gmail"]
-    GOOGLE_DOCS = ["workspace_tool", "Google Docs"]
-    GOOGLE_DRIVE = ["workspace_tool", "Google Drive"]
-    GOOGLE_FLIGHTS = ["google_flights_tool"]
-    GOOGLE_HOTELS = ["google_hotels_tool"]
-    GOOGLE_MAPS = ["google_map_tool"]
-    YOUTUBE = ["youtube_tool"]
+class URLs(Enum):
+    BASE_URL = "https://gemini.google.com"
+    POST_ENDPOINT = f"{BASE_URL}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
+    SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
+    BOT_SERVER = "boq_assistant-bard-web-server_20240227.13_p0"
 
 
-IMAGE_PUSH_ID = "feeds/mcudyrk2a4khkz"
+class Headers:
+    COMMON = {
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Referer": URLs.BASE_URL.value,
+        "Origin": URLs.BASE_URL.value,
+        "DNT": "1",
+        "Connection": "keep-alive",
+    }
+    MAIN = {
+        **COMMON,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:123.0) Gecko/20100101 Firefox/123.0",
+        "X-Same-Domain": "1",
+        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+    }
+    IMG_UPLOAD = {
+        **COMMON,
+        "authority": "content-push.googleapis.com",
+        "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",
+        "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "push-id": "feeds/mcudyrk2a4khkz",
+        "x-goog-upload-command": "start",
+        "x-goog-upload-header-content-length": "",
+        "x-goog-upload-protocol": "resumable",
+        "x-tenant-id": "bard-storage",
+    }
 
-DEFAULT_LANGUAGE = "en"
-POST_ENDPOINT = "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"
-HOST = "https://gemini.google.com"
-BOT_SERVER = "boq_assistant-bard-web-server_20240227.13_p0"
 
-SHARE_ENDPOINT = "https://clients6.google.com/upload/drive/v3/"
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:123.0) Gecko/20100101 Firefox/123.0",
-    "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Referer": "https://gemini.google.com/",
-    "X-Same-Domain": "1",
-    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-    "Origin": "https://gemini.google.com",
-    "DNT": "1",
-    "Connection": "keep-alive",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-}
-
-IMG_UPLOAD_HEADERS = {
-    "authority": "content-push.googleapis.com",
-    "accept": "*/*",
-    "accept-language": "en-US,en;q=0.7",
-    "authorization": "Basic c2F2ZXM6cyNMdGhlNmxzd2F2b0RsN3J1d1U=",
-    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "origin": "https://gemini.google.com",
-    "push-id": "feeds/mcudyrk2a4khkz",
-    "referer": "https://gemini.google.com/",
-    "x-goog-upload-command": "start",
-    "x-goog-upload-header-content-length": "",
-    "x-goog-upload-protocol": "resumable",
-    "x-tenant-id": "bard-storage",
-}
-
+# Extension replit
 REPLIT_SUPPORT_PROGRAM_LANGUAGES = {
     "python": "main.py",
     "javascript": "index.js",

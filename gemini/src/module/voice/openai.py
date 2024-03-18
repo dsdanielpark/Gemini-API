@@ -1,3 +1,4 @@
+# To-Do: Need QA and error handling
 from pathlib import Path
 from openai import OpenAI
 

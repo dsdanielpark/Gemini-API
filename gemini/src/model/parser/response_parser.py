@@ -1,7 +1,7 @@
 import json
-from typing import Dict, List
-from gemini.src.model.parser.base import BaesParser
+from typing import Dict
 from gemini.src.misc.utils import extract_code
+from gemini.src.model.parser.base import BaesParser
 
 
 class ResponseParser(BaesParser):
@@ -16,24 +16,9 @@ class ResponseParser(BaesParser):
     """
 
     def __init__(self, cookies: dict) -> None:
-        """
-        Initializes the ResponseParser object.
-
-        Args:
-            cookies (dict): Cookies used for parsing.
-        """
         self.cookies = cookies
 
     def parse(self, response_text: str) -> Dict:
-        """
-        Parses the response text and extracts relevant data.
-
-        Args:
-            response_text (str): The response text to parse.
-
-        Returns:
-            Dict: A dictionary containing parsed data.
-        """
         return self.parse_response_text(response_text)
 
     def parse_response_text(self, response_text: str) -> Dict:

@@ -9,7 +9,7 @@ from .src.model.parser.base import BaesParser
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
 from .src.model.parser.response_parser import ResponseParser
 
-from .src.misc.constants import Tool
+from .src.misc.constants import URLs, Headers
 from .src.misc.decorator import retry, log_method, time_execution, handle_errors
 from .src.misc.exceptions import PackageError, GeminiAPIError, TimeoutError
 from .src.misc.utils import extract_code, upload_image, max_token, max_sentence

@@ -1,6 +1,6 @@
 import requests
 from typing import Union
-from gemini.src.misc.constants import IMAGE_PUSH_ID
+from gemini.src.misc.constants import Headers
 
 
 def extract_code(text: str) -> str:
@@ -56,7 +56,7 @@ def upload_image(file: Union[bytes, str]) -> str:
     response = requests.post(
         url="https://content-push.googleapis.com/upload/",
         headers={
-            "Push-ID": IMAGE_PUSH_ID,
+            "Push-ID": Headers.IMG_UPLOAD["push-id"],
             "Content-Type": "application/octet-stream",
         },
         data=file_data,

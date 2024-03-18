@@ -1,3 +1,4 @@
+# To-Do: Need QA and error handling
 import os
 from gtts import gTTS
 import speech_recognition as sr
@@ -27,7 +28,7 @@ def google_tts(text, cache_dir, lang="en"):
     return save_path
 
 
-def speech_to_text(audio_file_path: str, recognizer: str = "google") -> str:
+def google_stt(audio_file_path: str, recognizer: str = "google") -> str:
     """
     Converts speech in an audio file to text using various Speech Recognition APIs.
 

@@ -1,6 +1,6 @@
-import functools
 import time
 import requests
+import functools
 from typing import Callable
 
 
