@@ -90,7 +90,9 @@ class ResponseParser(BaesParser):
                 # print(f"Parsing failed with strategy {strategy.__name__}: {e}")
                 continue
 
-        raise ValueError("All parsing strategies failed. Try to use `Gemini.send_request(prompt)` to get original payload.")
+        raise ValueError(
+            "All parsing strategies failed. Try to use `Gemini.send_request(prompt)` to get original payload."
+        )
 
     def __extract_strategy_1(self, response_text: str) -> Dict:
         body = json.loads(json.loads(response_text.split("\n")[3])[0][2])
