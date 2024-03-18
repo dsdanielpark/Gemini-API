@@ -35,7 +35,8 @@ setup(
         "voice": [
             "gTTS",  # Google Text-to-Speech
             "SpeechRecognition",  # Library for performing speech recognition, with support for several engines and APIs, including Google Speech Recognition
-            "openai",
+            "openai",  # OpenAI for Text-to-Speech and Speech-to-Text
+            "anthropic",  # Anthropic for Text-to-Speech and Speech-to-Text
         ]
     },
     keywords="Python, API, Gemini, Google Gemini, Large Language Model, Chatbot API, Google API, Chatbot",
