@@ -104,7 +104,7 @@ cookies = {} # Cookies may vary by account or region. Consider sending the entir
 GeminiClient = Gemini(cookies=cookies) # You can use various args
 
 response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
-response.response_dict
+response.response_dict # renamed to payload after v2.3.0
 ```
 
 Generate content from image
@@ -115,8 +115,12 @@ cookies = {} # Cookies may vary by account or region. Consider sending the entir
 
 GeminiClient = Gemini(cookies=cookies) # You can use various args
 response = GeminiClient.generate_content("What does the text in this image say?", image='folder/image.jpg')
-response.response_dict
+response.response_dict # renamed to payload after v2.3.0
 ```
+
+> [!NOTE] 
+> If the generate_content method returns an empty payload, try executing it again without reinitializing the Gemini object.
+
 
 <br>
 
@@ -145,13 +149,14 @@ GeminiClient = Gemini(cookies=cookies)
 <br>
 
 ### # 02. Generate content
+Returns Gemini's response, but the first one might be empty. If generate_content yields an empty payload, rerun it without reinitializing Gemini. 
 
-To check regardless of the data type of the model output, return the response_dict argument. And use it appropriately.
+Regardless of model output type, access the response_dict property (renamed to payload after v2.3.0).
 https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/core.py#L252
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
-print(response.response_dict)
+print(response.response_dict) # renamed to payload after v2.3.0
 ```
 > [!IMPORTANT]
 >  Once connected and generating valid content, **Be sure to CLOSE the Gemini website or CLOSE your browser** for cookie stability. 
@@ -166,7 +171,7 @@ The output of the generate_content function is `GeminiModelOutput`, with the fol
 - *code*: returns the codes of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
-- *payload*: returns the response dictionary, if available. (same as *reponse_dict*)
+- *payload*: returns the response dictionary, if available. (same as *reponse_dict* under v2.2.0)
 
 https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 
