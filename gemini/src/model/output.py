@@ -1,6 +1,6 @@
-from gemini.src.model.image import GeminiImage
-from typing import List, Optional, Dict
 from pydantic import BaseModel
+from typing import List, Optional, Dict
+from gemini.src.model.image import GeminiImage
 
 
 class GeminiCandidate(BaseModel):
@@ -24,7 +24,7 @@ class GeminiModelOutput(BaseModel):
 
     def __setattr__(self, name, value):
         if name == "chosen":
-            self.chosen = value
+            super().__setattr__(name, value)
         else:
             super().__setattr__(name, value)
 
