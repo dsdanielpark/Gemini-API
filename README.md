@@ -573,4 +573,6 @@ Users assume full legal responsibility for GeminiAPI. Not endorsed by Google. Ex
 
 <br>
 
+## Requirements
+Python 3.7 or higher.
 
