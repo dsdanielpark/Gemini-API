@@ -68,7 +68,15 @@ pip install -q -U python-gemini-api
 ## Authentication
 > [!NOTE]
 > Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. 
-1. Visit https://gemini.google.com/
+1. Visit https://gemini.google.com/ <br>
+    With browser open, try auto-collecting cookies first.
+    ```python
+    from gemini import Gemini
+    GeminiClient = Gemini(auto_cookies=True)
+    # GeminiClient = Gemini(auto_cookies=True, target_cookies = ["__Secure-1PSID", "__Secure-1PSIDTS") # Can select cookies.
+    response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+    print(response.payload)
+    ```
 2. `F12` for browser console → `Session: Application` → `Cookies` → Copy the value of some working cookie sets. If it doesn't work, go to step 3.
     <details><summary>Some working cookie sets</summary>
     Cookies may vary by account or region. 
