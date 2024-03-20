@@ -142,7 +142,7 @@ response.response_dict # renamed to payload after v2.3.0
 <br>
 
 ### # 01. Initialization
-Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
+Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
 
 
 
