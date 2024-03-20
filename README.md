@@ -143,6 +143,10 @@ GeminiClient = Gemini(cookies=cookies)
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
 
+#### Auto Cookie Update
+For `auto_cookie` to be set to `True`, Gemini WebUI must be active in the browser. The [browser_cookie3](https://github.com/borisbabic/browser_cookie3) enables automatic cookie collection, though updates may not be complete yet.
+
+
 > [!IMPORTANT]
 >  **If the session connects successfully and `generate_content` runs well, CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster.
 
@@ -458,15 +462,15 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ```
 
 ### Reusable session object
-Gemini class suffices for most cases, but use session objects for special cases.
+For standard cases, use Gemini class; for exceptions, use session objects. When creating a new bot Gemini server, adjust Headers.MAIN.
 ```python
-from gemini import Gemini, HEADERS
+from gemini import Gemini, Headers
 import requests
 
 cookies = {} 
 
 session = requests.Session()
-session.headers = HEADERS
+session.headers = Headers.MAIN
 for key, value in cookies.items():
     session.cookies.update({key: value})
 
