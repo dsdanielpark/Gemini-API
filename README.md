@@ -75,7 +75,10 @@ pip install -q -U python-gemini-api
     ```python
     from gemini import Gemini
     GeminiClient = Gemini(auto_cookies=True)
-    # GeminiClient = Gemini(auto_cookies=True, target_cookies = ["__Secure-1PSID", "__Secure-1PSIDTS"]) # Can select cookies.
+
+    # Testing needed as cookies vary by region.
+    # GeminiClient = Gemini(auto_cookies=True, target_cookies=["__Secure-1PSID", "__Secure-1PSIDTS"])
+
     response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
     print(response.payload)
     ```
@@ -106,14 +109,26 @@ pip install -q -U python-gemini-api
 
 *Simple usage*
 
-Setting Gemini Response Language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
+Setting Gemini response language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
 
 ```python
 import os
 os.environ["GEMINI_LANGUAGE"] = "KR"
 ```
 
-Generate content
+Send request: returns original payload.
+```python
+from gemini import Gemini
+
+cookies = {} # Cookies may vary by account or region. Consider sending the entire cookie file.
+GeminiClient = Gemini(cookies=cookies) # You can use various args
+
+response_text, response_status = GeminiClient.send_request("Hello, Gemini. What's the weather like in Seoul today?")
+print(response_text)
+```
+
+
+Generate content: returns parsed response.
 ```python
 from gemini import Gemini
 
@@ -121,10 +136,10 @@ cookies = {} # Cookies may vary by account or region. Consider sending the entir
 GeminiClient = Gemini(cookies=cookies) # You can use various args
 
 response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
-response.response_dict # renamed to payload after v2.3.0
+response.payload
 ```
 
-Generate content from image
+Generate content from image: you can use image as input.
 ```python
 from gemini import Gemini
 
@@ -132,7 +147,7 @@ cookies = {} # Cookies may vary by account or region. Consider sending the entir
 
 GeminiClient = Gemini(cookies=cookies) # You can use various args
 response = GeminiClient.generate_content("What does the text in this image say?", image='folder/image.jpg')
-response.response_dict # renamed to payload after v2.3.0
+response.payload
 ```
 
 > [!NOTE] 
@@ -159,7 +174,7 @@ cookies = {
   }
 
 GeminiClient = Gemini(cookies=cookies)
-# GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # Or use cookie file path
+# GeminiClient = Gemini(cookie_fp="folder/cookie_file.json") # (*.json, *.txt) are supported.
 # GeminiClient = Gemini(auto_cookies=True) # Or use auto_cookies paprameter
 ```
 
@@ -180,7 +195,7 @@ https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a2
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
-print(response.response_dict) # renamed to payload after v2.3.0
+print(response.payload)
 ```
 > [!IMPORTANT]
 >  Once connected and generating valid content, **Be sure to CLOSE the Gemini website or CLOSE your browser** for cookie stability. 
