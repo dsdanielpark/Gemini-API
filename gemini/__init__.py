@@ -1,7 +1,7 @@
 from os import environ
 
-from .core import Gemini
-from .async_core import GeminiClient
+from .sync_client import Gemini
+from .async_client import GeminiClient
 
 from .src.model.image import GeminiImage
 from .src.model.output import GeminiCandidate, GeminiModelOutput
