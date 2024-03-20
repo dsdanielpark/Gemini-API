@@ -73,7 +73,7 @@ pip install -q -U python-gemini-api
     ```python
     from gemini import Gemini
     GeminiClient = Gemini(auto_cookies=True)
-    # GeminiClient = Gemini(auto_cookies=True, target_cookies = ["__Secure-1PSID", "__Secure-1PSIDTS") # Can select cookies.
+    # GeminiClient = Gemini(auto_cookies=True, target_cookies = ["__Secure-1PSID", "__Secure-1PSIDTS"]) # Can select cookies.
     response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
     print(response.payload)
     ```
@@ -103,6 +103,15 @@ pip install -q -U python-gemini-api
 ## Usage
 
 *Simple usage*
+
+Setting Gemini Response Language (Optional): 
+
+Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default language is English. For abbreviations, see [abbr constant](https://github.com/dsdanielpark/Gemini-API/blob/0b9029a45ff3177757dd9645e67e9d43b86470de/gemini/src/misc/constants.py#L85).
+
+```python
+import os
+os.environ["GEMINI_LANGUAGE"] = "en" # 
+```
 
 Generate content
 ```python
@@ -134,6 +143,9 @@ response.response_dict # renamed to payload after v2.3.0
 
 ### # 01. Initialization
 Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`. Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
+
+
+
 
 ```python
 from gemini import Gemini
