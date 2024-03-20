@@ -2,6 +2,9 @@ from enum import Enum
 import browser_cookie3
 
 
+TARGET_COOKIES = ["__Secure-1PSIDCC", " __Secure-1PSID", "__Secure-1PSIDTS", "NID"]
+
+
 class URLs(Enum):
     BASE_URL = "https://gemini.google.com"
     POST_ENDPOINT = f"{BASE_URL}/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate"

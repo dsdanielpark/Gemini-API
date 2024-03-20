@@ -6,7 +6,7 @@ import string
 import inspect
 import requests
 import urllib.parse
-from typing import Optional, Tuple, Dict, Union
+from typing import Optional, Tuple, Dict, Union, List
 from requests.exceptions import ConnectionError
 
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
@@ -16,7 +16,8 @@ from .src.misc.utils import upload_image
 from .src.misc.constants import (
     URLs,
     Headers,
-    SUPPORTED_BROWSERS,  # no-qa
+    TARGET_COOKIES,
+    SUPPORTED_BROWSERS,
 )
 
 
@@ -46,38 +47,46 @@ class Gemini:
         self,
         session: Optional[requests.Session] = None,
         cookies: Optional[Dict[str, str]] = None,
-        nonce: Optional[str] = None,
         cookie_fp: str = None,
         auto_cookies: bool = False,
+        target_cookies: List = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
-        rcid: str = None,
     ) -> None:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
         """
-        self._nonce = None
+        self._nonce = None  # SNlM0e nonce value
         self._sid = None  # session id
-        self._rcid = rcid or None  # response candidate id
+        self._rcid = None  # response candidate id
         self._rid = None  # response id
         self._cid = None  # candidate id
+        self._reqid = int("".join(random.choices(string.digits, k=7)))  # request id
         self.auto_cookies = auto_cookies
+        self.target_cookies = target_cookies
         self.cookie_fp = cookie_fp
         self.cookies = cookies
         self.proxies = proxies or {}
         self.timeout = timeout
         self.session = session or self._initialize_session()
         self.base_url: str = URLs.BASE_URL.value
-        self.nonce = nonce
-        self._reqid = int("".join(random.choices(string.digits, k=7)))
         self.parser = ResponseParser(cookies=self.cookies)
 
     @property
-    def rcid(self):
+    def nonce(self) -> Optional[str]:
+        return self._nonce
+
+    @nonce.setter
+    def nonce(self, value: Optional[str]) -> None:
+        if value != self._nonce:
+            self._nonce = value
+
+    @property
+    def rcid(self) -> Optional[str]:
         return self._rcid
 
     @rcid.setter
-    def rcid(self, value):
+    def rcid(self, value: Optional[str]) -> None:
         self._rcid = value
 
     def _initialize_session(
@@ -128,7 +137,7 @@ class Gemini:
         Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
         try:
-            response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
+            response = requests.get(f"{URLs.BASE_URL.value}/app")
             response.raise_for_status()
 
             sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
@@ -138,13 +147,13 @@ class Gemini:
                 self._sid = sid_match.group(1)
             else:
                 raise ValueError(
-                    "Failed to parse SID value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                    "Failed to parse SID value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies. \nIf issue continues, export browser cookies, set manually. See auth section 3."
                 )
             if nonce_match:
                 self._nonce = nonce_match.group(1)
             else:
                 raise ValueError(
-                    "Failed to parse SNlM0e nonce value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies."
+                    "Failed to parse SNlM0e nonce value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies. \nIf issue continues, export browser cookies, set manually. See auth section 3."
                 )
 
         except requests.RequestException as e:
@@ -393,7 +402,7 @@ class Gemini:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
         """
-        if len(getattr(self, "cookies", {})) > 5:
+        if not self.auto_cookies and self.cookies is not None:
             return
 
         if self.auto_cookies:
@@ -419,6 +428,14 @@ class Gemini:
             raise Exception(
                 "Gemini cookies must be provided through environment variables or extracted from the browser with auto_cookies enabled."
             )
+
+        # Delete non-target cookies
+        if self.target_cookies == None:
+            self.cookies = {
+                key: value
+                for key, value in self.cookies.items()
+                if key in TARGET_COOKIES
+            }
 
     # To-Do: Get cookie values automatically.
     def _update_cookies_from_browser(self) -> dict:
