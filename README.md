@@ -77,7 +77,7 @@ pip install -q -U python-gemini-api
     response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
     print(response.payload)
     ```
-2. `F12` for browser console → `Session: Application` → `Cookies` → Copy the value of some working cookie sets. If it doesn't work, go to step 3.
+2. *(Manually)* `F12` for browser console → `Session: Application` → `Cookies` → Copy the value of some working cookie sets. If it doesn't work, go to step 3.
     <details><summary>Some working cookie sets</summary>
     Cookies may vary by account or region. 
       
@@ -85,7 +85,7 @@ pip install -q -U python-gemini-api
     
     </details>
 
-3. *(Recommended)* Export Gemini site cookies via a browser extension (e.g., Chrome extension). Use [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open, and copy the txt file contents.
+3. *(Recommended)* Export Gemini site cookies via a browser extension. For instance, use Chrome extension [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open, and copy the txt file contents.
 
 <details><summary>Further: For manual collection or Required for a few users upon error</summary>
 
@@ -104,13 +104,11 @@ pip install -q -U python-gemini-api
 
 *Simple usage*
 
-Setting Gemini Response Language (Optional): 
-
-Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default language is English. For abbreviations, see [abbr constant](https://github.com/dsdanielpark/Gemini-API/blob/0b9029a45ff3177757dd9645e67e9d43b86470de/gemini/src/misc/constants.py#L85).
+Setting Gemini Response Language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
 
 ```python
 import os
-os.environ["GEMINI_LANGUAGE"] = "en" # 
+os.environ["GEMINI_LANGUAGE"] = "KR"
 ```
 
 Generate content
@@ -195,7 +193,7 @@ The output of the generate_content function is `GeminiModelOutput`, with the fol
 - *code*: returns the codes of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
-- *payload*: returns the response dictionary, if available. (same as *reponse_dict* under v2.2.0)
+- *payload*: returns the response dictionary, if available. (same as *reponse_dict* under v2.3.0)
 
 https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 
