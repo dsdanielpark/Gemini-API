@@ -30,7 +30,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 > [!TIP]
-> | 2024-03-26 | Check out free LLM APIs with Open Router. [[Example codes]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
+> | 2024-03-26 | Check out partially free Open-source LLM APIs with Open Router. [[Example codes]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 
 <br><br>
 
@@ -77,7 +77,7 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
 
 
 
-## Installation
+## Installation 📦
 ```
 pip install python-gemini-api
 ```
