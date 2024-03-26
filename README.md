@@ -565,6 +565,37 @@ print(tokenizer.decode(outputs[0]))
 <br>
 
 
+## Utilize free open-source LLM API through [Open Router](https://openrouter.ai/)
+OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges.
+
+```python
+from gemini import OpenRouter
+
+OPENROUTER_API_KEY = "<your_open_router_api_key>"
+GemmaClient = OpenRouter(api_key=OPENROUTER_API_KEY, model="google/gemma-7b-it:free")
+
+prompt = "Do you know UCA academy in korea? https://blog.naver.com/ulsancoding"
+response = GemmaClient.create_chat_completion(prompt)
+print(response)
+
+# payload = GemmaClient.generate_content(prompt)
+# print(payload.json())
+```
+The free model list includes:
+- `google/gemma-7b-it:free`
+- `openrouter/cinematika-7b:free`
+- `undi95/toppy-m-7b:free`
+- `gryphe/mythomist-7b:free`
+- `mistralai/mistral-7b-instruct:free`
+- `nousresearch/nous-capybara-7b:free`
+- `openrouter/auto`
+
+
+
+
+<br>
+
+
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
 First review [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) and the [Official Google Gemini API](https://aistudio.google.com/) before using this package.
 You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. 
@@ -621,7 +652,9 @@ Core maintainers:
 [2] GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
 [3] Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
 [4] Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[5] WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[5] Github: [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner)
+[6] WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+
 
 > *Warning*
 Users assume full legal responsibility for GeminiAPI. Not endorsed by Google. Excessive use may lead to account restrictions. Changes in policies or account status may affect functionality. Utilize issue and discussion pages.
