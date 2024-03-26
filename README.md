@@ -594,13 +594,12 @@ print(response)
 # print(payload.json())
 ```
 The free model list includes:
-- `google/gemma-7b-it:free`
-- `openrouter/cinematika-7b:free`
-- `undi95/toppy-m-7b:free`
-- `gryphe/mythomist-7b:free`
-- `mistralai/mistral-7b-instruct:free`
-- `nousresearch/nous-capybara-7b:free`
-- `openrouter/auto`
+   - `google/gemma-7b-it:free` - 7B parameter [Google Gemma-7b](https://huggingface.co/google/gemma-7b) model
+   - `mistralai/mistral-7b-instruct:free` - 7B parameter [instructional model](https://huggingface.co/mistralai/Mistral-7B-v0.1) from Mistral AI
+   - `openrouter/cinematika-7b:free` - 7B parameter [openrouter/cinematika-7b](https://huggingface.co/jondurbin/cinematika-7b-v0.1) model
+   - `undi95/toppy-m-7b:free` - 7B parameter [toopy-m-7b](https://huggingface.co/Undi95/Toppy-M-7B?not-for-all-audiences=true) model
+   - `gryphe/mythomist-7b:free` - 7B parameter [mythomist-7b](https://huggingface.co/Gryphe/MythoMist-7b)
+   - `nousresearch/nous-capybara-7b:free` - 7B parameter [model](https://huggingface.co/NousResearch/Nous-Capybara-7B-V1) from Nous Research
 
 
 
