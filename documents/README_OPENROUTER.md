@@ -123,3 +123,7 @@ print(response)
 ### More Examples
 
 Check out the [OpenRouter documentation](https://openrouter.ai/docs) for more examples and usage details for the other available free models.
+
+> [!NOTE]
+> You can easily receive responses from open LLMs without this package by following the instructions on [here](https://openrouter.ai/docs#models).
+
