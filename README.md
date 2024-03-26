@@ -580,6 +580,9 @@ print(tokenizer.decode(outputs[0]))
 ## Utilize free open-source LLM API through [Open Router](https://openrouter.ai/)
 OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges. See more [free open-source LLM API guide](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 
+> [!NOTE]
+> You can easily receive responses from open LLMs without this package by following the instructions on [here](https://openrouter.ai/docs#models).
+
 ```python
 from gemini import OpenRouter
 
