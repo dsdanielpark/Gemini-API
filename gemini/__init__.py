@@ -2,6 +2,7 @@ from os import environ
 
 from .sync_client import Gemini
 from .async_client import GeminiClient
+from .src.module.openrouter.client import OpenRouter
 
 from .src.model.image import GeminiImage
 from .src.model.output import GeminiCandidate, GeminiModelOutput
