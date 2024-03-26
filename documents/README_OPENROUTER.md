@@ -31,13 +31,13 @@ print(response)
 
 
 3. **Current Free Model List** (2024-03-26):
-   - `google/gemma-7b-it:free` - 7B parameter Italian language model from Google
-   - `openrouter/cinematika-7b:free` - 7B parameter multimodal model trained on movie data
-   - `undi95/toppy-m-7b:free` - 7B parameter Korean language model
-   - `gryphe/mythomist-7b:free` - 7B parameter model trained on mythology and fantasy texts
-   - `mistralai/mistral-7b-instruct:free` - 7B parameter instructional model from Mistral AI
-   - `nousresearch/nous-capybara-7b:free` - 7B parameter model from Nous Research
-   - `openrouter/auto` - Automatic model selection based on input prompt
+   - `google/gemma-7b-it:free` - 7B parameter [Google Gemma-7b](https://huggingface.co/google/gemma-7b) model
+   - `mistralai/mistral-7b-instruct:free` - 7B parameter [instructional model](https://huggingface.co/mistralai/Mistral-7B-v0.1) from Mistral AI
+   - `openrouter/cinematika-7b:free` - 7B parameter [openrouter/cinematika-7b](https://huggingface.co/jondurbin/cinematika-7b-v0.1) model
+   - `undi95/toppy-m-7b:free` - 7B parameter [toopy-m-7b](https://huggingface.co/Undi95/Toppy-M-7B?not-for-all-audiences=true) model
+   - `gryphe/mythomist-7b:free` - 7B parameter [mythomist-7b](https://huggingface.co/Gryphe/MythoMist-7b)
+   - `nousresearch/nous-capybara-7b:free` - 7B parameter [model](https://huggingface.co/NousResearch/Nous-Capybara-7B-V1) from Nous Research
+
 
 > [!IMPORTANT]
 > The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models)
