@@ -3,6 +3,9 @@
 
 OpenRouter offers free access to various open-source Large Language Models (LLMs), allowing you to explore and experiment with these powerful models without incurring any charges.
 
+> [!IMPORTANT]
+> The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models)
+
 
 <br>
 
@@ -50,6 +53,8 @@ Here are examples using some of the models. Simply change the model to use diffe
 
 ### google/gemma-7b-it:free
 
+
+*chat completion*
 ```python
 from gemini import OpenRouter
 
@@ -59,6 +64,34 @@ gemma_client = OpenRouter(api_key=api_key, model="google/gemma-7b-it:free")
 prompt = "Do you know UCA academy in Korea?"
 response = gemma_client.create_chat_completion(prompt)
 print(response)
+```
+
+*get response*
+```python
+prompt = "Do you know UCA academy in Korea?"
+payload = gemma_client.generate_content(prompt)
+print(payload.json())
+```
+
+
+<br>
+
+### mistralai/mistral-7b-instruct:free
+
+```python
+
+from gemini import OpenRouter
+
+api_key = "<your_api_key>"
+mistral_client = OpenRouter(api_key=api_key, model="mistralai/mistral-7b-instruct:free")
+
+prompt = "Do you know UCA academy in Korea?"
+response = mistral_client.create_chat_completion(prompt)
+print(response)
+
+# payload = mistral_client.generate_content(prompt)
+# print(payload.json())
+
 ```
 
 ### openrouter/cinematika-7b:free
