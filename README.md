@@ -29,6 +29,12 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 <br>
 
 
+> [!TIP]
+> | 2024-03-26 | Check out free LLM APIs with Open Router. [[Example codes]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
+
+<br><br>
+
+
 - [ Gemini API   ](#-gemini-api---)
   - [What is Gemini?](#what-is-gemini)
   - [Installation](#installation)
@@ -36,7 +42,6 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
   - [Quick Start](#quick-start)
   - [Usage](#usage)
     - [# 01. Initialization](#-01-initialization)
-      - [Auto Cookie Update](#auto-cookie-update)
     - [# 02. Generate content](#-02-generate-content)
     - [# 03. Send request](#-03-send-request)
     - [# 04. Text generation](#-04-text-generation)
@@ -48,20 +53,10 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
-    - [Use rotating proxies](#use-rotating-proxies)
-    - [Reusable session object](#reusable-session-object)
-  - [More features](#more-features)
   - [Open-source LLM, Gemma](#open-source-llm-gemma)
     - [How to use Gemma](#how-to-use-gemma)
   - [Utilize free open-source LLM API through Open Router](#utilize-free-open-source-llm-api-through-open-router)
-  - [FAQ](#faq)
-  - [Issues](#issues)
-  - [Sponsor](#sponsor)
-  - [Contributors](#contributors)
-  - [Contacts](#contacts)
-  - [License ©️](#license-️)
-  - [References](#references)
-  - [Requirements](#requirements)
+
 
 
 
@@ -69,6 +64,9 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 <br>
+
+
+
 
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
@@ -580,7 +578,7 @@ print(tokenizer.decode(outputs[0]))
 
 
 ## Utilize free open-source LLM API through [Open Router](https://openrouter.ai/)
-OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges.
+OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges. See more [free open-source LLM API guide](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 
 ```python
 from gemini import OpenRouter
