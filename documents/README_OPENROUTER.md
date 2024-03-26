@@ -9,6 +9,12 @@ OpenRouter offers free access to various open-source Large Language Models (LLMs
 
 <br>
 
+## Installation
+```
+pip install python-gemini-api
+```
+
+
 ## Quick Start
 Get API key at [OpenRouter](https://openrouter.ai/keys) and generate contents as follow:
 ```python
