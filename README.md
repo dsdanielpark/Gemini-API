@@ -30,7 +30,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 > [!TIP]
-> | 2024-03-26 | Check out partially free Open-source LLM APIs with Open Router. [[Example codes]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
+> | 2024-03-26 | Check out partially free Open-source LLM APIs with Open Router. [[See example codes]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 
 <br><br>
 
@@ -586,7 +586,7 @@ from gemini import OpenRouter
 OPENROUTER_API_KEY = "<your_open_router_api_key>"
 GemmaClient = OpenRouter(api_key=OPENROUTER_API_KEY, model="google/gemma-7b-it:free")
 
-prompt = "Do you know UCA academy in korea? https://blog.naver.com/ulsancoding"
+prompt = "Do you know UCA academy in Korea? https://blog.naver.com/ulsancoding"
 response = GemmaClient.create_chat_completion(prompt)
 print(response)
 
