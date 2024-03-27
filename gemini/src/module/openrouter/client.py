@@ -24,12 +24,13 @@ class OpenRouter:
 
     FREE_MODEL_LIST: List[str] = [
         "google/gemma-7b-it:free",
+        "huggingfaceh4/zephyr-7b-beta:free",
+        "mistralai/mistral-7b-instruct:free",
         "openrouter/cinematika-7b:free",
         "undi95/toppy-m-7b:free",
         "gryphe/mythomist-7b:free",
-        "mistralai/mistral-7b-instruct:free",
         "nousresearch/nous-capybara-7b:free",
-        "openrouter/auto",
+        "openchat/openchat-7b:free",
     ]
 
     def __init__(self, model: str, api_key: str) -> None:
@@ -51,21 +52,11 @@ class OpenRouter:
         self.model = model
         self._validate_model(model)
 
-    def _validate_message(self, message: str) -> None:
+    def get_model_list(self) -> List[str]:
         """
-        Validates that the message is a string.
+        Returns a list of free model identifiers available for use.
         """
-        if not isinstance(message, str):
-            raise ValueError("Message must be a string")
-
-    def _validate_model(self, model: str) -> None:
-        """
-        Checks if the specified model is in the list of free models.
-        """
-        if model not in self.FREE_MODEL_LIST:
-            print(
-                "This model may not be free. Please check the following list for costs.\nUsers are responsible for API costs. Visit https://openrouter.ai/docs#models"
-            )
+        return self.FREE_MODEL_LIST
 
     def create_chat_completion(
         self,
@@ -130,8 +121,18 @@ class OpenRouter:
 
         return response
 
-    def get_model_list(self) -> List[str]:
+    def _validate_message(self, message: str) -> None:
         """
-        Returns a list of free model identifiers available for use.
+        Validates that the message is a string.
         """
-        return self.FREE_MODEL_LIST
+        if not isinstance(message, str):
+            raise ValueError("Message must be a string")
+
+    def _validate_model(self, model: str) -> None:
+        """
+        Checks if the specified model is in the list of free models.
+        """
+        if model not in self.FREE_MODEL_LIST:
+            print(
+                "This model may not be free. Please check the following list for costs.\nUsers are responsible for API costs. Visit https://openrouter.ai/docs#models"
+            )
