@@ -4,7 +4,7 @@
 OpenRouter offers free access to various open-source Large Language Models (LLMs), allowing you to explore and experiment with these powerful models without incurring any charges.
 
 > [!IMPORTANT]
-> The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models)
+> The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models) (Free limit: 10 requests/minute)
 
 
 <br>
