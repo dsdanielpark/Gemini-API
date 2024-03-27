@@ -596,13 +596,17 @@ print(response)
 # payload = GemmaClient.generate_content(prompt)
 # print(payload.json())
 ```
+
 The free model list includes:
-   - `google/gemma-7b-it:free` - 7B parameter [Google Gemma-7b](https://huggingface.co/google/gemma-7b) model
-   - `mistralai/mistral-7b-instruct:free` - 7B parameter [instructional model](https://huggingface.co/mistralai/Mistral-7B-v0.1) from Mistral AI
-   - `openrouter/cinematika-7b:free` - 7B parameter [openrouter/cinematika-7b](https://huggingface.co/jondurbin/cinematika-7b-v0.1) model
-   - `undi95/toppy-m-7b:free` - 7B parameter [toopy-m-7b](https://huggingface.co/Undi95/Toppy-M-7B?not-for-all-audiences=true) model
-   - `gryphe/mythomist-7b:free` - 7B parameter [mythomist-7b](https://huggingface.co/Gryphe/MythoMist-7b)
-   - `nousresearch/nous-capybara-7b:free` - 7B parameter [model](https://huggingface.co/NousResearch/Nous-Capybara-7B-V1) from Nous Research
+   - `google/gemma-7b-it:free` - [google/gemma-7b](https://huggingface.co/google/gemma-7b) from Google
+   - `mistralai/mistral-7b-instruct:free` - [mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1) from Mistral AI
+   - `huggingfaceh4/zephyr-7b-beta:free` -[HuggingFaceH4/zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta) 
+   - `openchat/openchat-7b:free` - [openchat/openchat](https://huggingface.co/openchat/openchat) 
+   - `openrouter/cinematika-7b:free` - [jondurbin/cinematika-7b-v0.1](https://huggingface.co/jondurbin/cinematika-7b-v0.1)
+   - `undi95/toppy-m-7b:free` - [Undi95/Toppy-M-7B](https://huggingface.co/Undi95/Toppy-M-7B?not-for-all-audiences=true)
+   - `gryphe/mythomist-7b:free` - [Gryphe/MythoMist-7b](https://huggingface.co/Gryphe/MythoMist-7b)
+   - `nousresearch/nous-capybara-7b:free` - [NousResearch/Nous-Capybara-7B-V1](https://huggingface.co/NousResearch/Nous-Capybara-7B-V1) from Nous Research
+
 
 
 
