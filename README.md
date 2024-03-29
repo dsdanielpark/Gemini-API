@@ -30,7 +30,9 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 > [!TIP]
-> | 2024-03-26 | Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute) [[See Code Examples]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
+> | 2024-03-26 |
+> 
+> Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute) [[See Code Examples]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 
 <br><br>
 
