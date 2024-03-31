@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from gemini.src.model.parser.base import BaesParser
+from gemini.src.models.parser.base import BaesParser
 
 
 class ParseMethod1(BaesParser):

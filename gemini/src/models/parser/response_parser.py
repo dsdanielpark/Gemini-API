@@ -1,7 +1,7 @@
 import json
 from typing import Dict
 from gemini.src.misc.utils import extract_code
-from gemini.src.model.parser.base import BaesParser
+from gemini.src.models.parser.base import BaesParser
 
 
 class ResponseParser(BaesParser):

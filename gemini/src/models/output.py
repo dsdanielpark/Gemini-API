@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict
-from gemini.src.model.image import GeminiImage
+from gemini.src.models.image import GeminiImage
 
 
 class GeminiCandidate(BaseModel):
