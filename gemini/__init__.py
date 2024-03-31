@@ -1,8 +1,8 @@
 from os import environ
 
-from .sync_client import Gemini
+from .client import Gemini
 from .async_client import GeminiClient
-from .src.module.openrouter.client import OpenRouter
+from .src.modules.openrouter.client import OpenRouter
 
 from .src.model.image import GeminiImage
 from .src.model.output import GeminiCandidate, GeminiModelOutput
@@ -15,11 +15,11 @@ from .src.misc.decorator import retry, log_method, time_execution, handle_errors
 from .src.misc.exceptions import PackageError, GeminiAPIError, TimeoutError
 from .src.misc.utils import extract_code, upload_image, max_token, max_sentence
 
-from .src.extension.replit import prepare_replit_data
+from .src.extensions.replit import prepare_replit_data
 
 try:
-    from .src.module.voice.google import google_tts, google_stt
-    from .src.module.voice.openai import openai_tts, openai_stt
+    from .src.modules.voice.google import google_tts, google_stt
+    from .src.modules.voice.openai import openai_tts, openai_stt
 except ImportError as e:
     pass
 
