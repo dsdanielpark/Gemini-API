@@ -137,7 +137,8 @@ class Gemini:
         Retrieves the session ID (SID) and a SNlM0e nonce value from the application page.
         """
         try:
-            response = requests.get(f"{URLs.BASE_URL.value}/app")
+            response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
+            print(response)
             response.raise_for_status()
 
             sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
@@ -208,7 +209,7 @@ class Gemini:
                                 image
                                 and [
                                     prompt,
-                                    0,
+                                    int(os.getenv("GEMINI_ULTRA" or 0)),
                                     None,
                                     [[[upload_image(image), 1]]],
                                 ]
