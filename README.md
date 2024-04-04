@@ -130,16 +130,21 @@ pip install -q -U python-gemini-api
 
 ## Quick Start
 
-*Simple usage*
+*Setting language and Gemini version using environment variables:*
 
 Setting Gemini response language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
 
 ```python
 import os
-os.environ["GEMINI_LANGUAGE"] = "KR"
+os.environ["GEMINI_LANGUAGE"] = "KR"  # Setting Gemini response language (Optional)
+os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Experimental, Optional)
 ```
 
 
+
+<br>
+
+*Simple usage*
 
 Generate content: returns parsed response.
 ```python
