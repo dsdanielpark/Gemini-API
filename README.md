@@ -138,6 +138,7 @@ Setting Gemini response language (Optional): Check supported languages [here](ht
 import os
 os.environ["GEMINI_LANGUAGE"] = "KR"  # Setting Gemini response language (Optional)
 os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Experimental, Optional)
+# In some accounts, access to Gemini Ultra may not be available. If that's the case, please revert it back to "0".
 ```
 
 
@@ -495,7 +496,8 @@ In Gemini, generate_content returns the first response. This may vary depending 
 ```python
 from gemini import GeminiModelOutput
 GeminiModelOutput.chosen = 1 # default is 0
-response1 = GeminiClient.generate_content("Give me some information about the USA.")
+response_choice_1 = GeminiClient.generate_content("Give me some information about the USA.")
+# If not all Gemini returns are necessarily plural, revert back to 0 in case of errors.
 ```
 
 <br>
