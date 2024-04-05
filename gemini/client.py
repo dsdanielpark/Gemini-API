@@ -6,17 +6,19 @@ import string
 import inspect
 import requests
 import urllib.parse
-from typing import Optional, Tuple, Dict, Union, List
 from requests.exceptions import ConnectionError
+from typing import Optional, Tuple, Dict, Union, List
 
-from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
+from .src.misc.utils import upload_image
 from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
-from .src.misc.utils import upload_image
+from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
+
 from .src.misc.constants import (
     URLs,
     Headers,
     TARGET_COOKIES,
+    WHOLE_COOKIES,
     SUPPORTED_BROWSERS,
 )
 
@@ -118,19 +120,23 @@ class Gemini:
     def _set_cookies_from_file(self, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
-            if file_path.endswith(".json"):
-                with open(file_path, "r") as file:
+            with open(file_path, "r") as file:
+                if file_path.endswith(".json"):
+                    # Load JSON formatted cookies directly
                     cookies = json.load(file)
-            else:
-                with open(file_path, "r") as file:
+                else:
                     content = file.read()
+                    # Attempt to load Python dictionary formatted cookies
                     try:
-                        cookies = eval(content)
+                        content = content.replace("cookies = ", "").replace("'", '"')
+                        cookies = json.loads(content)
                     except NameError:
+                        # Fallback to converting single quotes to double quotes and loading as JSON
                         cookies = json.loads(content.replace("'", '"'))
-            self.session.cookies.update(cookies)
         except Exception as e:
-            print(f"Error loading cookie file: {e}")
+            raise Exception(f"Failed to load cookies from {file_path}: {e}")
+
+        self.session.cookies.update(cookies)
 
     def _set_sid_and_nonce(self):
         """
@@ -399,6 +405,7 @@ class Gemini:
     #         )
 
     # To-Do: Get cookie values automatically.
+
     def _set_cookies_automatically(self) -> None:
         """
         Updates the instance's cookies attribute with Gemini API tokens, either from environment variables or by extracting them from the browser, based on the auto_cookies flag.
@@ -431,12 +438,16 @@ class Gemini:
             )
 
         # Delete non-target cookies
-        if self.target_cookies == None:
-            self.cookies = {
-                key: value
-                for key, value in self.cookies.items()
-                if key in TARGET_COOKIES
-            }
+        if isinstance(self.target_cookies, list):
+            filter_set = set(self.target_cookies)
+        elif self.target_cookies == "all":
+            filter_set = WHOLE_COOKIES
+        else:
+            filter_set = TARGET_COOKIES
+
+        self.cookies = {
+            key: value for key, value in self.cookies.items() if key in filter_set
+        }
 
     # To-Do: Get cookie values automatically.
     def _update_cookies_from_browser(self) -> dict:

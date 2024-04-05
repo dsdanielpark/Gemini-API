@@ -1,8 +1,38 @@
-from enum import Enum
+from enum import Enum, auto
 import browser_cookie3
 
 
-TARGET_COOKIES = ["__Secure-1PSIDCC", " __Secure-1PSID", "__Secure-1PSIDTS", "NID"]
+class CookieNames(Enum):
+    SEARCH_SAMESITE = auto()
+    SID = auto()
+    SECURE_1PSID = auto()
+    SECURE_3PSID = auto()
+    HSID = auto()
+    SSID = auto()
+    APISID = auto()
+    SAPISID = auto()
+    SECURE_1PAPISID = auto()
+    SECURE_3PAPISID = auto()
+    _GA = auto()
+    AEC = auto()
+    _GA_WC57KJ50ZZ = auto()
+    _1P_JAR = auto()
+    NID = auto()
+    SECURE_1PSIDTS = auto()
+    SECURE_3PSIDTS = auto()
+    SIDCC = auto()
+    SECURE_1PSIDCC = auto()
+    SECURE_3PSIDCC = auto()
+
+
+TARGET_COOKIES = [
+    CookieNames.SECURE_1PSIDCC.name,
+    CookieNames.SECURE_1PSID.name,
+    CookieNames.SECURE_1PSIDTS.name,
+    CookieNames.NID.name,
+]
+
+WHOLE_COOKIES = [cookie.name for cookie in CookieNames]
 
 
 class URLs(Enum):
