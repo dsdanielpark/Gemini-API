@@ -13,6 +13,7 @@ from .src.misc.utils import upload_image
 from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
+from .src.misc.exceptions import GeminiAPIError
 
 from .src.misc.constants import (
     URLs,
@@ -144,7 +145,11 @@ class Gemini:
         """
         try:
             response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
-            print(response)
+            if response.status_code != 200:
+                raise GeminiAPIError(
+                    f"Gemini API Error: Response code {response.status_code}\nExcessive connections may have temporarily blocked your account/IP, but web UI should remain accessible."
+                )
+            
             response.raise_for_status()
 
             sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
