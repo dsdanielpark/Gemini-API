@@ -39,11 +39,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 - [ Gemini API   ](#-gemini-api---)
   - [What is Gemini?](#what-is-gemini)
-  - [Installation](#installation)
-  - [Authentication](#authentication)
-  - [Quick Start](#quick-start)
+  - [Installation ✅](#installation-)
+  - [Authentication ✅](#authentication)
+  - [Quick Start ✅](#quick-start)
   - [Usage](#usage)
-    - [# 01. Initialization](#-01-initialization)
+    - [# 01. Initialization ✅](#-01-initialization)
     - [# 02. Generate content](#-02-generate-content)
     - [# 03. Send request](#-03-send-request)
     - [# 04. Text generation](#-04-text-generation)
@@ -51,13 +51,13 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
     - [# 06. Retrieving Images from Gemini Responses](#-06-retrieving-images-from-gemini-responses)
     - [# 07. Generate content from images](#-07-generate-content-from-images)
     - [# 08. Generate content using Google Services](#-08-generate-content-using-google-services)
-    - [# 09. Fix context setting rcid](#-09-fix-context-setting-rcid)
+    - [# 09. Fix context setting RCID](#-09-fix-context-setting-rcid)
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
   - [Open-source LLM, Gemma](#open-source-llm-gemma)
     - [How to use Gemma](#how-to-use-gemma)
-  - [Utilize free open-source LLM API through Open Router](#utilize-free-open-source-llm-api-through-open-router)
+  - [Utilize free open-source LLM API through Open Router ✅](#utilize-free-open-source-llm-api-through-open-router)
 
 
 
@@ -101,6 +101,7 @@ pip install -q -U python-gemini-api
 
     # Testing needed as cookies vary by region.
     # GeminiClient = Gemini(auto_cookies=True, target_cookies=["__Secure-1PSID", "__Secure-1PSIDTS"])
+    # GeminiClient = Gemini(auto_cookies=True, target_cookies="all") # You can pass whole cookies
 
     response = GeminiClient.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
     print(response.payload)
@@ -476,8 +477,8 @@ response.response_dict
 <br>
 
 
-### # 09. Fix context setting rcid
-You can specify a particular response by setting its response candidate id(rcid).
+### # 09. Fix context setting RCID
+You can specify a particular response by setting its Response Candidate ID(RCID).
 
 ```python
 # Generate content for the prompt "Give me some information about the USA."
@@ -487,7 +488,12 @@ GeminiClient.rcid = "rc_xxxx"
 
 # Now, generate content for the next prompt "How long does it take from LA to New York?"
 response2 = GeminiClient.generate_content("How long does it take from LA to New York?")
+
+# However, RCID may not persist. If parsing fails, reset `GeminiClient.rcid` to None.
+# GeminiClient.rcid = None
 ```
+
+
 
 <br>
 
@@ -497,7 +503,9 @@ In Gemini, generate_content returns the first response. This may vary depending 
 from gemini import GeminiModelOutput
 GeminiModelOutput.chosen = 1 # default is 0
 response_choice_1 = GeminiClient.generate_content("Give me some information about the USA.")
+
 # If not all Gemini returns are necessarily plural, revert back to 0 in case of errors.
+#  GeminiModelOutput.chosen = 0
 ```
 
 <br>
