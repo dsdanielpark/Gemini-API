@@ -149,7 +149,7 @@ class Gemini:
                 raise GeminiAPIError(
                     f"Gemini API Error: Response code {response.status_code}\nExcessive connections may have temporarily blocked your account/IP, but web UI should remain accessible."
                 )
-            
+
             response.raise_for_status()
 
             sid_match = re.search(r'"FdrFJe":"([\d-]+)"', response.text)
