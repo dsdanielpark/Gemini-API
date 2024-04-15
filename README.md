@@ -24,6 +24,42 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 
+## Large Language Models of Google
+
+| Model        | Type         | Access                              | Details                                                                                                                                                                   | Links |
+|:--------------:|:--------------:|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
+| **Gemini**    | 🔒Proprietary   | API only *(This repository contains unofficial API)*      | Gemini is a proprietary multimodal AI developed by Google DeepMind. It includes models like Gemini Pro and Gemini Pro Vision.  | [Paper](https://arxiv.org/abs/2312.11805), [Website](https://deepmind.google/technologies/gemini/#introduction), [API](https://aistudio.google.com/), [API Docs](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) |
+| **Gemma**    | 🔐<br>Open Source  | Downloadable weights for on-premises use | Gemma models are open-source, text-to-text language models with downloadable weights. Perfect for use cases like question answering and summarization.                        | [Hugging Face](https://huggingface.co/google/gemma-7b) |
+| **Code Gemma** | 🔐<br>Open Source  | Downloadable weights for on-premises use | Code Gemma models are designed specifically for coding tasks and are also open-source, providing flexibility for developers in handling code generation tasks.              | [Hugging Face Collection](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11), [Model Card](https://huggingface.co/google/codegemma-7b-it) |
+
+<details><summary>Code Examples of Gemma and GemmaCode </summary>
+    
+#### Gemma
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tokenizer = AutoTokenizer.from_pretrained("google/gemma-7b")
+model = AutoModelForCausalLM.from_pretrained("google/gemma-7b")
+input_text = "Write me a poem about Machine Learning."
+input_ids = tokenizer(input_text, return_tensors="pt")
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+#### Code Gemma
+```python
+from transformers import GemmaTokenizer, AutoModelForCausalLM
+
+tokenizer = GemmaTokenizer.from_pretrained("google/codegemma-7b-it")
+model = AutoModelForCausalLM.from_pretrained("google/codegemma-7b-it")
+input_text = "Write me a Python function to calculate the nth fibonacci number."
+input_ids = tokenizer(input_text, return_tensors="pt")
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+</details>
+
 
 
 <br>
@@ -34,11 +70,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 > 
 > Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute) 
 
-<br><br>
+<br>
 
 
 - [ Gemini API   ](#-gemini-api---)
-  - [What is Gemini?](#what-is-gemini)
+  - [What is Gemini?🔒](#what-is-gemini)
   - [Installation ✅](#installation-)
   - [Authentication ✅](#authentication)
   - [Quick Start ✅](#quick-start)
@@ -55,8 +91,8 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
-  - [Open-source LLM, Gemma](#open-source-llm-gemma)
-    - [How to use Gemma](#how-to-use-gemma)
+  - [Open-source LLM, Gemma🔐](#open-source-llm-gemma)
+  - [Open-source LLM, Code Gemma🔐](#open-source-llm-code-gemma)
   - [Utilize free open-source LLM API through Open Router ✅](#utilize-free-open-source-llm-api-through-open-router)
 
 
@@ -65,11 +101,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 
+
+
+
+
 <br>
-
-
-
-
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 
@@ -590,6 +626,28 @@ input_ids = tokenizer(input_text, return_tensors="pt")
 outputs = model.generate(**input_ids)
 print(tokenizer.decode(outputs[0]))
 ```
+
+<br>
+
+## Open-source LLM, [Code Gemma](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11)
+
+[CodeGemma](https://huggingface.co/blog/codegemma), which is an official release from Google for code LLMs, was released on April 9, 2024. It provides three models specifically designed for generating and interacting with code. You can explore the [Code Gemma models](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11) and view the [model card](https://huggingface.co/google/codegemma-7b-it) for more details.
+
+### How to use Code Gemma
+```python
+from transformers import GemmaTokenizer, AutoModelForCausalLM
+
+tokenizer = GemmaTokenizer.from_pretrained("google/codegemma-7b-it")
+model = AutoModelForCausalLM.from_pretrained("google/codegemma-7b-it")
+
+input_text = "Write me a Python function to calculate the nth fibonacci number."
+input_ids = tokenizer(input_text, return_tensors="pt")
+
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+
 
 <br>
 
