@@ -22,7 +22,43 @@ A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/pyth
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
+<br>
 
+### Large Language Models of Google
+
+| Model        | Type         | Access                              | Details                                                                                                                                                                   | Links |
+|:--------------:|:--------------:|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
+| **Gemini**    | 🔐<br>Proprietary   | API only *(This repository contains unofficial API)*      | Gemini is a proprietary multimodal AI developed by Google DeepMind. It includes models like Gemini Pro and Gemini Pro Vision.  | [Paper](https://arxiv.org/abs/2312.11805), [Website](https://deepmind.google/technologies/gemini/#introduction), [API](https://aistudio.google.com/), [API Docs](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) |
+| **Gemma**    | 🤝<br>Open Source  | Downloadable weights for on-premises use | Gemma models are open-source, text-to-text language models with downloadable weights. Perfect for use cases like question answering and summarization.                        | [Paprer](https://arxiv.org/abs/2403.08295), [Website](https://ai.google.dev/gemma/docs?hl=ko), [Model Card](https://huggingface.co/google/gemma-7b) |
+| **Code Gemma** | 🤝<br>Open Source  | Downloadable weights for on-premises use | Code Gemma models are designed specifically for coding tasks and are also open-source, providing flexibility for developers in handling code generation tasks.              | [Post](https://huggingface.co/blog/codegemma), [Hugging Face Collection](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11), [Model Card](https://huggingface.co/google/codegemma-7b-it) |
+
+<details><summary>Code Examples of Gemma and GemmaCode </summary>
+    
+#### Gemma
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tokenizer = AutoTokenizer.from_pretrained("google/gemma-7b")
+model = AutoModelForCausalLM.from_pretrained("google/gemma-7b")
+input_text = "Write me a poem about Machine Learning."
+input_ids = tokenizer(input_text, return_tensors="pt")
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+#### Code Gemma
+```python
+from transformers import GemmaTokenizer, AutoModelForCausalLM
+
+tokenizer = GemmaTokenizer.from_pretrained("google/codegemma-7b-it")
+model = AutoModelForCausalLM.from_pretrained("google/codegemma-7b-it")
+input_text = "Write me a Python function to calculate the nth fibonacci number."
+input_ids = tokenizer(input_text, return_tensors="pt")
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+</details>
 
 
 
@@ -34,11 +70,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 > 
 > Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute) 
 
-<br><br>
+<br>
 
 
 - [ Gemini API   ](#-gemini-api---)
-  - [What is Gemini?](#what-is-gemini)
+  - [What is Gemini?🔐](#what-is-gemini)
   - [Installation ✅](#installation-)
   - [Authentication ✅](#authentication)
   - [Quick Start ✅](#quick-start)
@@ -55,8 +91,8 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
-  - [Open-source LLM, Gemma](#open-source-llm-gemma)
-    - [How to use Gemma](#how-to-use-gemma)
+  - [Open-source LLM, Gemma🤝](#open-source-llm-gemma)
+  - [Open-source LLM, Code Gemma🤝](#open-source-llm-code-gemma)
   - [Utilize free open-source LLM API through Open Router ✅](#utilize-free-open-source-llm-api-through-open-router)
 
 
@@ -65,11 +101,11 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 
+
+
+
+
 <br>
-
-
-
-
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
 
@@ -529,7 +565,7 @@ response = GeminiClient.generate_custom_content("Give me some information about 
 
 ## Further
 
-### Use rotating proxies
+### Use rotating proxies via [Smart Proxy by Crawlbase](https://crawlbase.com/docs/smart-proxy/?utm_source=github_ad&utm_medium=social&utm_campaign=bard_api)
 
 If you want to **avoid blocked requests** and bans, then use [Smart Proxy by Crawlbase](https://crawlbase.com/docs/smart-proxy/?utm_source=github_ad&utm_medium=social&utm_campaign=bard_api). It forwards your connection requests to a **randomly rotating IP address** in a pool of proxies before reaching the target website. The combination of AI and ML make it more effective to avoid CAPTCHAs and blocks.
 
@@ -593,6 +629,28 @@ print(tokenizer.decode(outputs[0]))
 
 <br>
 
+## Open-source LLM, [Code Gemma](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11)
+
+[CodeGemma](https://huggingface.co/blog/codegemma), which is an official release from Google for code LLMs, was released on April 9, 2024. It provides three models specifically designed for generating and interacting with code. You can explore the [Code Gemma models](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11) and view the [model card](https://huggingface.co/google/codegemma-7b-it) for more details.
+
+### How to use Code Gemma
+```python
+from transformers import GemmaTokenizer, AutoModelForCausalLM
+
+tokenizer = GemmaTokenizer.from_pretrained("google/codegemma-7b-it")
+model = AutoModelForCausalLM.from_pretrained("google/codegemma-7b-it")
+
+input_text = "Write me a Python function to calculate the nth fibonacci number."
+input_ids = tokenizer(input_text, return_tensors="pt")
+
+outputs = model.generate(**input_ids)
+print(tokenizer.decode(outputs[0]))
+```
+
+
+
+<br>
+
 
 ## Utilize free open-source LLM API through [Open Router](https://openrouter.ai/)
 OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges. See more [free open-source LLM API guide](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
@@ -630,19 +688,17 @@ The free model list includes:
 
 <br>
 
+## Sponsor, [Crawlbase](https://crawlbase.com/)
+Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
+
+<br>
 
 ## [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md)
 First review [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) and the [Official Google Gemini API](https://aistudio.google.com/) before using this package.
 You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_FAQ.md) and [Issue](https://github.com/dsdanielpark/Gemini-API/issues) pages. 
-
-
             
 ## [Issues](https://github.com/dsdanielpark/Gemini-API/issues)
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
-
-
-## Sponsor
-Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
 ## Contributors
 We would like to express our sincere gratitude to all the contributors. 
