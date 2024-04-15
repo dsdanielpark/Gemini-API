@@ -22,9 +22,9 @@ A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/pyth
 
 Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
+<br>
 
-
-## Large Language Models of Google
+### Large Language Models of Google
 
 | Model        | Type         | Access                              | Details                                                                                                                                                                   | Links |
 |:--------------:|:--------------:|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
