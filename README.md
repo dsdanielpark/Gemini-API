@@ -28,9 +28,9 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 | Model        | Type         | Access                              | Details                                                                                                                                                                   | Links |
 |:--------------:|:--------------:|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| **Gemini**    | 🔒Proprietary   | API only *(This repository contains unofficial API)*      | Gemini is a proprietary multimodal AI developed by Google DeepMind. It includes models like Gemini Pro and Gemini Pro Vision.  | [Paper](https://arxiv.org/abs/2312.11805), [Website](https://deepmind.google/technologies/gemini/#introduction), [API](https://aistudio.google.com/), [API Docs](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) |
-| **Gemma**    | 🔐<br>Open Source  | Downloadable weights for on-premises use | Gemma models are open-source, text-to-text language models with downloadable weights. Perfect for use cases like question answering and summarization.                        | [Paprer](https://arxiv.org/abs/2403.08295), [Website](https://ai.google.dev/gemma/docs?hl=ko), [Model Card](https://huggingface.co/google/gemma-7b) |
-| **Code Gemma** | 🔐<br>Open Source  | Downloadable weights for on-premises use | Code Gemma models are designed specifically for coding tasks and are also open-source, providing flexibility for developers in handling code generation tasks.              | [Post](https://huggingface.co/blog/codegemma), [Hugging Face Collection](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11), [Model Card](https://huggingface.co/google/codegemma-7b-it) |
+| **Gemini**    | 🔐<br>Proprietary   | API only *(This repository contains unofficial API)*      | Gemini is a proprietary multimodal AI developed by Google DeepMind. It includes models like Gemini Pro and Gemini Pro Vision.  | [Paper](https://arxiv.org/abs/2312.11805), [Website](https://deepmind.google/technologies/gemini/#introduction), [API](https://aistudio.google.com/), [API Docs](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) |
+| **Gemma**    | 🤝<br>Open Source  | Downloadable weights for on-premises use | Gemma models are open-source, text-to-text language models with downloadable weights. Perfect for use cases like question answering and summarization.                        | [Paprer](https://arxiv.org/abs/2403.08295), [Website](https://ai.google.dev/gemma/docs?hl=ko), [Model Card](https://huggingface.co/google/gemma-7b) |
+| **Code Gemma** | 🤝<br>Open Source  | Downloadable weights for on-premises use | Code Gemma models are designed specifically for coding tasks and are also open-source, providing flexibility for developers in handling code generation tasks.              | [Post](https://huggingface.co/blog/codegemma), [Hugging Face Collection](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11), [Model Card](https://huggingface.co/google/codegemma-7b-it) |
 
 <details><summary>Code Examples of Gemma and GemmaCode </summary>
     
@@ -74,7 +74,7 @@ print(tokenizer.decode(outputs[0]))
 
 
 - [ Gemini API   ](#-gemini-api---)
-  - [What is Gemini?🔒](#what-is-gemini)
+  - [What is Gemini?🔐](#what-is-gemini)
   - [Installation ✅](#installation-)
   - [Authentication ✅](#authentication)
   - [Quick Start ✅](#quick-start)
@@ -91,8 +91,8 @@ print(tokenizer.decode(outputs[0]))
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
-  - [Open-source LLM, Gemma🔐](#open-source-llm-gemma)
-  - [Open-source LLM, Code Gemma🔐](#open-source-llm-code-gemma)
+  - [Open-source LLM, Gemma🤝](#open-source-llm-gemma)
+  - [Open-source LLM, Code Gemma🤝](#open-source-llm-code-gemma)
   - [Utilize free open-source LLM API through Open Router ✅](#utilize-free-open-source-llm-api-through-open-router)
 
 
