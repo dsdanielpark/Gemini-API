@@ -9,7 +9,7 @@ import urllib.parse
 from requests.exceptions import ConnectionError
 from typing import Optional, Tuple, Dict, Union, List
 
-from .src.misc.utils import upload_image
+from .src.misc.utils import upload_image, load_cookies
 from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
@@ -121,19 +121,7 @@ class Gemini:
     def _set_cookies_from_file(self, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
-            with open(file_path, "r") as file:
-                if file_path.endswith(".json"):
-                    # Load JSON formatted cookies directly
-                    cookies = json.load(file)
-                else:
-                    content = file.read()
-                    # Attempt to load Python dictionary formatted cookies
-                    try:
-                        content = content.replace("cookies = ", "").replace("'", '"')
-                        cookies = json.loads(content)
-                    except NameError:
-                        # Fallback to converting single quotes to double quotes and loading as JSON
-                        cookies = json.loads(content.replace("'", '"'))
+            cookies = load_cookies(file_path)
         except Exception as e:
             raise Exception(f"Failed to load cookies from {file_path}: {e}")
 

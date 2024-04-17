@@ -1,6 +1,39 @@
+import json
 import requests
 from typing import Union
 from gemini.src.misc.constants import Headers
+
+
+def load_cookies(file_path):
+    """
+    Reads a text file and tries to parse it into a Python dictionary.
+    Assumes the file might contain a cookies string or is in JSON format.
+
+    :param file_path: Path to the file containing cookie data
+    :return: A dictionary containing cookie data
+    """
+    with open(file_path, "r") as file:
+        content = file.read().strip()
+
+    # If content includes '=', assume it's a cookie string
+    if "=" in content:
+        try:
+            # Split at the first '=' and prepare for JSON parsing
+            json_str = content.split("=", 1)[1].strip()
+            json_str = json_str.replace(
+                "'", '"'
+            )  # Replace single quotes with double quotes
+            cookies_dict = json.loads(json_str)
+        except json.JSONDecodeError:
+            raise ValueError("The cookie string does not have a valid JSON format.")
+    else:
+        try:
+            # Parse the entire content directly as JSON
+            cookies_dict = json.loads(content)
+        except json.JSONDecodeError:
+            raise ValueError("The file content does not have a valid JSON format.")
+
+    return cookies_dict
 
 
 def extract_code(text: str) -> str:

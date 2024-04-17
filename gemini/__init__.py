@@ -13,7 +13,13 @@ from .src.model.parser.response_parser import ResponseParser
 from .src.misc.constants import URLs, Headers
 from .src.misc.decorator import retry, log_method, time_execution, handle_errors
 from .src.misc.exceptions import PackageError, GeminiAPIError, TimeoutError
-from .src.misc.utils import extract_code, upload_image, max_token, max_sentence
+from .src.misc.utils import (
+    extract_code,
+    upload_image,
+    max_token,
+    max_sentence,
+    load_cookies,
+)
 
 from .src.extensions.replit import prepare_replit_data
 
