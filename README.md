@@ -187,7 +187,7 @@ os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Expe
 <br>
 
 ### # 01. Initialization
-Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this sample cookie file. [[cookies_sample.txt]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.txt), [[cookies_sample.json]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.json)
+Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check sample cookie files in [assets](https://github.com/dsdanielpark/Gemini-API/tree/main/assets) folder.
 
 
 
