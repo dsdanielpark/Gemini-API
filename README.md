@@ -142,20 +142,6 @@ pip install -q -U python-gemini-api
 
 ## Quick Start
 
-*Setting language and Gemini version using environment variables:*
-
-Setting Gemini response language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
-
-```python
-import os
-os.environ["GEMINI_LANGUAGE"] = "KR"  # Setting Gemini response language (Optional)
-os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Experimental, Optional)
-# In some accounts, access to Gemini Ultra may not be available. If that's the case, please revert it back to "0".
-```
-
-
-
-<br>
 
 *Simple usage*
 
@@ -188,6 +174,20 @@ response.payload
 
 ## Usage
 
+*Setting language and Gemini version using environment variables:*
+
+Setting Gemini response language (Optional): Check supported languages [here](https://developers.google.com/hotels/hotel-prices/dev-guide/country-codes). Default is English.
+
+```python
+import os
+os.environ["GEMINI_LANGUAGE"] = "KR"  # Setting Gemini response language (Optional)
+os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Experimental, Optional)
+# In some accounts, access to Gemini Ultra may not be available. If that's the case, please revert it back to "0".
+```
+
+
+
+<br>
 
 ### # 01. Initialization
 Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this sample cookie file. [[cookies_sample.txt]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.txt), [[cookies_sample.json]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.json)
