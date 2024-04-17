@@ -11,6 +11,7 @@
 </p>
 
 
+
 https://github.com/dsdanielpark/Gemini-API/assets/81407603/e0c11d4f-3fe1-4cbb-ba79-d9f89b637324
 
 
@@ -34,6 +35,7 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 <br>
 
+## Contents
 
 - [ Gemini API   ](#-gemini-api---)
   - [What is Gemini? 🔐](#what-is-gemini)
@@ -64,10 +66,6 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 
 
-
-
-
-
 <br>
 
 ## What is [Gemini](https://deepmind.google/technologies/gemini/#introduction)?
@@ -76,7 +74,19 @@ Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
 
 Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro and Gemini Pro Vision models. In February 2024, Google's **Bard** service was changed to **Gemini**.
 
+#### Overview of Google LLMs
 
+| Model | Type | Access | Details
+|:-------:|:------:|:--------:|---------
+[Gemini](https://huggingface.co/google/gemma-7b) | Proprietary | API <sup>[[13](https://ai.google.dev/tutorials/ai-studio_quickstart)] | A proprietary multimodal AI by Google DeepMind, including advanced models such as Gemini Pro and Gemini Pro Vision. Access is restricted to API usage; additional insights may be obtained through the paper and website. <sup>[[1](https://arxiv.org/abs/2312.11805)][[2](https://deepmind.google/technologies/gemini/#introduction)]</sup>
+[Gemma](https://huggingface.co/google/gemma-7b) | Open Source | [Downloadable](https://huggingface.co/google/gemma-7b) <br>[Free API](https://github.com/dsdanielpark/Gemini-API?tab=readme-ov-file#utilize-free-open-source-llm-api-through-open-router) | An open-source text-to-text language model suitable for tasks like QA and summarization. Weights are downloadable for on-premises use, and detailed documentation is provided via the paper and website. <sup>[[3](https://arxiv.org/abs/2403.08295)][[4](https://ai.google.dev/gemma/docs)]</sup>
+[Code Gemma](https://huggingface.co/google/codegemma-7b-it) | Open Source | [Downloadable](https://huggingface.co/google/codegemma-7b-it) | Designed specifically for programming tasks, this open-source model offers downloadable weights to assist developers with code generation and similar activities. Refer to the associated paper, blog post, and Hugging Face collection for more information. <sup>[[5](https://storage.googleapis.com/deepmind-media/gemma/codegemma_report.pdf?utm_source=substack&utm_medium=email)][[6](https://huggingface.co/blog/codegemma)][[7](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11)]</sup>
+
+
+<br>
+
+## What is [Python-Gemini-API](https://github.com/dsdanielpark/Gemini-API)?
+This is a Python wrapper derived from the [Bard API](https://github.com/dsdanielpark/Bard-API) project, designed to retrieve responses from Gemini Web in REST format. 
 
 ## Installation 📦
 ```
@@ -90,8 +100,7 @@ For the updated version, use as follows:
 pip install -q -U python-gemini-api
 ```
 ## Authentication
-> [!NOTE]
-> Cookies can change quickly. Don't reopen the same session or repeat prompts too often; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. 
+
 1. Visit https://gemini.google.com/ <br>
     With browser open, try auto-collecting cookies first.
     ```python
@@ -114,6 +123,9 @@ pip install -q -U python-gemini-api
     </details>
 
 3. *(Recommended)* Export Gemini site cookies via a browser extension. For instance, use Chrome extension [ExportThisCookies](https://chromewebstore.google.com/detail/exportthiscookie/dannllckdimllhkiplchkcaoheibealk), open, and copy the txt file contents.
+
+
+<br>
 
 <details><summary>Further: For manual collection or Required for a few users upon error</summary>
 
@@ -172,13 +184,13 @@ response.payload
 > [!NOTE] 
 > If the generate_content method returns an empty payload, try executing it again without reinitializing the Gemini object.
 
-<br>
+<br><br>
 
 ## Usage
 
 
 ### # 01. Initialization
-Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this [sample cookie file](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies.txt).
+Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this sample cookie file. [[cookies_sample.txt]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.txt), [[cookies_sample.json]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.json)
 
 
 
@@ -203,23 +215,22 @@ GeminiClient = Gemini(cookies=cookies)
 For `auto_cookie` to be set to `True`, Gemini WebUI must be active in the browser. The [browser_cookie3](https://github.com/borisbabic/browser_cookie3) enables automatic cookie collection, though updates may not be complete yet.
 
 
-> [!IMPORTANT]
->  **If the session connects successfully and `generate_content` runs well, CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster.
 
 <br>
 
 ### # 02. Generate content
-Returns Gemini's response, but the first one might be empty. If generate_content yields an empty payload, rerun it without reinitializing Gemini. 
+Returns Gemini's response, but the first one might be empty. 
 
-Regardless of model output type, access the response_dict property (renamed to payload after v2.3.0).
-https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/core.py#L252
+
 ```python
 prompt = "Hello, Gemini. What's the weather like in Seoul today?"
 response = GeminiClient.generate_content(prompt)
 print(response.payload)
 ```
+
+
 > [!IMPORTANT]
->  Once connected and generating valid content, **Be sure to CLOSE the Gemini website or CLOSE your browser** for cookie stability. 
+>  DO NOT send same prompt repeatly. **If the session connects successfully and `generate_content` runs well, CLOSE Gemini website.** If Gemini web stays open in the browser, cookies may expire faster. 
 
 <br>
 
@@ -231,13 +242,11 @@ The output of the generate_content function is `GeminiModelOutput`, with the fol
 - *code*: returns the codes of the chosen candidate.
 - *web_images*: returns a list of web images from the chosen candidate.
 - *generated_images*: returns a list of generated images from the chosen candidate.
-- *payload*: returns the response dictionary, if available. (same as *reponse_dict* under v2.3.0)
-
+- *payload*: returns the response dictionary, if available.
 https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/output.py#L16
 
 
-> [!NOTE]
-> If the session fails to connect, works improperly, or terminates, returning an error, it is recommended to manually renew the cookies. The error is likely due to incorrect cookie values. Refresh or log out of Gemini web to renew cookies and try again. 
+
 
 <br>
 
@@ -253,8 +262,9 @@ GeminiClient = Gemini(cookies=cookies) # You can use various args
 response_text, response_status = GeminiClient.send_request("Hello, Gemini. What's the weather like in Seoul today?")
 print(response_text)
 ```
-
-
+You can track the total number of requests made by accessing the `request_count` property within the `Gemini` class.
+> [!NOTE]
+> Cookies can change quickly. **Don't reopen the same session or repeat prompts too often**; they'll expire faster. If the cookie value doesn't export correctly, refresh the Gemini page and export again. 
 <br>
 
 ### # 04. Text generation
@@ -270,7 +280,7 @@ print(response.text)
 
 ### # 05. Image generation
 Returns images generated by Gemini.
-https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/src/model/image.py#L12
+
 
 *Sync downloader*
 ```python
@@ -512,7 +522,6 @@ response_choice_1 = GeminiClient.generate_content("Give me some information abou
 ### # 11. Generate custom content 
 Parse the response text to extract desired values.
 
-https://github.com/dsdanielpark/Gemini-API/blob/fdf064c57bc1fb47fbbb4b93067618a200e77f62/gemini/core.py#L317
 
 Using `Gemini.generate_custom_content`, specify custom parsing to extract specific values. Utilize ParseMethod1 and ParseMethod2 by default, and you can pass custom parsing methods as arguments if desired. Refer to [custom_parser.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/model/parser/custom_parser.py).
 
@@ -524,6 +533,7 @@ response_text, response_status = GeminiClient.send_request("Give me some informa
 response = GeminiClient.generate_custom_content("Give me some information about the USA.", *custom_parser)
 ```
 
+https://github.com/dsdanielpark/Gemini-API/blob/31b842488bbc5429ad9c74b1d8b00e20d94e8cb1/gemini/client.py#L323
 <br>
 
 ## Further
@@ -571,12 +581,9 @@ If you want to develop your own simple code, you can start from [this simple cod
 <br>
 
 ## Google Open-source LLMs
+
 If you have sufficient GPU resources, you can download weights directly instead of using the Gemini API to generate content. Consider Gemma and Code Gemma, an open-source models **available for on-premises use**.
-| Model         | Type              | Access                              | Details                                                                                                           |
-|:---------------:|:-------------------:|:-------------------------------------:|-------------------------------------------------------------------------------------------------------------------|
-| [Gemini](https://huggingface.co/google/gemma-7b)    | 🔐<br>Proprietary       | API only<br>[Official API](https://aistudio.google.com), [Unofficial API](https://github.com/dsdanielpark/Gemini-API)                        | A proprietary multimodal AI by Google DeepMind, Gemini includes advanced models like Gemini Pro and Gemini Pro Vision. Access to Gemini is limited to API use, and further insights can be gathered from the [paper](https://arxiv.org/abs/2312.11805) and the [website](https://deepmind.google/technologies/gemini/#introduction) |
-| [Gemma](https://huggingface.co/google/gemma-7b)     | 🤝<br>Open Source       | [Downloadable](https://huggingface.co/google/gemma-7b), [Free API](https://github.com/dsdanielpark/Gemini-API?tab=readme-ov-file#utilize-free-open-source-llm-api-through-open-router)                        | An open-source, text-to-text language model, Gemma is ideal for tasks like question answering and summarization. The model's weights are downloadable for on-premises use, and details are available in the [paper](https://arxiv.org/abs/2403.08295), on the [website](https://ai.google.dev/gemma/docs) |
-| [Code Gemma](https://huggingface.co/google/codegemma-7b-it) | 🤝<br>Open Source       | [Downloadable](https://huggingface.co/google/codegemma-7b-it)                        | Specifically designed for coding tasks, Code Gemma is another open-source model from Google. It provides downloadable weights to aid developers with code generation and related tasks. More information can be found in the [paper](https://storage.googleapis.com/deepmind-media/gemma/codegemma_report.pdf?utm_source=substack&utm_medium=email), [blog post](https://huggingface.co/blog/codegemma), and the [hugging-face collection](https://huggingface.co/collections/google/codegemma-release-66152ac7b683e2667abdee11) |
+
 
 
 ### Open-source LLM, [Gemma](https://huggingface.co/google/gemma-7b)
@@ -708,12 +715,19 @@ Core maintainers:
 
 
 ## References
-[1] Github: [acheong08/Bard](https://github.com/acheong08/Bard) <br>
-[2] GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
-[3] Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
-[4] Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[5] Github: [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
-[6] WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[1]: Paper - [Introducing GEMINI: Multimodal Generative Models](https://arxiv.org/abs/2312.11805) <br>
+[2]: Website - [Google DeepMind :: GEMINI Introduction](https://deepmind.google/technologies/gemini/#introduction) <br>
+[3]: Paper - [GEMMA: A Unified Language Model for Text Generation, Understanding, Translation, Coding, and Math.]() <br>
+[4]: Website - [AI at Google :: GEMS Documentation](https://ai.google.dev/gemma/docs) <br>
+[5]: Report - [CodeGMMA: Large Language Models Can Write Realistic Programming Assignments](https://storage.googleapis.com/deepmind-media/gemma/codegemma_report.pdf?utm_source=substack&utm_medium=email) <br>
+[6]: Blog Post - [Announcing CodeGen: Building Better Developers’ Tools Using LLMs](https://huggingface.co/blog/codegen) <br>
+[7]: Collection - [Google :: CodeGen Release](https://huggingface.co/collections/google/codegen-release-5d0f4c4eaedbc5cefcfdcbdf) <br>
+[8]: Github - [acheong08/Bard](https://github.com/acheong08/Bard) <br>
+[9]: GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[10]: Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
+[11]: Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
+[12]: Github: [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
+[13]: WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 
 > *Warning*
