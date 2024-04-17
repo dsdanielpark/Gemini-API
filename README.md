@@ -142,10 +142,7 @@ pip install -q -U python-gemini-api
 
 ## Quick Start
 
-
-*Simple usage*
-
-Generate content: returns parsed response.
+**Generate content:** returns parsed response.
 ```python
 from gemini import Gemini
 
@@ -156,7 +153,7 @@ response = GeminiClient.generate_content("Hello, Gemini. What's the weather like
 response.payload
 ```
 
-Generate content from image: you can use image as input.
+**Generate content from image:** you can use image as input.
 ```python
 from gemini import Gemini
 
