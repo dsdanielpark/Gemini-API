@@ -59,6 +59,7 @@ class Gemini:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
         """
+        self._request_count = 0
         self._nonce = None  # SNlM0e nonce value
         self._sid = None  # session id
         self._rcid = None  # response candidate id
@@ -74,6 +75,10 @@ class Gemini:
         self.session = session or self._initialize_session()
         self.base_url: str = URLs.BASE_URL.value
         self.parser = ResponseParser(cookies=self.cookies)
+
+    @property
+    def request_count(self) -> int:
+        return self._request_count
 
     @property
     def nonce(self) -> Optional[str]:
@@ -226,6 +231,7 @@ class Gemini:
         self, prompt: str, image: Union[bytes, str] = None
     ) -> Tuple[str, int]:
         """Sends a request and returns the response text and status code."""
+        self._request_count += 1
         params = self._construct_params(self._sid)
         data = self._construct_payload(prompt, image, self._nonce)
         response = self.session.post(
