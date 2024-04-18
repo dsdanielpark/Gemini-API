@@ -720,11 +720,11 @@ Core maintainers:
 [6]: Blog Post - [Announcing CodeGen: Building Better Developers’ Tools Using LLMs](https://huggingface.co/blog/codegen) <br>
 [7]: Collection - [Google :: CodeGen Release](https://huggingface.co/collections/google/codegen-release-5d0f4c4eaedbc5cefcfdcbdf) <br>
 [8]: Github - [acheong08/Bard](https://github.com/acheong08/Bard) <br>
-[9]: GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
-[10]: Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
-[11]: Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[12]: Github: [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
-[13]: WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[9]: GitHub - [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[10]: Github - [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
+[11]: Github - [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
+[12]: Github - [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
+[13]: WebSite - [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 
 > *Warning*
