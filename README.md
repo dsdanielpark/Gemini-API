@@ -86,6 +86,7 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
 <br>
 
 ## What is [Python-Gemini-API](https://github.com/dsdanielpark/Gemini-API)?
+
 This is a Python wrapper derived from the [Bard API](https://github.com/dsdanielpark/Bard-API) project, designed to retrieve responses from Gemini Web in REST format. 
 
 ## Installation 📦
@@ -99,6 +100,9 @@ For the updated version, use as follows:
 ```
 pip install -q -U python-gemini-api
 ```
+
+
+
 ## Authentication
 
 1. Visit https://gemini.google.com/ <br>
