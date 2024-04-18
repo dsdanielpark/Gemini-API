@@ -509,6 +509,7 @@ response2 = GeminiClient.generate_content("How long does it take from LA to New 
 In Gemini, generate_content returns the first response. This may vary depending on length or sorting. Therefore, you can specify the index of the chosen response from 0 to *n* as follows. However, if there is only one response, revert it back to 0.
 ```python
 from gemini import GeminiModelOutput
+
 GeminiModelOutput.chosen = 1 # default is 0
 response_choice_1 = GeminiClient.generate_content("Give me some information about the USA.")
 
@@ -553,8 +554,8 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ### Reusable session object
 For standard cases, use Gemini class; for exceptions, use session objects. When creating a new bot Gemini server, adjust Headers.MAIN.
 ```python
-from gemini import Gemini, Headers
 import requests
+from gemini import Gemini, Headers
 
 cookies = {} 
 
