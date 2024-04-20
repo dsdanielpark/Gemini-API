@@ -86,6 +86,7 @@ Gemini is a family of generative AI models developed by Google DeepMind that is 
 <br>
 
 ## What is [Python-Gemini-API](https://github.com/dsdanielpark/Gemini-API)?
+
 This is a Python wrapper derived from the [Bard API](https://github.com/dsdanielpark/Bard-API) project, designed to retrieve responses from Gemini Web in REST format. 
 
 ## Installation 📦
@@ -99,6 +100,9 @@ For the updated version, use as follows:
 ```
 pip install -q -U python-gemini-api
 ```
+
+
+
 ## Authentication
 
 1. Visit https://gemini.google.com/ <br>
@@ -187,7 +191,7 @@ os.environ["GEMINI_ULTRA"] = "1"      # Switch to Gemini-advanced response (Expe
 <br>
 
 ### # 01. Initialization
-Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check this sample cookie file. [[cookies_sample.txt]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.txt), [[cookies_sample.json]](https://github.com/dsdanielpark/Gemini-API/blob/main/cookies_sample.json)
+Please explicitly declare `cookies` in dict format. You can also enter the path to the file containing the cookie with `cookie_fp`(*.json, *.txt supported). Check sample cookie files in [assets](https://github.com/dsdanielpark/Gemini-API/tree/main/assets) folder.
 
 
 
@@ -505,6 +509,7 @@ response2 = GeminiClient.generate_content("How long does it take from LA to New 
 In Gemini, generate_content returns the first response. This may vary depending on length or sorting. Therefore, you can specify the index of the chosen response from 0 to *n* as follows. However, if there is only one response, revert it back to 0.
 ```python
 from gemini import GeminiModelOutput
+
 GeminiModelOutput.chosen = 1 # default is 0
 response_choice_1 = GeminiClient.generate_content("Give me some information about the USA.")
 
@@ -549,8 +554,8 @@ GeminiClient.generate_content("Hello, Gemini. Give me a beautiful photo of Seoul
 ### Reusable session object
 For standard cases, use Gemini class; for exceptions, use session objects. When creating a new bot Gemini server, adjust Headers.MAIN.
 ```python
-from gemini import Gemini, Headers
 import requests
+from gemini import Gemini, Headers
 
 cookies = {} 
 
@@ -715,11 +720,11 @@ Core maintainers:
 [6]: Blog Post - [Announcing CodeGen: Building Better Developers’ Tools Using LLMs](https://huggingface.co/blog/codegen) <br>
 [7]: Collection - [Google :: CodeGen Release](https://huggingface.co/collections/google/codegen-release-5d0f4c4eaedbc5cefcfdcbdf) <br>
 [8]: Github - [acheong08/Bard](https://github.com/acheong08/Bard) <br>
-[9]: GitHub: [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
-[10]: Github: [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
-[11]: Github: [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
-[12]: Github: [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
-[13]: WebSite: [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
+[9]: GitHub - [HanaokaYuzu/Gemini-API](https://github.com/HanaokaYuzu/Gemini-API) <br>
+[10]: Github - [dsdanielpark/Bard-API](https://github.com/dsdanielpark/Bard-API) <br>
+[11]: Github - [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai) <br>
+[12]: Github - [OpenRouter](https://github.com/OpenRouterTeam/openrouter-runner) <br>
+[13]: WebSite - [Google AI Studio](https://ai.google.dev/tutorials/ai-studio_quickstart) <br>
 
 
 > *Warning*
