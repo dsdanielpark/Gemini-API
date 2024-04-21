@@ -5,6 +5,11 @@ OpenRouter offers free access to various open-source Large Language Models (LLMs
 > [!IMPORTANT]
 > The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models) (Free limit: 10 requests/minute)
 
+## Features
+
+- **Asynchronous API Calls**: Makes use of Python's `asyncio` and `aiohttp` to perform asynchronous API calls.
+- **Concurrent Completions**: Ability to handle multiple chat completions concurrently.
+- **Error Handling**: Basic error handling for API keys and message formatting.
 
 <br>
 
@@ -140,11 +145,6 @@ For the Gemini API, due to issues like rate limiting and blocking, sync objects 
 
 The `OpenRouter` class is designed to manage API interactions with OpenRouter for creating chat completions using AI models asynchronously. This class utilizes `aiohttp` for asynchronous network calls.
 
-## Features
-
-- **Asynchronous API Calls**: Makes use of Python's `asyncio` and `aiohttp` to perform asynchronous API calls.
-- **Concurrent Completions**: Ability to handle multiple chat completions concurrently.
-- **Error Handling**: Basic error handling for API keys and message formatting.
 
 
 ## Class Usage
@@ -197,7 +197,6 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-This README provides a basic guide to setting up and using the `OpenRouter` class, including how to send asynchronous requests for single and multiple chat completions. You can include this README file in your project directory to help users understand and use your asynchronous API client effectively.
 
 ### More Examples
 
