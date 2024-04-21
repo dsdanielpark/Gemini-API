@@ -1,7 +1,6 @@
 # OpenRouter: Free Open-Source LLMs API
 
-
-OpenRouter offers free access to various open-source Large Language Models (LLMs), allowing you to explore and experiment with these powerful models without incurring any charges.
+OpenRouter offers free access to various open-source Large Language Models (LLMs), allowing you to explore and experiment with these powerful models without incurring any charges. After contacting Open Route via Discord, they have confirmed that there are no plans to switch the free models to paid ones for the time being. (2024-04)
 
 > [!IMPORTANT]
 > The free models may be temporary and subject to change based on policies. Please refer to the following page to check the available free models: [Open Router Models](https://openrouter.ai/docs#models) (Free limit: 10 requests/minute)
@@ -131,6 +130,74 @@ prompt = "Give me infomation of Seoul, Korea."
 response = toppy_client.create_chat_completion(prompt)
 print(response)
 ```
+
+
+<br><br><br>
+
+# OpenRouter Async API Client
+
+For the Gemini API, due to issues like rate limiting and blocking, sync objects are preferred over async, as async can be easily neutralized. However, since OpenRouter reliably provides open-source LLMs, you can use the asynchronous implementation as follows.
+
+The `OpenRouter` class is designed to manage API interactions with OpenRouter for creating chat completions using AI models asynchronously. This class utilizes `aiohttp` for asynchronous network calls.
+
+## Features
+
+- **Asynchronous API Calls**: Makes use of Python's `asyncio` and `aiohttp` to perform asynchronous API calls.
+- **Concurrent Completions**: Ability to handle multiple chat completions concurrently.
+- **Error Handling**: Basic error handling for API keys and message formatting.
+
+
+## Class Usage
+
+### Initialization
+
+Initialize an instance of `OpenRouter` with your model identifier and API key:
+
+```python
+from open_router_async import OpenRouter
+
+api_key = 'your_api_key_here'
+model = 'google/gemma-7b-it:free'
+router = OpenRouter(model, api_key)
+```
+
+### Single Chat Completion
+
+To generate a single chat completion asynchronously:
+
+```python
+import asyncio
+
+async def main():
+    completion = await router.create_chat_completion("Hello, how can I help you today?")
+    print(completion)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Multiple Chat Completions
+
+To handle multiple chat completions concurrently:
+
+```python
+import asyncio
+
+async def main():
+    messages = [
+        "Hello, how can I help you today?",
+        "What is the weather like today?",
+        "Can you recommend some books?"
+    ]
+    completions = await router.create_multi_chat_completions(messages)
+    for completion in completions:
+        print(completion)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+This README provides a basic guide to setting up and using the `OpenRouter` class, including how to send asynchronous requests for single and multiple chat completions. You can include this README file in your project directory to help users understand and use your asynchronous API client effectively.
 
 ### More Examples
 

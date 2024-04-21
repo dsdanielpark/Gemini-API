@@ -1,4 +1,5 @@
 import requests
+from const import FreeModel
 from typing import List, Optional
 from requests.models import Response
 
@@ -21,17 +22,6 @@ class OpenRouter:
     Raises:
         ValueError: If an API key is not provided or if the message format is incorrect.
     """
-
-    FREE_MODEL_LIST: List[str] = [
-        "google/gemma-7b-it:free",
-        "huggingfaceh4/zephyr-7b-beta:free",
-        "mistralai/mistral-7b-instruct:free",
-        "openrouter/cinematika-7b:free",
-        "undi95/toppy-m-7b:free",
-        "gryphe/mythomist-7b:free",
-        "nousresearch/nous-capybara-7b:free",
-        "openchat/openchat-7b:free",
-    ]
 
     def __init__(self, model: str, api_key: str) -> None:
         """
@@ -132,7 +122,7 @@ class OpenRouter:
         """
         Checks if the specified model is in the list of free models.
         """
-        if model not in self.FREE_MODEL_LIST:
+        if model not in FreeModel:
             print(
                 "This model may not be free. Please check the following list for costs.\nUsers are responsible for API costs. Visit https://openrouter.ai/docs#models"
             )
