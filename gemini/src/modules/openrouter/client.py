@@ -1,5 +1,5 @@
 import requests
-from const import FreeModel
+from .const import FREE_MODELS
 from typing import List, Optional
 from requests.models import Response
 
@@ -122,7 +122,7 @@ class OpenRouter:
         """
         Checks if the specified model is in the list of free models.
         """
-        if model not in FreeModel:
+        if model not in FREE_MODELS:
             print(
                 "This model may not be free. Please check the following list for costs.\nUsers are responsible for API costs. Visit https://openrouter.ai/docs#models"
             )

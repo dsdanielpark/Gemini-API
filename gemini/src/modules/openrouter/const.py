@@ -10,3 +10,5 @@ class FreeModel(Enum):
     MYTHOMIST_7B = "gryphe/mythomist-7b:free"
     CAPYBARA_7B = "nousresearch/nous-capybara-7b:free"
     OPENCHAT_7B = "openchat/openchat-7b:free"
+
+FREE_MODELS = {member.value for member in FreeModel}
