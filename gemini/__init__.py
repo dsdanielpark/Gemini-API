@@ -32,7 +32,7 @@ except ImportError as e:
 
 gemini_api_key = environ.get("GEMINI_COOKIES")
 
-__version__ = "2.4.5"
+__version__ = "2.4.6"
 __author__ = (
     "daniel park <parkminwoo1991@gmail.com>, antonio cheang <teapotv8@proton.me>, "
     "HanaokaYuzu, CBoYXD, veonua, thewh1teagle, jjkoh95, yihong0618, nishantchauhan949, MeemeeLab, kota113, "
