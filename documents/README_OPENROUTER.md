@@ -179,7 +179,7 @@ if __name__ == "__main__":
 ```python
 from gemini import AsyncOpenRouter
 
-payload = await GemmaClient.create_chat_completion("Give me infomation of Seoul, Korea.")
+payload = await router.create_chat_completion("Give me infomation of Seoul, Korea.")
 ```
 
 ### Multiple Chat Completions
@@ -195,7 +195,7 @@ async def main():
         "What is the weather like today?",
         "Can you recommend some books?"
     ]
-    completions = await GemmaClient.create_multi_chat_completions(messages)
+    completions = await router.create_multi_chat_completions(messages)
     for completion in completions:
         print(completion)
 
@@ -210,7 +210,7 @@ messages = [
         "Can you recommend some books?"
     ]
 
-completions = await GemmaClient.create_multi_chat_completions(messages)
+completions = await router.create_multi_chat_completions(messages)
 
 # Print completions
 for completion in completions:
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 ```python
 from gemini import AsyncOpenRouter
 
-payload = await GemmaClient.generate_content("Give me infomation of Seoul, Korea.")
+payload = await router.generate_content("Give me infomation of Seoul, Korea.")
 ```
 
 ### More Examples
