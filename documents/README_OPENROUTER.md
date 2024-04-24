@@ -145,20 +145,20 @@ For the Gemini API, due to issues like rate limiting and blocking, sync objects 
 
 The `OpenRouter` class is designed to manage API interactions with OpenRouter for creating chat completions using AI models asynchronously. This class utilizes `aiohttp` for asynchronous network calls.
 
+<br>
 
-
-## Class Usage
+## Usage
 
 ### Initialization
 
 Initialize an instance of `OpenRouter` with your model identifier and API key:
 
 ```python
-from open_router_async import OpenRouter
+from gemini import AsyncOpenRouter
 
 api_key = 'your_api_key_here'
 model = 'google/gemma-7b-it:free'
-router = OpenRouter(model, api_key)
+router = AsyncOpenRouter(model, api_key)
 ```
 
 ### Single Chat Completion
@@ -169,11 +169,17 @@ To generate a single chat completion asynchronously:
 import asyncio
 
 async def main():
-    completion = await router.create_chat_completion("Hello, how can I help you today?")
+    completion = await router.create_chat_completion("Give me infomation of Seoul, Korea.")
     print(completion)
 
 if __name__ == "__main__":
     asyncio.run(main())
+```
+
+```python
+from gemini import AsyncOpenRouter
+
+payload = await GemmaClient.create_chat_completion("Give me infomation of Seoul, Korea.")
 ```
 
 ### Multiple Chat Completions
@@ -185,11 +191,11 @@ import asyncio
 
 async def main():
     messages = [
-        "Hello, how can I help you today?",
+        ""Give me infomation of Seoul, Korea.",
         "What is the weather like today?",
         "Can you recommend some books?"
     ]
-    completions = await router.create_multi_chat_completions(messages)
+    completions = await GemmaClient.create_multi_chat_completions(messages)
     for completion in completions:
         print(completion)
 
@@ -197,6 +203,41 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+```python
+messages = [
+        "Give me infomation of Seoul, Korea.",
+        "What is the weather like today?",
+        "Can you recommend some books?"
+    ]
+
+completions = await GemmaClient.create_multi_chat_completions(messages)
+
+# Print completions
+for completion in completions:
+    print("-"*20)
+    print(completion)
+```
+
+### Generate Content
+
+To generate a single chat completion asynchronously:
+
+```python
+import asyncio
+
+async def main():
+    completion = await router.generate_content("Give me infomation of Seoul, Korea.")
+    print(completion)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+```python
+from gemini import AsyncOpenRouter
+
+payload = await GemmaClient.generate_content("Give me infomation of Seoul, Korea.")
+```
 
 ### More Examples
 
