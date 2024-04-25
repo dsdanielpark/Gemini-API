@@ -156,7 +156,7 @@ Initialize an instance of `OpenRouter` with your model identifier and API key:
 ```python
 from gemini import AsyncOpenRouter
 
-api_key = 'your_api_key_here'
+api_key = '<your_api_key>'
 model = 'google/gemma-7b-it:free'
 router = AsyncOpenRouter(model, api_key)
 ```
@@ -184,14 +184,15 @@ payload = await router.create_chat_completion("Give me infomation of Seoul, Kore
 
 ### Multiple Chat Completions
 
-To handle multiple chat completions concurrently:
+To handle multiple chat completions concurrently in various programming environments, you can follow these approaches:
 
+*Python Script*
 ```python
 import asyncio
 
 async def main():
     messages = [
-        ""Give me infomation of Seoul, Korea.",
+        "Give me infomation of Seoul, Korea.",
         "What is the weather like today?",
         "Can you recommend some books?"
     ]
@@ -203,6 +204,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+*IPython Example*
 ```python
 messages = [
         "Give me infomation of Seoul, Korea.",
@@ -216,6 +218,25 @@ completions = await router.create_multi_chat_completions(messages)
 for completion in completions:
     print("-"*20)
     print(completion)
+```
+
+*Command Line Interface (CLI) Script*
+```python
+import asyncio
+
+async def main(messages):
+    completions = await router.create_multi_chat_completions(messages)
+    for completion in completions:
+        print(completion)
+
+def get_user_input():
+    input_string = input("Enter your messages, separated by commas:\n")
+    messages = [message.strip() for message in input_string.split(',')]
+    return messages
+
+if __name__ == "__main__":
+    user_messages = get_user_input()
+    asyncio.run(main(user_messages))
 ```
 
 ### Generate Content
