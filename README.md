@@ -19,10 +19,9 @@ https://github.com/dsdanielpark/Gemini-API/assets/81407603/e0c11d4f-3fe1-4cbb-ba
 
 
 
-A *unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), operates through reverse-engineering, utilizing cookie values to interact with [Google Gemini](https://gemini.google.com) for users struggling with frequent authentication problems or unable to authenticate via [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en).
+An **unofficial* Python wrapper, [python-gemini-api](https://pypi.org/project/python-gemini-api/), is available for users facing frequent authentication issues or unable to use [Google Authentication](https://developers.google.com/identity/protocols/oauth2?hl=en). This wrapper uses cookie values to interact with [Google Gemini](https://gemini.google.com) through reverse-engineering. The project involved a collaboration with [Antonio Cheong](https://github.com/acheong08).
 
-Collaborated competently with [Antonio Cheong](https://github.com/acheong08).
-
+On the official side, Google provides partially free, clean [official Gemini APIs and SDKs](https://aistudio.google.com/), which can be accessed and utilized neatly via Python packages, [google-generativeai](https://pypi.org/project/google-generativeai/). 
 <br>
 
 <br>
