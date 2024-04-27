@@ -1,10 +1,7 @@
 # Automatically generated using PDM. Do not edit manually. 
 requests
-colorama
 httpx[http2]>=0.20.0
-langdetect
-deep_translator
-google-cloud-translate
 browser_cookie3
 loguru
 pydantic
+aiohttp

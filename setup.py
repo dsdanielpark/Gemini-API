@@ -30,6 +30,7 @@ setup(
         "browser_cookie3",
         "loguru",
         "pydantic",
+        "aiohttp",
     ],
     extras_require={
         "voice": [
