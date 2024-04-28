@@ -21,6 +21,9 @@ This section aims to implement functionalities of the Gemini API. While there ar
     - [Using Gemini asynchronously](#using-gemini-asynchronously)
     - [Translation to Another Programming Language](#translation-to-another-programming-language)
     - [Post-processing: max\_token, max\_sentence](#post-processing-max_token-max_sentence)
+  - [Release Notes](#release-notes)
+      - [v2.4.7](#v247)
+      - [v2.4.8](#v248)
 
 
 ### Chat Gemini
@@ -123,3 +126,15 @@ max_sentence(response, 2)
 
 <br>
 
+
+
+## Release Notes
+Write a rough draft of the Gemini API release notes.
+
+#### v2.4.7 
+- Fixed missing aiohttp dependency for open router async client
+- Cleaned up requirements import.
+
+#### v2.4.8
+- Add verification(`verify`) argument in `Gemini` class.
+- Add cookies argument in `GeminiImage` class.
