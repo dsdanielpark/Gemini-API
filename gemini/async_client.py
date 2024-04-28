@@ -2,14 +2,13 @@
 import os
 import re
 import json
-import time
 import httpx
 import random
 import string
 import urllib
 import asyncio
 import requests
-from typing import Optional, Any, List
+from typing import Optional
 
 from gemini.src.misc.constants import (
     URLs,
