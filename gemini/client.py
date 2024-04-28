@@ -13,7 +13,13 @@ from .src.misc.utils import upload_image, load_cookies
 from .src.model.parser.response_parser import ResponseParser
 from .src.model.output import GeminiCandidate, GeminiModelOutput
 from .src.model.parser.custom_parser import ParseMethod1, ParseMethod2
-from .src.misc.exceptions import GeminiAPIError
+from .src.misc.exceptions import (
+    GeminiAPIError,
+    PackageError,
+    TimeoutError,
+    RateLimitException,
+    ContentGenerationException,
+)
 
 from .src.misc.constants import (
     URLs,
@@ -26,24 +32,30 @@ from .src.misc.constants import (
 
 class Gemini:
     """
-    A class to manage interactions with a web service, handling sessions, cookies, and proxies.
+    This class facilitates interactions with a web service by managing sessions, cookies, and proxy configurations.
 
     Attributes:
-        auto_cookies (bool): Whether to automatically manage cookies.
-        cookies (Dict[str, str]): A dictionary of cookies.
-        proxies (dict): A dictionary of proxy settings.
-        timeout (int): The timeout for requests.
-        session (requests.Session): The session for making requests.
-        base_url (str): The base URL for the web service.
+        auto_cookies (bool): If set to True, cookies are managed automatically.
+        cookies (dict[str, str]): Stores the cookies used in HTTP requests.
+        proxies (dict[str, str]): Proxy settings for the HTTP requests.
+        timeout (int): Timeout in seconds for HTTP requests.
+        session (requests.Session): The session used for HTTP requests.
+        base_url (str): The base URL of the web service.
+        target_cookies (list): Specific cookies targeted for operations if auto_cookies is enabled.
+        verify (bool): If True, the SSL certificate is verified. Defaults to True.
 
     Parameters:
-        session (Optional[requests.Session]): An existing requests session, if any.
-        cookies (Optional[Dict[str, str]]): Initial cookies to use, if any.
-        cookie_fp (str): File path to load cookies from, if `auto_cookies` is True.
-        auto_cookies (bool): Automatically manage cookies if True.
-        timeout (int): Timeout for requests, defaults to 30 seconds.
-        proxies (Optional[dict]): Proxy configuration for requests, if any.
-        rcid (str): Response candidate ID.
+        session (Optional[requests.Session]): An existing session, if any.
+        cookies (Optional[dict[str, str]]): Initial cookies, if any.
+        cookie_fp (str): File path to load cookies from if `auto_cookies` is set.
+        auto_cookies (bool): Enables automatic cookie management when True.
+        target_cookies (list): List of cookie names to manage if `auto_cookies` is set.
+        timeout (int): Request timeout; defaults to 30 seconds.
+        proxies (Optional[dict[str, str]]): Proxy settings, if any.
+
+    Raises:
+        ConnectionError: If there is a problem with the network connection.
+        TimeoutError: If the request times out.
     """
 
     def __init__(
@@ -55,6 +67,7 @@ class Gemini:
         target_cookies: List = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
+        verify: bool = True,
     ) -> None:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
@@ -75,6 +88,7 @@ class Gemini:
         self.session = session or self._initialize_session()
         self.base_url: str = URLs.BASE_URL.value
         self.parser = ResponseParser(cookies=self.cookies)
+        self.verify = True  # Default is True
 
     @property
     def request_count(self) -> int:
@@ -101,11 +115,7 @@ class Gemini:
         self,
     ) -> requests.Session:
         """
-        Initializes a new session with headers, cookies, and optionally loads cookies from a file.
-
-        Parameters:
-            cookies (Optional[Dict[str, str]]): Cookies to add to the session.
-            cookie_fp (Optional[str]): Path to a file from which to load cookies.
+        Initializes a sync session.
 
         Returns:
             requests.Session: The initialized session.
@@ -140,7 +150,7 @@ class Gemini:
             response = requests.get(f"{URLs.BASE_URL.value}/app", cookies=self.cookies)
             if response.status_code != 200:
                 raise GeminiAPIError(
-                    f"Gemini API Error: Response code {response.status_code}\nExcessive connections may have temporarily blocked your account/IP, but web UI should remain accessible."
+                    f"Gemini API Error: Response code {response.status_code}\nDetails:\n{response}\n\nExcessive connections may have temporarily blocked your account/IP, but web UI should remain accessible."
                 )
 
             response.raise_for_status()
@@ -240,6 +250,7 @@ class Gemini:
             data=data,
             timeout=self.timeout,
             proxies=self.proxies,
+            verify=self.verify,
         )
         self._reqid += 100000
         response.raise_for_status()
@@ -291,7 +302,7 @@ class Gemini:
         )
 
     @staticmethod
-    def collect_candidates(data):
+    def collect_candidates(data: dict) -> list:
         """
         Collects candidate data from parsed response.
 
