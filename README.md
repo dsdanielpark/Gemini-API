@@ -409,7 +409,6 @@ client = Gemini(cookies=cookies)
 image_client = GeminiImage(cookies=cookies)
 
 response = client.generate_content("Create illustrations of Seoul, South Korea.")
-
 response_images = response.web_images # Check generated images [Dict]
 
 await image_client.save(response_images, "output")
