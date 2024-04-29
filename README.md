@@ -741,7 +741,13 @@ You can find most help on the [FAQ](https://github.com/dsdanielpark/Gemini-API/b
 Sincerely grateful for any reports on new features or bugs. Your valuable feedback on the code is highly appreciated. Frequent errors may occur due to changes in Google's service API interface. Both [Issue reports](https://github.com/dsdanielpark/Gemini-API/issues) and [Pull requests](https://github.com/dsdanielpark/Gemini-API/pulls) contributing to improvements are always welcome. We strive to maintain an active and courteous open community.
 
 ## Contributors
+
+<p align="center"><i>dig the well before you are thirsty.</i></p>
+
+
 We would like to express our sincere gratitude to all the contributors. 
+
+
 
 This package aims to re-implement the functionality of the [Bard API](https://github.com/dsdanielpark/Bard-API/), which has been archived for the contributions of the beloved open-source community, despite Gemini's official API already being available.
 
