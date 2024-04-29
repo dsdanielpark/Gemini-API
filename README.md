@@ -297,14 +297,13 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
 response = client.generate_content("Create illustrations of Seoul, South Korea.")
 generated_images = response.generated_images # Check generated images [Dict]
 
-await image_client.save(generated_images, "output")
-# image_data_dict = await image_client.fetch_images_dict(generated_images)
-# await image_client.save_images(image_data_dict, "output")
+await GeminiImage.save(generated_images, "output", cookies)
+# image_data_dict = await GeminiImage.fetch_images_dict(generated_images, cookies)
+# await GeminiImage.save_images(image_data_dict, "output")
 ```
 
 
@@ -320,8 +319,7 @@ await image_client.save(generated_images, "output")
   
   cookies = {}
   client = Gemini(cookies=cookies)
-  image_client = GeminiImage(cookies=cookies)
-  bytes_images_dict = image_client.fetch_images_dict_sync(generated_images) # Get bytes images dict
+  bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
   
   for image_name, image_bytes in bytes_images_dict.items():
       print(image_name)
@@ -336,16 +334,15 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
 response = client.generate_content("Create illustrations of Seoul, South Korea.")
 generated_images = response.generated_images # Check generated images [Dict]
 
-image_client.save_sync(generated_images, save_path="output")
+GeminiImage.save_sync(generated_images, save_path="output")
 
 # You can use byte type image dict for printing images as follow:
-# bytes_images_dict = image_client.fetch_images_dict_sync(generated_images) # Get bytes images dict
-# image_client.save_images_sync(bytes_images_dict, path="output") # Save to dir
+# bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
+# GeminiImage.save_images_sync(bytes_images_dict, path="output") # Save to dir
 ```
 
 *Async downloader wrapper*
@@ -356,10 +353,9 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
-async def save_generated_imagse(generated_imagse, save_path="output"):
-    await image_client.save(generated_imagse, save_path=save_path)
+async def save_generated_imagse(generated_imagse, save_path="output", cookies=cookies):
+    await GeminiImage.save(generated_imagse, save_path=save_path, cookies=cookies)
 
 # Run the async function
 if __name__ == "__main__":
@@ -376,17 +372,16 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
-async def save_generated_imagse(generated_imagse, save_path="output"):
-    image_data_dict = await image_client.fetch_images_dict(generated_imagse)  # Get bytes images dict asynchronously
-    await image_client.save_images(image_data_dict, save_path=save_path)  
+async def save_generated_imagse(generated_imagse, save_path="output", cookies=cookies):
+    image_data_dict = await GeminiImage.fetch_images_dict(generated_imagse, cookies)  # Get bytes images dict asynchronously
+    await GeminiImage.save_images(image_data_dict, save_path=save_path)  
 
 # Run the async function
 if __name__ == "__main__":
     cookies = {"key" : "value"}
     generated_imagse = response.generated_imagse  # Check response images [Dict]
-    asyncio.run(save_generated_imagse(generated_imagse, save_path="output"))
+    asyncio.run(save_generated_imagse(generated_imagse, save_path="output", cookies=cookies))
 ```
 
 </details>
@@ -406,14 +401,13 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
-response = client.generate_content("Create illustrations of Seoul, South Korea.")
-response_images = response.web_images # Check generated images [Dict]
+response = client.generate_content("Give me picture of Stanford.")
+response_images = response.web_images # Check generated images
 
-await image_client.save(response_images, "output")
-# image_data_dict = await image_client.fetch_images_dict(response_images)
-# await image_client.save_images(image_data_dict, "output")
+await GeminiImage.save(response_images, "output")
+# image_data_dict = await GeminiImage.fetch_images_dict(response_images)
+# await GeminiImage.save_images(image_data_dict, "output")
 ```
 
 <details><summary>Further</summary>
@@ -425,16 +419,15 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
 response = client.generate_content("Please recommend a travel itinerary for Seoul.")
-response_images = response.web_images # Check response images [Dict]
+response_images = response.web_images # Check response images
 
-GeminiImage.save_sync(response_images, save_path="output")
+GeminiImage.save_sync(response_images, save_path="output", cookies=cookies)
 
 # You can use byte type image dict as follow:
-# bytes_images_dict = image_client.fetch_bytes_sync(response_images) # Get bytes images dict
-# image_client.save_images_sync(bytes_images_dict, save_path="output") # Save to path
+# bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images, cookies) # Get bytes images dict
+# GeminiImage.save_images_sync(bytes_images_dict, save_path="output") # Save to path
 ```
 
 *Async downloader wrapper*
@@ -444,10 +437,9 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
 async def save_response_web_imagse(response_images, save_path="output"):
-    await image_client.save(response_images, save_path=save_path)
+    await GeminiImage.save(response_images, save_path=save_path)
 
 # Run the async function
 if __name__ == "__main__":
@@ -464,11 +456,10 @@ from gemini import Gemini, GeminiImage
 
 cookies = {}
 client = Gemini(cookies=cookies)
-image_client = GeminiImage(cookies=cookies)
 
 async def save_response_web_imagse(response_images, save_path="output"):
-    image_data_dict = await image_client.fetch_images_dict(response_images)  # Get bytes images dict asynchronously
-    await image_client.save_images(image_data_dict, save_path=save_path)  
+    image_data_dict = await GeminiImage.fetch_images_dict(response_images)  # Get bytes images dict asynchronously
+    await GeminiImage.save_images(image_data_dict, save_path=save_path)  
 
 # Run the async function
 if __name__ == "__main__":
