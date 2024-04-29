@@ -112,7 +112,9 @@ class GeminiImage(BaseModel):
             Optional[bytes]: The bytes of the image, or None if fetching fails.
         """
         try:
-            async with httpx.AsyncClient(follow_redirects=True, cookies=cookies, proxies=proxies) as client:
+            async with httpx.AsyncClient(
+                follow_redirects=True, cookies=cookies, proxies=proxies
+            ) as client:
                 response = await client.get(str(url))
                 response.raise_for_status()
                 return response.content
