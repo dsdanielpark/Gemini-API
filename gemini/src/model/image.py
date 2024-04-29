@@ -50,7 +50,7 @@ class GeminiImage(BaseModel):
                 "Input is empty. Please provide images infomation to proceed."
             )
 
-    # Async downloader
+    # Async
     @classmethod
     async def save(
         cls,
@@ -73,9 +73,33 @@ class GeminiImage(BaseModel):
         image_data = await cls.fetch_images_dict(images, cookies)
         await cls.save_images(image_data, save_path)
 
+    # Sync
+    @staticmethod
+    def save_sync(
+        images: List["GeminiImage"],
+        save_path: str = "cached",
+        cookies: Optional[dict] = None,
+    ) -> Optional[Path]:
+        """Synchronously saves the image to the specified path.
+
+        Args:
+            path (str): The directory where the image will be saved.
+            filename (str, optional): The filename for the saved image. If not provided,
+                a filename is generated based on the image title.
+            cookies (dict, optional): Cookies to be used for downloading the image.
+
+        Returns:
+            Optional[Path]: The path where the image is saved, or None if saving fails.
+        """
+        image_data = GeminiImage.fetch_images_dict_sync(images, cookies)
+        GeminiImage.validate_images(image_data)
+        GeminiImage.save_images_sync(image_data, save_path)
+
+    ##### Main functions are above. The code below handles special cases for transmitting byte images.
+
     @staticmethod
     async def fetch_bytes(
-        url: HttpUrl, cookies: Optional[dict] = None
+        url: HttpUrl, cookies: Optional[dict] = None, proxies: Optional[dict] = None
     ) -> Optional[bytes]:
         """
         Fetches bytes of an image asynchronously.
@@ -88,8 +112,8 @@ class GeminiImage(BaseModel):
             Optional[bytes]: The bytes of the image, or None if fetching fails.
         """
         try:
-            async with httpx.AsyncClient(follow_redirects=True) as client:
-                response = await client.get(str(url), cookies=cookies)
+            async with httpx.AsyncClient(follow_redirects=True, cookies=cookies, proxies=proxies) as client:
+                response = await client.get(str(url))
                 response.raise_for_status()
                 return response.content
         except Exception as e:
@@ -135,28 +159,6 @@ class GeminiImage(BaseModel):
                 print(f"Saved {title} to {filepath}")
             except Exception as e:
                 print(f"Error saving {title}: {str(e)}")
-
-    # Sync downloader
-    @staticmethod
-    def save_sync(
-        images: List["GeminiImage"],
-        cookies: Optional[dict] = None,
-        save_path: str = "cached",
-    ) -> Optional[Path]:
-        """Synchronously saves the image to the specified path.
-
-        Args:
-            path (str): The directory where the image will be saved.
-            filename (str, optional): The filename for the saved image. If not provided,
-                a filename is generated based on the image title.
-            cookies (dict, optional): Cookies to be used for downloading the image.
-
-        Returns:
-            Optional[Path]: The path where the image is saved, or None if saving fails.
-        """
-        image_data = GeminiImage.fetch_images_dict_sync(images, cookies)
-        GeminiImage.validate_images(image_data)
-        GeminiImage.save_images_sync(image_data, save_path)
 
     @staticmethod
     def fetch_bytes_sync(

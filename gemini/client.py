@@ -223,7 +223,7 @@ class Gemini:
                                 image
                                 and [
                                     prompt,
-                                    int(os.getenv("GEMINI_ULTRA" or 0)),
+                                    int(os.getenv("GEMINI_ULTRA", "0")),
                                     None,
                                     [[[upload_image(image), 1]]],
                                 ]

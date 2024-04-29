@@ -91,7 +91,7 @@ class ResponseParser(BaesParser):
                 continue
 
         raise ValueError(
-            "All parsing strategies failed. Try to use `Gemini.send_request(prompt)` to get original payload."
+            "Google PeerSide authentication may have expired. Refresh the cookie manually and retry the test.\nDetails: All parsing strategies failed. Try to use `Gemini.send_request(prompt)` to get original payload"
         )
 
     def __extract_strategy_1(self, response_text: str) -> Dict:
