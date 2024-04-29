@@ -711,8 +711,11 @@ The free model list includes:
 ## Sponsor
 
 <p align="left">
-  <img src="assets/crawlbase.png" width="240">
+  <a href="https://crawlbase.com/">
+    <img src="assets/crawlbase.png" width="240">
+  </a>
 </p>
+
 
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
