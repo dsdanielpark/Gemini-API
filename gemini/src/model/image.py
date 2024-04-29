@@ -1,13 +1,12 @@
-# Will be refactored.
 import os
-import httpx
 import random
+import httpx
 import asyncio
 import datetime
 from pathlib import Path
 from loguru import logger
-from pydantic import BaseModel, HttpUrl
 from typing import List, Optional, Dict
+from pydantic import BaseModel, HttpUrl
 
 
 class GeminiImage(BaseModel):
@@ -18,38 +17,25 @@ class GeminiImage(BaseModel):
         url (HttpUrl): The URL of the image.
         title (str): The title of the image. Defaults to "[Image]".
         alt (str): The alt text of the image. Defaults to "".
-        cookies (Optional[Dict[str, str]]): Optional cookies to be used for fetching the image.
-            This parameter is required if you want to fetch generated images.
 
     Methods:
-        validate_images(images: List["GeminiImage"]) -> bool:
-            Validates the input images list.
-        save(images: List["GeminiImage"], save_path: str = "cached", cookies: Optional[dict] = None) -> Optional[Path]:
+        validate_images(cls, images): Validates the input images list.
+        save(cls, images: List["GeminiImage"], save_path: str = "cached", cookies: Optional[dict] = None) -> Optional[Path]:
             Downloads and saves images asynchronously.
         fetch_bytes(url: HttpUrl, cookies: Optional[dict] = None) -> Optional[bytes]:
             Fetches bytes of an image asynchronously.
-        fetch_images_dict(images: List["GeminiImage"], cookies: Optional[dict] = None) -> Dict[str, bytes]:
+        fetch_images_dict(cls, images: List["GeminiImage"], cookies: Optional[dict] = None) -> Dict[str, bytes]:
             Fetches images asynchronously and returns a dictionary of image data.
-        save_images(image_data: Dict[str, bytes], save_path: str = "cached"):
+        save_images(cls, image_data: Dict[str, bytes], save_path: str = "cached"):
             Saves images locally.
     """
 
     url: HttpUrl
     title: str = "[Image]"
     alt: str = ""
-    cookies: Optional[Dict[str, str]] = None
 
-    def __init__(self, cookies: Optional[Dict[str, str]] = None):
-        """
-        Initialize GeminiImage with optional cookies.
-
-        Args:
-            cookies (Optional[Dict[str, str]]): Optional cookies to be used for fetching the image.
-                *This parameter is required if you want to fetch `generated images`.
-        """
-        self.cookies = cookies
-
-    def validate_images(self, images):
+    @classmethod
+    def validate_images(cls, images):
         """
         Validates the input images list.
 
@@ -61,14 +47,16 @@ class GeminiImage(BaseModel):
         """
         if not images:
             raise ValueError(
-                "Input is empty. Please provide GeminiOutput formatted images list to proceed."
+                "Input is empty. Please provide images infomation to proceed."
             )
 
     # Async downloader
+    @classmethod
     async def save(
-        self,
+        cls,
         images: List["GeminiImage"],
         save_path: str = "cached",
+        cookies: Optional[dict] = None,
     ) -> Optional[Path]:
         """
         Downloads and saves images asynchronously.
@@ -81,9 +69,9 @@ class GeminiImage(BaseModel):
         Returns:
             Optional[Path]: The path to the directory where the images are saved, or None if saving fails.
         """
-        self.validate_images(images)
-        image_data = await self.fetch_images_dict(images, self.cookies)
-        await self.save_images(image_data, save_path)
+        cls.validate_images(images)
+        image_data = await cls.fetch_images_dict(images, cookies)
+        await cls.save_images(image_data, save_path)
 
     @staticmethod
     async def fetch_bytes(
@@ -108,8 +96,9 @@ class GeminiImage(BaseModel):
             print(f"Failed to download {url}: {str(e)}")
             return None
 
+    @classmethod
     async def fetch_images_dict(
-        self, images: List["GeminiImage"], cookies: Optional[dict] = None
+        cls, images: List["GeminiImage"], cookies: Optional[dict] = None
     ) -> Dict[str, bytes]:
         """
         Fetches images asynchronously and returns a dictionary of image data.
@@ -121,8 +110,8 @@ class GeminiImage(BaseModel):
         Returns:
             Dict[str, bytes]: A dictionary containing image titles as keys and image bytes as values.
         """
-        self.validate_images(images)
-        tasks = [self.fetch_bytes(image.url, cookies=cookies) for image in images]
+        cls.validate_images(images)
+        tasks = [cls.fetch_bytes(image.url, cookies=cookies) for image in images]
         results = await asyncio.gather(*tasks)
         return {image.title: result for image, result in zip(images, results) if result}
 
@@ -148,9 +137,10 @@ class GeminiImage(BaseModel):
                 print(f"Error saving {title}: {str(e)}")
 
     # Sync downloader
+    @staticmethod
     def save_sync(
-        self,
         images: List["GeminiImage"],
+        cookies: Optional[dict] = None,
         save_path: str = "cached",
     ) -> Optional[Path]:
         """Synchronously saves the image to the specified path.
@@ -164,7 +154,7 @@ class GeminiImage(BaseModel):
         Returns:
             Optional[Path]: The path where the image is saved, or None if saving fails.
         """
-        image_data = GeminiImage.fetch_images_dict_sync(images, self.cookies)
+        image_data = GeminiImage.fetch_images_dict_sync(images, cookies)
         GeminiImage.validate_images(image_data)
         GeminiImage.save_images_sync(image_data, save_path)
 

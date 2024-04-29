@@ -6,6 +6,10 @@ pyproject.toml
 test2.ipynb
 test3.ipynb
 
+*.png
+*.jpg
+*.jpeg
+
 venv
 
 # Byte-compiled / optimized / DLL files

@@ -2,15 +2,19 @@ import json
 import requests
 from typing import Union
 from gemini.src.misc.constants import Headers
+from typing import Dict, Union
 
 
-def load_cookies(file_path):
+def load_cookies(file_path: str) -> Dict:
     """
     Reads a text file and tries to parse it into a Python dictionary.
     Assumes the file might contain a cookies string or is in JSON format.
 
-    :param file_path: Path to the file containing cookie data
-    :return: A dictionary containing cookie data
+    Args:
+        file_path (str): Path to the file containing cookie data.
+
+    Returns:
+        Dict: A dictionary containing cookie data.
     """
     with open(file_path, "r") as file:
         content = file.read().strip()
@@ -102,14 +106,14 @@ def upload_image(file: Union[bytes, str]) -> str:
 
 def max_token(text: str, n: int) -> str:
     """
-    Return the first 'n' tokens (words) of the given text.
+    Return the first `n` words, not actual token, of the given text.
 
     Args:
         text (str): The input text to be processed.
         n (int): The number of tokens (words) to be included in the result.
 
     Returns:
-        str: The first 'n' tokens from the input text.
+        str: The first `n` tokens from the input text.
     """
     if not isinstance(text, str):
         raise ValueError("Input 'text' must be a valid string.")
