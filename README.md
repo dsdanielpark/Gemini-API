@@ -37,7 +37,8 @@ On the official side, Google provides partially free, clean [official Gemini API
 ## Contents
 
 - [ Gemini API   ](#-gemini-api---)
-  - [What is Gemini? 🔐](#what-is-gemini)
+  - [What is Gemini? 🔒](#what-is-gemini)
+  - [What is Python-Gemini-API? 🔐](#what-is-python-gemini-api)
   - [Installation ✅](#installation-)
   - [Authentication ✅](#authentication)
   - [Quick Start ✅](#quick-start)
@@ -54,7 +55,8 @@ On the official side, Google provides partially free, clean [official Gemini API
     - [# 10. Changing the Selected Response from 0 to *n*](#-10-changing-the-selected-response-from-0-to-n)
     - [# 11. Generate custom content](#-11-generate-custom-content)
   - [Further](#further)
-  - [Google Open-source LLMs](#google-open-source-llms)
+  - [Google Proprietary LLM, Gemini 🔒](#google-proprietary-llm-gemini)
+  - [Google Open-source LLMs 🤝](#google-open-source-llms)
       - [Open-source LLM, Gemma 🤝](#open-source-llm-gemma)
       - [Open-source LLM, Code Gemma 🤝](#open-source-llm-code-gemma)
   - [Utilize free open-source LLM API through Open Router ✅](#utilize-free-open-source-llm-api-through-open-router)
@@ -625,14 +627,37 @@ If you want to develop your own simple code, you can start from [this simple cod
 
 <br>
 
+---
+
+<br>
+
+## Google Proprietary LLM, [Gemini](https://gemini.google.com/app) 
+
+#### Official API
+
+Prepare necessary items and obtain an API key at [Google AI Studio](https://aistudio.google.com/app/apikey). Install on Python 3.9 or higher and enter the issued API key. Refer to the [tutorial](https://ai.google.dev/gemini-api/docs/get-started/python) for details.
+
+```
+pip install -q -U google-generativeai
+```
+```python
+import google.generativeai as genai
+
+GOOGLE_API_KEY="<your_gemini_api_key>"
+genai.configure(api_key=GOOGLE_API_KEY)
+
+model = genai.GenerativeModel('gemini-pro')
+response = model.generate_content("Write me a poem about Machine Learning.")
+
+print(response.text)
+```
+
 ## Google Open-source LLMs
 
 If you have sufficient GPU resources, you can download weights directly instead of using the Gemini API to generate content. Consider Gemma and Code Gemma, an open-source models **available for on-premises use**.
 
 
-
 ### Open-source LLM, [Gemma](https://huggingface.co/google/gemma-7b)
-
 
 Gemma models are Google's lightweight, advanced text-to-text, decoder-only language models, derived from Gemini research. Available in English, they offer open weights and variants, ideal for tasks like question answering and summarization. For more infomation, visit [Gemma-7b](https://huggingface.co/google/gemma-7b) model card.
 
@@ -672,6 +697,10 @@ print(tokenizer.decode(outputs[0]))
 
 <br>
 
+---
+
+<br>
+
 
 ## Utilize free open-source LLM API through [Open Router](https://openrouter.ai/)
 OpenRouter offers temporary free inference for select models. Obtain an API key from [Open Router API](https://openrouter.ai/keys) and check free models at [Open Router models](https://openrouter.ai/docs#models). Use models with a 0-dollar token cost primarily; other models may incur charges. See more at [free open-source LLM API guide](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md).
@@ -701,8 +730,6 @@ The free model list includes:
    - `undi95/toppy-m-7b:free` - [Undi95/Toppy-M-7B](https://huggingface.co/Undi95/Toppy-M-7B?not-for-all-audiences=true)
    - `gryphe/mythomist-7b:free` - [Gryphe/MythoMist-7b](https://huggingface.co/Gryphe/MythoMist-7b)
    - `nousresearch/nous-capybara-7b:free` - [NousResearch/Nous-Capybara-7B-V1](https://huggingface.co/NousResearch/Nous-Capybara-7B-V1) from Nous Research
-
-
 
 
 
