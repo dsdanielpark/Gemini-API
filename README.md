@@ -230,7 +230,7 @@ from gemini import Gemini
 cookies = {}
 client = Gemini(cookies=cookies)
 
-prompt = "Hello, Gemini. What's the weather like in Seoul today?"
+prompt = "Tell me about Large Language Model."
 response = client.generate_content(prompt)
 print(response.payload)
 ```
@@ -264,7 +264,7 @@ from gemini import Gemini
 cookies = {} 
 client = Gemini(cookies=cookies) 
 
-response_text, response_status = client.send_request("Hello, Gemini. What's the weather like in Seoul today?")
+response_text, response_status = client.send_request("Hello, Gemini. Tell me about Large Language Models.")
 print(response_text)
 ```
 You can track the total number of requests made by accessing the `request_count` property within the `Gemini` class.
@@ -279,7 +279,7 @@ from gemini import Gemini
 cookies = {}
 client = Gemini(cookies=cookies)
 
-prompt = "Hello, Gemini. What's the weather like in Seoul today?"
+prompt = "Hello, Gemini. Tell me about Large Language Models."
 response = client.generate_content(prompt)
 print(response.text)
 ```
@@ -298,7 +298,7 @@ from gemini import Gemini, GeminiImage
 cookies = {}
 client = Gemini(cookies=cookies)
 
-response = client.generate_content("Create illustrations of Seoul, South Korea.")
+response = client.generate_content("Hello, Gemini. Tell me about Large Language Models.")
 generated_images = response.generated_images # Check generated images [Dict]
 
 await GeminiImage.save(generated_images, "output", cookies)
@@ -338,7 +338,7 @@ client = Gemini(cookies=cookies)
 response = client.generate_content("Create illustrations of Seoul, South Korea.")
 generated_images = response.generated_images # Check generated images [Dict]
 
-GeminiImage.save_sync(generated_images, save_path="output")
+GeminiImage.save_sync(generated_images, save_path="output", cookies=cookies)
 
 # You can use byte type image dict for printing images as follow:
 # bytes_images_dict = GeminiImage.fetch_images_dict_sync(generated_images, cookies) # Get bytes images dict
@@ -349,19 +349,20 @@ GeminiImage.save_sync(generated_images, save_path="output")
 
 ```python
 import asyncio
-from gemini import Gemini, GeminiImage
+from gemini import GeminiImage
 
-cookies = {}
-client = Gemini(cookies=cookies)
-
-async def save_generated_imagse(generated_imagse, save_path="output", cookies=cookies):
-    await GeminiImage.save(generated_imagse, save_path=save_path, cookies=cookies)
+async def save_generated_images(generated_images, save_path="output", cookies=cookies):
+    await GeminiImage.save(generated_images, save_path=save_path, cookies=cookies)
 
 # Run the async function
 if __name__ == "__main__":
-    cookies = {"key" : "value"}
-    generated_imagse = response.generated_imagse  
-    asyncio.run(save_generated_imagse(generated_imagse, save_path="output"))
+    cookies = {}
+    client = Gemini(cookies=cookies)
+
+    response = client.generate_content("Create illustrations of Seoul, South Korea.")
+
+    generated_images = response.generated_images  
+    asyncio.run(save_generated_images(generated_images, save_path="output", cookies=cookies))
 ```
 
 `GeminiImage.save` method logic
@@ -370,18 +371,19 @@ if __name__ == "__main__":
 import asyncio
 from gemini import Gemini, GeminiImage
 
-cookies = {}
-client = Gemini(cookies=cookies)
-
-async def save_generated_imagse(generated_imagse, save_path="output", cookies=cookies):
-    image_data_dict = await GeminiImage.fetch_images_dict(generated_imagse, cookies)  # Get bytes images dict asynchronously
+async def save_generated_images(generated_images, save_path="output", cookies=cookies):
+    image_data_dict = await GeminiImage.fetch_images_dict(generated_images, cookies)  # Get bytes images dict asynchronously
     await GeminiImage.save_images(image_data_dict, save_path=save_path)  
 
 # Run the async function
 if __name__ == "__main__":
-    cookies = {"key" : "value"}
-    generated_imagse = response.generated_imagse  # Check response images [Dict]
-    asyncio.run(save_generated_imagse(generated_imagse, save_path="output", cookies=cookies))
+    cookies = {}
+    client = Gemini(cookies=cookies)
+
+    response = client.generate_content("Create illustrations of Seoul, South Korea.")
+
+    generated_images = response.generated_images 
+    asyncio.run(save_generated_images(generated_images, save_path="output", cookies=cookies))
 ```
 
 </details>
@@ -402,7 +404,7 @@ from gemini import Gemini, GeminiImage
 cookies = {}
 client = Gemini(cookies=cookies)
 
-response = client.generate_content("Give me picture of Stanford.")
+response = client.generate_content("Give me a picture of Stanford.")
 response_images = response.web_images # Check generated images
 
 await GeminiImage.save(response_images, "output")
@@ -420,13 +422,13 @@ from gemini import Gemini, GeminiImage
 cookies = {}
 client = Gemini(cookies=cookies)
 
-response = client.generate_content("Please recommend a travel itinerary for Seoul.")
+response = client.generate_content("Give me a picture of Stanford.")
 response_images = response.web_images # Check response images
 
-GeminiImage.save_sync(response_images, save_path="output", cookies=cookies)
+GeminiImage.save_sync(response_images, save_path="output")
 
 # You can use byte type image dict as follow:
-# bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images, cookies) # Get bytes images dict
+# bytes_images_dict = GeminiImage.fetch_bytes_sync(response_images) # Get bytes images dict
 # GeminiImage.save_images_sync(bytes_images_dict, save_path="output") # Save to path
 ```
 
@@ -434,16 +436,14 @@ GeminiImage.save_sync(response_images, save_path="output", cookies=cookies)
 ```python
 import asyncio
 from gemini import Gemini, GeminiImage
-
-cookies = {}
-client = Gemini(cookies=cookies)
-
+   
 async def save_response_web_imagse(response_images, save_path="output"):
     await GeminiImage.save(response_images, save_path=save_path)
 
-# Run the async function
 if __name__ == "__main__":
-    cookies = {"key" : "value"}
+    cookies = {}
+    client = Gemini(cookies=cookies)
+    response = client.generate_content("Give me a picture of Stanford.")
     response_images = response.web_images  
     asyncio.run(save_response_web_imagse(response_images, save_path="output"))
 ```
@@ -454,16 +454,16 @@ if __name__ == "__main__":
 import asyncio
 from gemini import Gemini, GeminiImage
 
-cookies = {}
-client = Gemini(cookies=cookies)
-
 async def save_response_web_imagse(response_images, save_path="output"):
     image_data_dict = await GeminiImage.fetch_images_dict(response_images)  # Get bytes images dict asynchronously
     await GeminiImage.save_images(image_data_dict, save_path=save_path)  
 
 # Run the async function
 if __name__ == "__main__":
-    response_images = response.web_images  # Check response images [Dict]
+    cookies = {}
+    client = Gemini(cookies=cookies)
+    response = client.generate_content("Give me a picture of Stanford.")
+    response_images = response.web_images 
     asyncio.run(save_response_web_imagse(response_images, save_path="output"))
 ```
 
@@ -480,7 +480,7 @@ image = 'folder/image.jpg'
 
 # Image file path or Byte-formatted image array
 response = client.generate_content("What does the text in this image say?", image=image)
-response.response_dict
+print(response)
 ```
 
 <br>
@@ -610,7 +610,7 @@ for key, value in cookies.items():
     session.cookies.update({key: value})
 
 client = Gemini(session=session) # You can use various args
-response = client.generate_content("Hello, Gemini. What's the weather like in Seoul today?")
+response = client.generate_content("Hello, Gemini. Tell me about Large Language Model.")
 ```
 
 
@@ -711,8 +711,11 @@ The free model list includes:
 ## Sponsor
 
 <p align="left">
-  <img src="assets/crawlbase.png" width="240">
+  <a href="https://crawlbase.com/">
+    <img src="assets/crawlbase.png" width="240">
+  </a>
 </p>
+
 
 Use [Crawlbase](https://crawlbase.com/) API for efficient data scraping to train AI models, boasting a 98% success rate and 99.9% uptime. It's quick to start, GDPR/CCPA compliant, supports massive data extraction, and is trusted by 70k+ developers.
 
