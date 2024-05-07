@@ -793,13 +793,6 @@ I do not plan to actively curate this repository. Please review [HanaokaYuzu/Gem
 Thank you, and have a great day.
 </details>
 
-## Contacts
-
-Core maintainers:
-- [Antonio Cheong](https://github.com/acheong08) / teapotv8@proton.me <br>
-- [Daniel Park](https://github.com/DSDanielPark) / parkminwoo1991@gmail.com
- 
-
 
 ## License ©️ 
 [MIT](https://opensource.org/license/mit/) license, 2024. We hereby strongly disclaim any explicit or implicit legal liability related to our works. Users are required to use this package responsibly and at their own risk. This project is a personal initiative and is not affiliated with or endorsed by Google. It is recommended to use Google's official API.
