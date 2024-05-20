@@ -67,14 +67,14 @@ class Gemini:
         target_cookies: List = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
-        verify: bool = True,
+        verify: bool = True, # Try to use if needed.
     ) -> None:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
         """
         self._request_count = 0
         self._nonce = None  # SNlM0e nonce value
-        self._sid = None  # session id
+        self._sid = None  # session id, try to use if needed.
         self._rcid = None  # response candidate id
         self._rid = None  # response id
         self._cid = None  # candidate id
@@ -125,7 +125,7 @@ class Gemini:
         if self.cookies:
             session.cookies.update(self.cookies)
         elif self.cookie_fp:
-            self._set_cookies_from_file(self.cookie_fp)
+            session = self._set_cookies_from_file(session, self.cookie_fp)
         elif self.auto_cookies == True:
             self._set_cookies_automatically()
 
@@ -133,14 +133,15 @@ class Gemini:
 
         return session
 
-    def _set_cookies_from_file(self, file_path: str) -> None:
+    def _set_cookies_from_file(self, session: requests.Session, file_path: str) -> None:
         """Loads cookies from a file and updates the session."""
         try:
-            cookies = load_cookies(file_path)
+            self.cookies = load_cookies(file_path)
         except Exception as e:
             raise Exception(f"Failed to load cookies from {file_path}: {e}")
 
-        self.session.cookies.update(cookies)
+        session.cookies.update(self.cookies)
+        return session
 
     def _set_sid_and_nonce(self):
         """
@@ -161,8 +162,8 @@ class Gemini:
             if sid_match:
                 self._sid = sid_match.group(1)
             else:
-                raise ValueError(
-                    "Failed to parse SID value from the response.\nRefresh the Gemini web page or access Gemini in a new incognito browser to resend cookies. \nIf issue continues, export browser cookies, set manually. See auth section 3."
+                print(
+                    "Skip FdrFJe value."
                 )
             if nonce_match:
                 self._nonce = nonce_match.group(1)
@@ -194,7 +195,7 @@ class Gemini:
                 "hl": os.environ.get("GEMINI_LANGUAGE", "en"),
                 "_reqid": self._reqid,
                 "rt": "c",
-                "f.sid": sid,
+                # "f.sid": sid, # Try to use if needed.
             }
         )
 
