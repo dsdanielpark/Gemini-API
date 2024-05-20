@@ -30,7 +30,15 @@ On the official side, Google provides partially free, clean [official Gemini API
 > [!TIP]
 > | 2024-03-26 | [[See Code Examples]](https://github.com/dsdanielpark/Gemini-API/blob/main/documents/README_OPENROUTER.md)
 > 
-> Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute) 
+> Check out temporarily free Open-source LLM APIs with Open Router.  (Free limit: 10 requests/minute)
+>
+> 
+> | 2024-05-20 | There are some changes in logic depending on the region/country (IP) and account. Users need to check the following to find the appropriate logic for themselves. The package remains suitable for the most common use cases.
+> - `BOT_SERVER` params in [const.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/misc/constants.py)
+> - `self._sid` in [client.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/client.py)
+> - `self._rcid` in [client.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/client.py)
+> - Parsing method in [response_parser.py](https://github.com/dsdanielpark/Gemini-API/blob/main/gemini/src/model/parser/response_parser.py)
+
 
 <br>
 
