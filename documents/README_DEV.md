@@ -138,3 +138,8 @@ Write a rough draft of the Gemini API release notes.
 #### v2.4.8
 - Add verification(`verify`) argument in `Gemini` class.
 - Add cookies argument in `GeminiImage` class.
+
+#### v2.4.9 ~ v2.4.11
+- Writes mostly private test code for errors and tests functionality.
+- Rechecks robust implementation of parsing methods.
+- Preparing to upgrade to major version three after a small patch.
