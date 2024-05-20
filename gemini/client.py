@@ -67,7 +67,7 @@ class Gemini:
         target_cookies: List = None,
         timeout: int = 30,
         proxies: Optional[dict] = None,
-        verify: bool = True, # Try to use if needed.
+        verify: bool = True,  # Try to use if needed.
     ) -> None:
         """
         Initializes the Gemini object with session, cookies, and other configurations.
@@ -162,9 +162,7 @@ class Gemini:
             if sid_match:
                 self._sid = sid_match.group(1)
             else:
-                print(
-                    "Skip FdrFJe value."
-                )
+                print("Skip FdrFJe value.")
             if nonce_match:
                 self._nonce = nonce_match.group(1)
             else:
